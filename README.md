@@ -6,7 +6,7 @@
 | フォルダ | 対象 | 内容 | 状態 |
 |---|---|---|---|
 | [api-test/](api-test/README.md) | WebAPI（HTTP） | 図書貸出 API（Go + Oracle）、oapi2wire による WireMock モック、生成・契約・シナリオテスト、PL/SQL 前後処理、runnora-docgen による手順書 | 作成済み |
-| grpc-test/ | gRPC | gRPC アプリのテストセット | 作成予定 |
+| [grpc-test/](grpc-test/README.md) | gRPC | Go 製の図書照会サービスに対する Unary / Server streaming の E2E runbook と runnora-docgen 手順書 | 作成済み |
 
 ## 前提とするフォルダ配置
 

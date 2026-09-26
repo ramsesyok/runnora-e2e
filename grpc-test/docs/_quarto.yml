@@ -1,0 +1,17 @@
+project:
+  type: book
+  output-dir: _book
+book:
+  title: gRPC E2E テスト手順書
+  chapters:
+    - index.qmd
+    - unary.qmd
+    - server-streaming.qmd
+lang: ja
+format:
+  html:
+    toc: true
+    css: design-doc.css
+filters:
+  - workflow-layout.lua
+  - design-doc.lua

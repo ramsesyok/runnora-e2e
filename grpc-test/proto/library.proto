@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package sample.library.v1;
+
+service LibraryService {
+  rpc GetBook(GetBookRequest) returns (GetBookResponse);
+  rpc ListBooks(ListBooksRequest) returns (stream Book);
+}
+
+message GetBookRequest {
+  string book_id = 1;
+}
+
+message GetBookResponse {
+  Book book = 1;
+}
+
+message ListBooksRequest {
+  string genre = 1;
+}
+
+message Book {
+  string book_id = 1;
+  string title = 2;
+  string genre = 3;
+  int32 available_copies = 4;
+}
