@@ -158,7 +158,7 @@ runbooks/contract/get_getMember.suite.yml
 - 実 API: 生成 8/8、契約 8/8、シナリオ 7/7 成功、検知確認は期待どおり exit 4
   （`ORA-20100: integrity check failed (1): B0001 available=2 expected=3`）
 - OpenAPI カバレッジ（契約 + シナリオ）: 8/8 operation
-- 手順書: HTML（`docs/_book/`）と PDF（`docs/design-doc.pdf`、112 ページ）を発行
+- 手順書: HTML（`docs/_book/`）と PDF（`docs/design-doc.pdf`、114 ページ）を発行
 - 期待値を 1 項目だけ誤らせた契約ケースが失敗すること（検証が空振りしていないこと）
 
 ## 作成中に分かったこと（ツールへのフィードバック）
