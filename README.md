@@ -180,7 +180,7 @@ runbooks/contract/get_getMember.suite.yml
 | 10 | ddq | PlantUML サーバを 127.0.0.1:18080 で探すため WireMock と衝突する | WireMock 停止後に手順書を生成 |
 | 11 | go-ora | TZ なし `TIMESTAMP` と `SYSTIMESTAMP` の比較がセッション TZ 依存で、go-ora 接続では 9 時間ずれて失敗した | ログ列を `TIMESTAMP WITH TIME ZONE` に |
 | 12 | runn | `loop`（`until` なし）は最後の回の失敗しか報告しない。`runnora generate` の suite（loop + include でケースを回す形）は、ケースを増やすと途中のケースの失敗を見逃す | 契約 suite はケースごとに include ステップを並べる形に変更。`contract-check` が loop の使用も検出 |
-| 13 | runnora-docgen | HTTP 呼び出し表の Query 欄が常に空（runn はクエリを URL に書くが、docgen は `query` キーだけを見ていた）。表のセルで英数字の語が途中改行され、HTML に空白が入る（`tech_a vailable`） | runnora-docgen を修正（[ramsesyok/runnora-docgen#6](https://github.com/ramsesyok/runnora-docgen/pull/6)） |
+| 13 | runnora-docgen | HTTP 呼び出し表の Query 欄が常に空（runn はクエリを URL に書くが、docgen は `query` キーだけを見ていた）。表のセルで英数字の語が途中改行され、HTML に空白が入る（`tech_a vailable`） | runnora-docgen を修正（[ramsesyok/runnora-docgen#6](https://github.com/ramsesyok/runnora-docgen/pull/6) で main にマージ済み） |
 
 OpenAPI 応答検証（`openapi3` ランナー）は、作成時に「`GET /books` 等が 400 を返すのに OpenAPI に未定義」
 という仕様漏れを検出しました（OpenAPI を修正済み）。
