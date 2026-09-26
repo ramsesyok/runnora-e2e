@@ -25,8 +25,8 @@ try {
     New-Item -ItemType Directory -Force $env:RUNNORA_EVIDENCE_DIR | Out-Null
     go build -buildvcs=false -o bin/libraryd.exe ./cmd/libraryd
     if ($LASTEXITCODE -ne 0) { throw 'gRPC サーバのビルドに失敗しました' }
-    go -C $jsondiffProject build -buildvcs=false -o (Join-Path $root 'bin/jsondiff-eps.exe') ./cmd/jsondiff-eps
-    if ($LASTEXITCODE -ne 0) { throw 'jsondiff-eps のビルドに失敗しました' }
+    go -C $jsondiffProject build -buildvcs=false -o (Join-Path $root 'bin/runnora-diff.exe') .
+    if ($LASTEXITCODE -ne 0) { throw 'runnora-diff のビルドに失敗しました' }
     if (-not $runnora) {
         $runnora = Join-Path $root 'bin/runnora.exe'
         go -C $runnoraProject build -buildvcs=false -o $runnora .

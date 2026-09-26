@@ -27,13 +27,13 @@ steps:
 
   compare_without_epsilon:
     exec:
-      command: ./bin/jsondiff-eps.exe --format json cases/series-analysis/expected.json -
+      command: ./bin/runnora-diff.exe --format json cases/series-analysis/expected.json -
       shell: pwsh -NoProfile -Command {0}
       stdin: '{{ toJSON(steps.analyze_series.res.message) }} '
     test: current.exit_code == 1 && fromJSON(current.stdout).summary.differences > 0
   compare_with_epsilon:
     exec:
-      command: ./bin/jsondiff-eps.exe --config cases/series-analysis/tolerances.yaml cases/series-analysis/expected.json -
+      command: ./bin/runnora-diff.exe --config cases/series-analysis/tolerances.yaml cases/series-analysis/expected.json -
       shell: pwsh -NoProfile -Command {0}
       stdin: '{{ toJSON(steps.analyze_series.res.message) }} '
     test: current.stdout == "" && current.stderr == "" && current.exit_code == 0

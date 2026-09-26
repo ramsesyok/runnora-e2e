@@ -34,7 +34,7 @@ grpc-test/
 
 ## 実行
 
-PowerShell で次を実行します。スクリプトがサーバ・runnora・jsondiff-eps をビルドし、サーバ起動後に 4 本の runbook と RPC カバレッジを確認して停止します。
+PowerShell で次を実行します。スクリプトがサーバ・runnora・runnora-diff をビルドし、サーバ起動後に 4 本の runbook と RPC カバレッジを確認して停止します。
 
 ```powershell
 ./scripts/run.ps1
