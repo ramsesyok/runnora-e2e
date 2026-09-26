@@ -148,7 +148,7 @@ runbooks/contract/get_getMember.suite.yml
 - 本文は `compare` で全体一致。実装で変わる項目（貸出 ID・日付）だけ `ignorePaths`（jq 形式）で除外します。
 - モックに流したときの本文比較は同じファイル同士なので、モックで確かめられるのは「正しいケースが選ばれること・ステータス・OpenAPI スキーマ」です。本文の正しさは実 API に流して確かめます。
 - suite はケースごとに include ステップを並べ、`loop` は使いません（下表 #12）。
-- この形の suite を手順書にするには、include の `vars` の `json://` を読む runnora-docgen が必要です（runnora-docgen のブランチ `feature/include-vars-json`）。
+- この形の suite を手順書にするには、include の `vars` の `json://` を読む runnora-docgen が必要です（[ramsesyok/runnora-docgen#4](https://github.com/ramsesyok/runnora-docgen/pull/4) で main にマージ済み）。
 
 ## 検証結果（2026-09-26、Windows 11 / Windows PowerShell 5.1）
 
