@@ -8,9 +8,10 @@ if ($runnora -and -not (Test-Path -LiteralPath $runnora)) { throw "runnora が�
 if (-not $runnora -and -not (Test-Path -LiteralPath (Join-Path $runnoraProject 'go.mod'))) {
     throw "runnora のソースが見つかりません: $runnoraProject"
 }
-$jsondiffProject = Join-Path $projects 'json-diff-with-epsilon'
+$jsondiffProject = [Environment]::GetEnvironmentVariable('RUNNORA_DIFF_SOURCE_DIR')
+if (-not $jsondiffProject) { $jsondiffProject = Join-Path $projects 'runnora-diff' }
 if (-not (Test-Path -LiteralPath (Join-Path $jsondiffProject 'go.mod'))) {
-    throw "json-diff-with-epsilon が見つかりません: $jsondiffProject"
+    throw "runnora-diff のソースが見つかりません: $jsondiffProject"
 }
 
 Push-Location $root
