@@ -1,6 +1,6 @@
 # Unary RPC {.landscape-chapter}
 
-`GetBook` で B0003 を照会し、gRPC ステータスと蔵書の内容を確認する。
+`GetBook` で B0003 を照会する。入力と期待する応答全体は `cases/unary/` の JSON ファイルから読み込む。
 
 {{< include generated/unary/scenario.qmd >}}
 

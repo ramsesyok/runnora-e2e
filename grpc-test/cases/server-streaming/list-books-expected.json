@@ -1,0 +1,17 @@
+{
+  "status": 0,
+  "messages": [
+    {
+      "book_id": "B0003",
+      "title": "Go言語によるWebアプリ開発",
+      "genre": "TECH",
+      "available_copies": 2
+    },
+    {
+      "book_id": "B0004",
+      "title": "データベース入門",
+      "genre": "TECH",
+      "available_copies": 1
+    }
+  ]
+}

@@ -35,13 +35,13 @@ try {
     if (-not $ready) { throw 'gRPC サーバが 127.0.0.1:19090 で起動しませんでした' }
     & $runnora run --config config.yaml --report-format text `
         --report-out (Join-Path $reportDir 'runnora.txt') `
-        runbooks/unary.yml runbooks/server-streaming.yml
+        runbooks/unary.yml runbooks/server-streaming.yml runbooks/calculation-streaming.yml
     if ($LASTEXITCODE -ne 0) {
         Get-Content (Join-Path $reportDir 'runnora.txt')
         throw 'runbook の実行に失敗しました'
     }
     Get-Content (Join-Path $reportDir 'runnora.txt')
-    & $runnora coverage --long runbooks/unary.yml runbooks/server-streaming.yml |
+    & $runnora coverage --long runbooks/unary.yml runbooks/server-streaming.yml runbooks/calculation-streaming.yml |
         Tee-Object -FilePath (Join-Path $reportDir 'coverage.txt')
     if ($LASTEXITCODE -ne 0) { throw 'カバレッジの確認に失敗しました' }
     Write-Host "レポート: $reportDir"

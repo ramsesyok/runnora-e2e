@@ -40,6 +40,9 @@ type server struct {
 	getResponse protoreflect.MessageDescriptor
 	listRequest protoreflect.MessageDescriptor
 	bookMessage protoreflect.MessageDescriptor
+	calcRequest protoreflect.MessageDescriptor
+	calcUpdate  protoreflect.MessageDescriptor
+	calcSummary protoreflect.MessageDescriptor
 }
 
 func main() {
@@ -65,8 +68,12 @@ func main() {
 		getResponse: messages.ByName("GetBookResponse"),
 		listRequest: messages.ByName("ListBooksRequest"),
 		bookMessage: messages.ByName("Book"),
+		calcRequest: messages.ByName("CalculateRequest"),
+		calcUpdate:  messages.ByName("CalculationUpdate"),
+		calcSummary: messages.ByName("CalculationSummary"),
 	}
-	if s.getRequest == nil || s.getResponse == nil || s.listRequest == nil || s.bookMessage == nil {
+	if s.getRequest == nil || s.getResponse == nil || s.listRequest == nil || s.bookMessage == nil ||
+		s.calcRequest == nil || s.calcUpdate == nil || s.calcSummary == nil {
 		log.Fatal("required messages not found in proto")
 	}
 
@@ -78,8 +85,11 @@ func main() {
 	g.RegisterService(&grpc.ServiceDesc{
 		ServiceName: string(svc.FullName()),
 		HandlerType: (*libraryService)(nil),
-		Methods: []grpc.MethodDesc{{MethodName: "GetBook", Handler: s.getBook}},
-		Streams: []grpc.StreamDesc{{StreamName: "ListBooks", Handler: s.listBooks, ServerStreams: true}},
+		Methods:     []grpc.MethodDesc{{MethodName: "GetBook", Handler: s.getBook}},
+		Streams: []grpc.StreamDesc{
+			{StreamName: "ListBooks", Handler: s.listBooks, ServerStreams: true},
+			{StreamName: "Calculate", Handler: s.calculate, ServerStreams: true},
+		},
 	}, s)
 	go func() {
 		ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
@@ -142,4 +152,34 @@ func (s *server) bookValue(b book) *dynamicpb.Message {
 	m.Set(fields.ByName("genre"), protoreflect.ValueOfString(b.genre))
 	m.Set(fields.ByName("available_copies"), protoreflect.ValueOfInt32(b.available))
 	return m
+}
+
+func (s *server) calculate(_ interface{}, stream grpc.ServerStream) error {
+	req := dynamicpb.NewMessage(s.calcRequest)
+	if err := stream.RecvMsg(req); err != nil {
+		return err
+	}
+	values := req.Get(s.calcRequest.Fields().ByName("values")).List()
+	if values.Len() == 0 {
+		return status.Error(codes.InvalidArgument, "values must not be empty")
+	}
+	var total int32
+	for i := 0; i < values.Len(); i++ {
+		total += int32(values.Get(i).Int())
+		update := dynamicpb.NewMessage(s.calcUpdate)
+		fields := s.calcUpdate.Fields()
+		update.Set(fields.ByName("step"), protoreflect.ValueOfInt32(int32(i+1)))
+		update.Set(fields.ByName("running_total"), protoreflect.ValueOfInt32(total))
+		if i == values.Len()-1 {
+			summary := dynamicpb.NewMessage(s.calcSummary)
+			summaryFields := s.calcSummary.Fields()
+			summary.Set(summaryFields.ByName("count"), protoreflect.ValueOfInt32(int32(values.Len())))
+			summary.Set(summaryFields.ByName("total"), protoreflect.ValueOfInt32(total))
+			update.Set(fields.ByName("completion"), protoreflect.ValueOfMessage(summary.ProtoReflect()))
+		}
+		if err := stream.SendMsg(update); err != nil {
+			return fmt.Errorf("send calculation step %d: %w", i+1, err)
+		}
+	}
+	return nil
 }

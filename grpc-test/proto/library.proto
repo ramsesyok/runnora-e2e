@@ -5,6 +5,7 @@ package sample.library.v1;
 service LibraryService {
   rpc GetBook(GetBookRequest) returns (GetBookResponse);
   rpc ListBooks(ListBooksRequest) returns (stream Book);
+  rpc Calculate(CalculateRequest) returns (stream CalculationUpdate);
 }
 
 message GetBookRequest {
@@ -24,4 +25,20 @@ message Book {
   string title = 2;
   string genre = 3;
   int32 available_copies = 4;
+}
+
+message CalculateRequest {
+  repeated int32 values = 1;
+}
+
+message CalculationUpdate {
+  int32 step = 1;
+  int32 running_total = 2;
+  // 中間配信では未設定。最後の配信だけに集計結果を含める。
+  optional CalculationSummary completion = 3;
+}
+
+message CalculationSummary {
+  int32 count = 1;
+  int32 total = 2;
 }

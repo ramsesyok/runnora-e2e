@@ -2,7 +2,7 @@
   "generator": "runnora-docgen",
   "scenario": "Unary RPC で蔵書を1冊取得する",
   "source": "runbooks/unary.yml",
-  "sha256": "b92c9877748d9be38c61ebe5d8fc5e944a643179112cb2720c475956b00624a7",
+  "sha256": "a0c740932742127b4f7db144e832c16648cd5a4a50260c4250c5be95febc2c73",
   "files": [
     "expectations.qmd",
     "grpc-request.qmd",
@@ -13,17 +13,27 @@
     {
       "kind": "runbook",
       "path": "runbooks/unary.yml",
-      "sha256": "b92c9877748d9be38c61ebe5d8fc5e944a643179112cb2720c475956b00624a7"
+      "sha256": "a0c740932742127b4f7db144e832c16648cd5a4a50260c4250c5be95febc2c73"
     },
     {
       "kind": "proto",
       "path": "proto/library.proto",
-      "sha256": "5bb59b2e8df6357ea19e81387e1038434932e2538f67fd8709c1d34fdf6a78fa"
+      "sha256": "baad43452ebc44d2a659f619c04fa672e76e2f940295099db4c47e4bdea81ca0"
+    },
+    {
+      "kind": "json",
+      "path": "cases/unary/get-book-request.json",
+      "sha256": "b5a63b15d778db3abec5430306e18b8bfe3ca96fd2f194844838a1e9626c9195"
+    },
+    {
+      "kind": "json",
+      "path": "cases/unary/get-book-expected.json",
+      "sha256": "7cf7c38b3e90c530c76939a1fa50bcc99bee50cb117eb58e8fb03a84344e8a42"
     },
     {
       "kind": "config",
       "path": "config.yaml",
-      "sha256": "99827be06c34f7974bdc60844f887138ad0a4cf32eb0820bf457adcd45b633b6"
+      "sha256": "07883df8d8280590475df5cb700d3927b3837d695bf4f90905a774fb06cce781"
     }
   ]
 }

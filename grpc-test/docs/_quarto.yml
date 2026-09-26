@@ -7,6 +7,7 @@ book:
     - index.qmd
     - unary.qmd
     - server-streaming.qmd
+    - calculation-streaming.qmd
 lang: ja
 format:
   html:
