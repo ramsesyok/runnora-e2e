@@ -41,10 +41,18 @@ function Invoke-Runnora {
     foreach ($f in $AfterSql) { $runArgs += @('--after-sql', $f) }
     $runArgs += $Runbooks
     $log = Join-Path $ReportDir "$Name.log"
+    $evidenceDir = Join-Path $ReportDir "evidence\$Name"
+    New-Item -ItemType Directory -Force $evidenceDir | Out-Null
+    $previousEvidenceDir = [Environment]::GetEnvironmentVariable('RUNNORA_EVIDENCE_DIR')
     # Windows PowerShell 5.1 では Stop 設定下でネイティブコマンドの stderr が例外になるため一時的に緩める
     $ErrorActionPreference = 'Continue'
-    & $Runnora @runArgs *> $log
-    $code = $LASTEXITCODE
+    try {
+        $env:RUNNORA_EVIDENCE_DIR = $evidenceDir
+        & $Runnora @runArgs *> $log
+        $code = $LASTEXITCODE
+    } finally {
+        [Environment]::SetEnvironmentVariable('RUNNORA_EVIDENCE_DIR', $previousEvidenceDir)
+    }
     $ok = ($code -eq $Expect)
     $mark = if ($ok) { 'OK ' } else { 'NG ' }
     Write-Host ("  [{0}] {1,-28} exit={2} (expect {3})" -f $mark, $Name, $code, $Expect)

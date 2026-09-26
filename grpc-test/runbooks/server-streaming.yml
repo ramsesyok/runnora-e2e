@@ -21,9 +21,15 @@ steps:
     greq:
       sample.library.v1.LibraryService/GetBook:
         message: "{{ vars.get_request }}"
+  dump_get_book:
+    dump:
+      expr: steps.get_book.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/server-streaming-get_book.json'
+  check_get_book:
     test: |
-      current.res.status == vars.get_expected.status &&
-      compare(current.res.message, vars.get_expected.message)
+      steps.get_book.res.status == vars.get_expected.status &&
+      compare(steps.get_book.res.message, vars.get_expected.message)
+
   save_genre:
     desc: Unary応答のジャンルを保存し、JSONファイルの検索条件と照合する
     bind:
@@ -33,7 +39,12 @@ steps:
     greq:
       sample.library.v1.LibraryService/ListBooks:
         message: "{{ vars.list_request }}"
+  dump_list_books:
+    dump:
+      expr: steps.list_books.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/server-streaming-list_books.json'
+  check_list_books:
     test: |
-      current.res.status == vars.list_expected.status &&
+      steps.list_books.res.status == vars.list_expected.status &&
       vars.list_request.genre == genre &&
-      compare(current.res.messages, vars.list_expected.messages)
+      compare(steps.list_books.res.messages, vars.list_expected.messages)

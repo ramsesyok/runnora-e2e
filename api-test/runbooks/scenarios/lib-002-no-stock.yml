@@ -21,10 +21,16 @@ steps:
             application/json:
               memberId: M0001
               bookId: B0002
+  dump_first_loan:
+    dump:
+      expr: steps.first_loan.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/first_loan.json'
+  check_first_loan:
     test: |
-      current.res.status == 201 &&
-      current.res.body.loanId == 1 &&
-      current.res.body.bookId == "B0002"
+      steps.first_loan.res.status == 201 &&
+      steps.first_loan.res.body.loanId == 1 &&
+      steps.first_loan.res.body.bookId == "B0002"
+
   save_first:
     desc: 1件目の貸出IDをfirst_loan_idに保存する
     bind:
@@ -37,9 +43,15 @@ steps:
           headers:
             X-Test-Scenario: LIB-002
           body: null
+  dump_book_empty:
+    dump:
+      expr: steps.book_empty.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/book_empty.json'
+  check_book_empty:
     test: |
-      current.res.status == 200 &&
-      current.res.body.availableCopies == 0
+      steps.book_empty.res.status == 200 &&
+      steps.book_empty.res.body.availableCopies == 0
+
   available_novels:
     desc: 貸出可能な小説の検索結果からB0002が消えることを確認する
     req:
@@ -48,10 +60,16 @@ steps:
           headers:
             X-Test-Scenario: LIB-002
           body: null
+  dump_available_novels:
+    dump:
+      expr: steps.available_novels.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/available_novels.json'
+  check_available_novels:
     test: |
-      current.res.status == 200 &&
-      current.res.body.total == 1 &&
-      current.res.body.items[0].bookId == "B0001"
+      steps.available_novels.res.status == 200 &&
+      steps.available_novels.res.body.total == 1 &&
+      steps.available_novels.res.body.items[0].bookId == "B0001"
+
   second_loan_rejected:
     desc: 別会員M0002が同じ本を借りようとすると409 NO_STOCKになる
     req:
@@ -63,9 +81,15 @@ steps:
             application/json:
               memberId: M0002
               bookId: B0002
+  dump_second_loan_rejected:
+    dump:
+      expr: steps.second_loan_rejected.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/second_loan_rejected.json'
+  check_second_loan_rejected:
     test: |
-      current.res.status == 409 &&
-      current.res.body.code == "NO_STOCK"
+      steps.second_loan_rejected.res.status == 409 &&
+      steps.second_loan_rejected.res.body.code == "NO_STOCK"
+
   db_no_extra_loan:
     desc: 拒否された貸出がDBに作られていないことを確認する
     db:
@@ -81,9 +105,15 @@ steps:
             X-Test-Scenario: LIB-002
           body:
             application/json: {}
+  dump_return_first:
+    dump:
+      expr: steps.return_first.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/return_first.json'
+  check_return_first:
     test: |
-      current.res.status == 200 &&
-      current.res.body.status == "RETURNED"
+      steps.return_first.res.status == 200 &&
+      steps.return_first.res.body.status == "RETURNED"
+
   second_loan_ok:
     desc: 返却後はM0002が借りられ、新しい貸出IDが採番される
     req:
@@ -95,10 +125,16 @@ steps:
             application/json:
               memberId: M0002
               bookId: B0002
+  dump_second_loan_ok:
+    dump:
+      expr: steps.second_loan_ok.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/second_loan_ok.json'
+  check_second_loan_ok:
     test: |
-      current.res.status == 201 &&
-      current.res.body.loanId == first_loan_id + 1 &&
-      current.res.body.memberId == "M0002"
+      steps.second_loan_ok.res.status == 201 &&
+      steps.second_loan_ok.res.body.loanId == first_loan_id + 1 &&
+      steps.second_loan_ok.res.body.memberId == "M0002"
+
   book_empty_again:
     desc: 再び貸出可能冊数が0になったことを確認する
     req:
@@ -107,6 +143,11 @@ steps:
           headers:
             X-Test-Scenario: LIB-002
           body: null
+  dump_book_empty_again:
+    dump:
+      expr: steps.book_empty_again.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/book_empty_again.json'
+  check_book_empty_again:
     test: |
-      current.res.status == 200 &&
-      current.res.body.availableCopies == 0
+      steps.book_empty_again.res.status == 200 &&
+      steps.book_empty_again.res.body.availableCopies == 0

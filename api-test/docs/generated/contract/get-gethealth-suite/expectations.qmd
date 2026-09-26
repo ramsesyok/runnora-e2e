@@ -4,12 +4,13 @@ sha256: 793c48067b5360acd4d0700d43329ac0468ae5de984ba58505e2aca009c8dfd3
 -->
 
 ::: {.landscape}
-::: {.tbl caption="期待値・検証条件（契約 getHealth 稼働状態を確認する（モック・実APIの両方で実行する）／手順 1）" label="tbl-exp-df40abd0" widths="18,20,62" merge-cols="all" breakable-rows="true"}
+::: {.tbl caption="期待値・検証条件（契約 getHealth 稼働状態を確認する（モック・実APIの両方で実行する）／手順 3）" label="tbl-exp-fbac2d61" widths="18,20,62" merge-cols="all" breakable-rows="true"}
 +--------------------+----------------------------+--------------------------------------------------------------------------+
 | 区分               | 出典                       | 内容                                                                     |
 +====================+============================+==========================================================================+
-| 検証式             | get_getHealth\             | current.res.status == vars.case.expect.status &&                         |
-|                    | .template.yml:26           | compare(current.res.body, vars.expected, vars.case.expect.ignorePaths)   |
+| 検証式             | get_getHealth\             | steps.call_api.res.status == vars.case.expect.status &&                  |
+|                    | .template.yml:35           | compare(steps.call_api.res.body, vars.expected,                          |
+|                    |                            | vars.case.expect.ignorePaths)                                            |
 |                    |                            |                                                                          |
 +--------------------+----------------------------+--------------------------------------------------------------------------+
 | ステータス         | 検証式から抽出             | HTTP 200                                                                 |

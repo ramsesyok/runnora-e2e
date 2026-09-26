@@ -4,12 +4,13 @@ sha256: a4e532571439119ad94233225c39d4a75e9f24055d0bfa77d21e7d124e694773
 -->
 
 ::: {.landscape}
-::: {.tbl caption="期待値・検証条件（契約 returnLoan 本を返却する（モック・実APIの両方で実行する）／手順 1）" label="tbl-exp-2330e08c" widths="18,20,62" merge-cols="all" breakable-rows="true"}
+::: {.tbl caption="期待値・検証条件（契約 returnLoan 本を返却する（モック・実APIの両方で実行する）／手順 3）" label="tbl-exp-8fee1e1d" widths="18,20,62" merge-cols="all" breakable-rows="true"}
 +--------------------+----------------------------+--------------------------------------------------------------------------+
 | 区分               | 出典                       | 内容                                                                     |
 +====================+============================+==========================================================================+
-| 検証式             | post_returnLoan\           | current.res.status == vars.case.expect.status &&                         |
-|                    | .template.yml:26           | compare(current.res.body, vars.expected, vars.case.expect.ignorePaths)   |
+| 検証式             | post_returnLoan\           | steps.call_api.res.status == vars.case.expect.status &&                  |
+|                    | .template.yml:37           | compare(steps.call_api.res.body, vars.expected,                          |
+|                    |                            | vars.case.expect.ignorePaths)                                            |
 |                    |                            |                                                                          |
 +--------------------+----------------------------+--------------------------------------------------------------------------+
 | ステータス         | 検証式から抽出             | HTTP 200                                                                 |
@@ -40,12 +41,13 @@ sha256: a4e532571439119ad94233225c39d4a75e9f24055d0bfa77d21e7d124e694773
 :::
 
 ::: {.landscape}
-::: {.tbl caption="期待値・検証条件（契約 returnLoan 本を返却する（モック・実APIの両方で実行する）／手順 2）" label="tbl-exp-a7e92093" widths="18,20,62" merge-cols="all" breakable-rows="true"}
+::: {.tbl caption="期待値・検証条件（契約 returnLoan 本を返却する（モック・実APIの両方で実行する）／手順 6）" label="tbl-exp-87e94d8a" widths="18,20,62" merge-cols="all" breakable-rows="true"}
 +--------------------+------------------------------------+--------------------------------------------------------------------------+
 | 区分               | 出典                               | 内容                                                                     |
 +====================+====================================+==========================================================================+
-| 検証式             | post_returnLoan\                   | current.res.status == vars.case.expect.status &&                         |
-|                    | .template.yml:26                   | compare(current.res.body, vars.expected, vars.case.expect.ignorePaths)   |
+| 検証式             | post_returnLoan\                   | steps.call_api.res.status == vars.case.expect.status &&                  |
+|                    | .template.yml:37                   | compare(steps.call_api.res.body, vars.expected,                          |
+|                    |                                    | vars.case.expect.ignorePaths)                                            |
 |                    |                                    |                                                                          |
 +--------------------+------------------------------------+--------------------------------------------------------------------------+
 | ステータス         | 検証式から抽出                     | HTTP 409                                                                 |
@@ -62,12 +64,13 @@ sha256: a4e532571439119ad94233225c39d4a75e9f24055d0bfa77d21e7d124e694773
 :::
 
 ::: {.landscape}
-::: {.tbl caption="期待値・検証条件（契約 returnLoan 本を返却する（モック・実APIの両方で実行する）／手順 3）" label="tbl-exp-71488ddf" widths="18,20,62" merge-cols="all" breakable-rows="true"}
+::: {.tbl caption="期待値・検証条件（契約 returnLoan 本を返却する（モック・実APIの両方で実行する）／手順 9）" label="tbl-exp-8791b916" widths="18,20,62" merge-cols="all" breakable-rows="true"}
 +--------------------+----------------------------+--------------------------------------------------------------------------+
 | 区分               | 出典                       | 内容                                                                     |
 +====================+============================+==========================================================================+
-| 検証式             | post_returnLoan\           | current.res.status == vars.case.expect.status &&                         |
-|                    | .template.yml:26           | compare(current.res.body, vars.expected, vars.case.expect.ignorePaths)   |
+| 検証式             | post_returnLoan\           | steps.call_api.res.status == vars.case.expect.status &&                  |
+|                    | .template.yml:37           | compare(steps.call_api.res.body, vars.expected,                          |
+|                    |                            | vars.case.expect.ignorePaths)                                            |
 |                    |                            |                                                                          |
 +--------------------+----------------------------+--------------------------------------------------------------------------+
 | ステータス         | 検証式から抽出             | HTTP 404                                                                 |

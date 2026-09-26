@@ -2,7 +2,7 @@
   "generator": "runnora-docgen",
   "scenario": "LIB-001 本を借りて返すまでの正常系（在庫増減・ID引き継ぎ・二重返却）",
   "source": "runbooks/scenarios/lib-001-loan-lifecycle.yml",
-  "sha256": "9fb4d4e7977555c384bbeffb4c47e8f73d0cf30324594a76374a480953ca6fb4",
+  "sha256": "fed277cc3cd0c946f42fc69ed45698a6f39468379fc389eac94f1f0a6e04c60a",
   "files": [
     "after.qmd",
     "before.qmd",
@@ -15,7 +15,12 @@
     {
       "kind": "runbook",
       "path": "runbooks/scenarios/lib-001-loan-lifecycle.yml",
-      "sha256": "9fb4d4e7977555c384bbeffb4c47e8f73d0cf30324594a76374a480953ca6fb4"
+      "sha256": "fed277cc3cd0c946f42fc69ed45698a6f39468379fc389eac94f1f0a6e04c60a"
+    },
+    {
+      "kind": "runbook",
+      "path": "runbooks/scenarios/lib-001-member-loans-poll.yml",
+      "sha256": "4eebe227b631157ada1840d3adf187ae22528c64289e48c7952a669575ce1aa0"
     },
     {
       "kind": "config",

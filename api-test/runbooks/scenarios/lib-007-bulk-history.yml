@@ -21,29 +21,41 @@ steps:
           headers:
             X-Test-Scenario: LIB-007
           body: null
+  dump_returned_history:
+    dump:
+      expr: steps.returned_history.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/returned_history.json'
+  check_returned_history:
     test: |
-      current.res.status == 200 &&
-      current.res.body.total == 16 &&
-      current.res.body.items[0].loanId == 1 &&
-      current.res.body.items[0].bookId == "B0005" &&
-      current.res.body.items[15].loanId == 16 &&
-      current.res.body.items[15].bookId == "B0020" &&
-      all(current.res.body.items, .returnedAt != nil)
-  inspect_history_books:
-    desc: 履歴の先頭3件をloopで順に蔵書照会する（iは0から始まる）
-    # loopのtestは最終回だけが報告されるため、各回の正否が重要な検証には使わない。
-    # 16件すべての内容はreturned_historyでまとめて検証している。
-    loop:
-      count: 3
-    req:
-      /books/{{ steps.returned_history.res.body.items[i].bookId }}:
-        get:
-          headers:
-            X-Test-Scenario: LIB-007
-          body: null
-    test: |
-      current.res.status == 200 &&
-      current.res.body.bookId == steps.returned_history.res.body.items[i].bookId
+      steps.returned_history.res.status == 200 &&
+      steps.returned_history.res.body.total == 16 &&
+      steps.returned_history.res.body.items[0].loanId == 1 &&
+      steps.returned_history.res.body.items[0].bookId == "B0005" &&
+      steps.returned_history.res.body.items[15].loanId == 16 &&
+      steps.returned_history.res.body.items[15].bookId == "B0020" &&
+      all(steps.returned_history.res.body.items, .returnedAt != nil)
+
+  inspect_history_book_0:
+    desc: 履歴の先頭1件目の蔵書を照会する
+    include:
+      path: ./lib-007-inspect-history-book.yml
+      vars:
+        index: 0
+        book_id: '{{ steps.returned_history.res.body.items[0].bookId }}'
+  inspect_history_book_1:
+    desc: 履歴の先頭2件目の蔵書を照会する
+    include:
+      path: ./lib-007-inspect-history-book.yml
+      vars:
+        index: 1
+        book_id: '{{ steps.returned_history.res.body.items[1].bookId }}'
+  inspect_history_book_2:
+    desc: 履歴の先頭3件目の蔵書を照会する
+    include:
+      path: ./lib-007-inspect-history-book.yml
+      vars:
+        index: 2
+        book_id: '{{ steps.returned_history.res.body.items[2].bookId }}'
   no_active:
     desc: 貸出中の履歴は0件である
     req:
@@ -52,9 +64,15 @@ steps:
           headers:
             X-Test-Scenario: LIB-007
           body: null
+  dump_no_active:
+    dump:
+      expr: steps.no_active.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/no_active.json'
+  check_no_active:
     test: |
-      current.res.status == 200 &&
-      current.res.body.total == 0
+      steps.no_active.res.status == 200 &&
+      steps.no_active.res.body.total == 0
+
   member_clean:
     desc: 返却済みの貸出は期限を過ぎていても延滞にならない
     req:
@@ -63,10 +81,16 @@ steps:
           headers:
             X-Test-Scenario: LIB-007
           body: null
+  dump_member_clean:
+    dump:
+      expr: steps.member_clean.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/member_clean.json'
+  check_member_clean:
     test: |
-      current.res.status == 200 &&
-      current.res.body.activeLoanCount == 0 &&
-      current.res.body.overdue == false
+      steps.member_clean.res.status == 200 &&
+      steps.member_clean.res.body.activeLoanCount == 0 &&
+      steps.member_clean.res.body.overdue == false
+
   loan_after_history:
     desc: 履歴が多くても新規貸出でき、貸出IDは17になる
     req:
@@ -78,9 +102,15 @@ steps:
             application/json:
               memberId: M0004
               bookId: B0005
+  dump_loan_after_history:
+    dump:
+      expr: steps.loan_after_history.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/loan_after_history.json'
+  check_loan_after_history:
     test: |
-      current.res.status == 201 &&
-      current.res.body.loanId == 17
+      steps.loan_after_history.res.status == 201 &&
+      steps.loan_after_history.res.body.loanId == 17
+
   db_batch_log:
     desc: 前処理がBULK COLLECT LIMIT 5で4バッチに分けて投入したことをログで確認する
     db:

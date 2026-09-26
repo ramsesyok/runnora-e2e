@@ -4,12 +4,13 @@ sha256: 1d874f4a0209fb7d6b83e7f01bfd39757c10089b1443f832304a3c8b4d36a57c
 -->
 
 ::: {.landscape}
-::: {.tbl caption="期待値・検証条件（契約 getMember 会員と貸出状況を取得する（モック・実APIの両方で実行する）／手順 1）" label="tbl-exp-c8496873" widths="18,20,62" merge-cols="all" breakable-rows="true"}
+::: {.tbl caption="期待値・検証条件（契約 getMember 会員と貸出状況を取得する（モック・実APIの両方で実行する）／手順 3）" label="tbl-exp-8034d62a" widths="18,20,62" merge-cols="all" breakable-rows="true"}
 +--------------------+----------------------------+--------------------------------------------------------------------------+
 | 区分               | 出典                       | 内容                                                                     |
 +====================+============================+==========================================================================+
-| 検証式             | get_getMember\             | current.res.status == vars.case.expect.status &&                         |
-|                    | .template.yml:26           | compare(current.res.body, vars.expected, vars.case.expect.ignorePaths)   |
+| 検証式             | get_getMember\             | steps.call_api.res.status == vars.case.expect.status &&                  |
+|                    | .template.yml:35           | compare(steps.call_api.res.body, vars.expected,                          |
+|                    |                            | vars.case.expect.ignorePaths)                                            |
 |                    |                            |                                                                          |
 +--------------------+----------------------------+--------------------------------------------------------------------------+
 | ステータス         | 検証式から抽出             | HTTP 200                                                                 |
@@ -34,12 +35,13 @@ sha256: 1d874f4a0209fb7d6b83e7f01bfd39757c10089b1443f832304a3c8b4d36a57c
 :::
 
 ::: {.landscape}
-::: {.tbl caption="期待値・検証条件（契約 getMember 会員と貸出状況を取得する（モック・実APIの両方で実行する）／手順 2）" label="tbl-exp-681a62e7" widths="18,20,62" merge-cols="all" breakable-rows="true"}
+::: {.tbl caption="期待値・検証条件（契約 getMember 会員と貸出状況を取得する（モック・実APIの両方で実行する）／手順 6）" label="tbl-exp-02e4884e" widths="18,20,62" merge-cols="all" breakable-rows="true"}
 +--------------------+--------------------------------+--------------------------------------------------------------------------+
 | 区分               | 出典                           | 内容                                                                     |
 +====================+================================+==========================================================================+
-| 検証式             | get_getMember\                 | current.res.status == vars.case.expect.status &&                         |
-|                    | .template.yml:26               | compare(current.res.body, vars.expected, vars.case.expect.ignorePaths)   |
+| 検証式             | get_getMember\                 | steps.call_api.res.status == vars.case.expect.status &&                  |
+|                    | .template.yml:35               | compare(steps.call_api.res.body, vars.expected,                          |
+|                    |                                | vars.case.expect.ignorePaths)                                            |
 |                    |                                |                                                                          |
 +--------------------+--------------------------------+--------------------------------------------------------------------------+
 | ステータス         | 検証式から抽出                 | HTTP 200                                                                 |
@@ -64,12 +66,13 @@ sha256: 1d874f4a0209fb7d6b83e7f01bfd39757c10089b1443f832304a3c8b4d36a57c
 :::
 
 ::: {.landscape}
-::: {.tbl caption="期待値・検証条件（契約 getMember 会員と貸出状況を取得する（モック・実APIの両方で実行する）／手順 3）" label="tbl-exp-110070bd" widths="18,20,62" merge-cols="all" breakable-rows="true"}
+::: {.tbl caption="期待値・検証条件（契約 getMember 会員と貸出状況を取得する（モック・実APIの両方で実行する）／手順 9）" label="tbl-exp-58061ffc" widths="18,20,62" merge-cols="all" breakable-rows="true"}
 +--------------------+----------------------------+--------------------------------------------------------------------------+
 | 区分               | 出典                       | 内容                                                                     |
 +====================+============================+==========================================================================+
-| 検証式             | get_getMember\             | current.res.status == vars.case.expect.status &&                         |
-|                    | .template.yml:26           | compare(current.res.body, vars.expected, vars.case.expect.ignorePaths)   |
+| 検証式             | get_getMember\             | steps.call_api.res.status == vars.case.expect.status &&                  |
+|                    | .template.yml:35           | compare(steps.call_api.res.body, vars.expected,                          |
+|                    |                            | vars.case.expect.ignorePaths)                                            |
 |                    |                            |                                                                          |
 +--------------------+----------------------------+--------------------------------------------------------------------------+
 | ステータス         | 検証式から抽出             | HTTP 404                                                                 |

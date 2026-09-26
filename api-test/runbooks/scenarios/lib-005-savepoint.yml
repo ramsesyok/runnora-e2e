@@ -24,10 +24,16 @@ steps:
           headers:
             X-Test-Scenario: LIB-005
           body: null
+  dump_test_books:
+    dump:
+      expr: steps.test_books.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/test_books.json'
+  check_test_books:
     test: |
-      current.res.status == 200 &&
-      current.res.body.total == 3 &&
-      map(current.res.body.items, .bookId) == ["B0101", "B0102", "B0105"]
+      steps.test_books.res.status == 200 &&
+      steps.test_books.res.body.total == 3 &&
+      map(steps.test_books.res.body.items, .bookId) == ["B0101", "B0102", "B0105"]
+
   duplicate_rolled_back:
     desc: ISBN重複で取り消したB0103が存在しないことを確認する
     req:
@@ -36,9 +42,15 @@ steps:
           headers:
             X-Test-Scenario: LIB-005
           body: null
+  dump_duplicate_rolled_back:
+    dump:
+      expr: steps.duplicate_rolled_back.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/duplicate_rolled_back.json'
+  check_duplicate_rolled_back:
     test: |
-      current.res.status == 404 &&
-      current.res.body.code == "NOT_FOUND"
+      steps.duplicate_rolled_back.res.status == 404 &&
+      steps.duplicate_rolled_back.res.body.code == "NOT_FOUND"
+
   fk_rolled_back:
     desc: 貸出の外部キー違反で蔵書ごと取り消したB0104が存在しないことを確認する
     req:
@@ -47,7 +59,13 @@ steps:
           headers:
             X-Test-Scenario: LIB-005
           body: null
-    test: current.res.status == 404
+  dump_fk_rolled_back:
+    dump:
+      expr: steps.fk_rolled_back.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/fk_rolled_back.json'
+  check_fk_rolled_back:
+    test: steps.fk_rolled_back.res.status == 404
+
   unit_with_loan:
     desc: 蔵書と初回貸出を同じ単位で確定したB0101は、貸出可能冊数が1減っている
     req:
@@ -56,10 +74,16 @@ steps:
           headers:
             X-Test-Scenario: LIB-005
           body: null
+  dump_unit_with_loan:
+    dump:
+      expr: steps.unit_with_loan.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/unit_with_loan.json'
+  check_unit_with_loan:
     test: |
-      current.res.status == 200 &&
-      current.res.body.totalCopies == 2 &&
-      current.res.body.availableCopies == 1
+      steps.unit_with_loan.res.status == 200 &&
+      steps.unit_with_loan.res.body.totalCopies == 2 &&
+      steps.unit_with_loan.res.body.availableCopies == 1
+
   sequence_gap:
     desc: 取り消した単位で消費された採番は戻らないため、B0105の貸出IDは3になる
     req:
@@ -68,11 +92,17 @@ steps:
           headers:
             X-Test-Scenario: LIB-005
           body: null
+  dump_sequence_gap:
+    dump:
+      expr: steps.sequence_gap.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/sequence_gap.json'
+  check_sequence_gap:
     test: |
-      current.res.status == 200 &&
-      current.res.body.total == 1 &&
-      current.res.body.items[0].loanId == 3 &&
-      current.res.body.items[0].bookId == "B0105"
+      steps.sequence_gap.res.status == 200 &&
+      steps.sequence_gap.res.body.total == 1 &&
+      steps.sequence_gap.res.body.items[0].loanId == 3 &&
+      steps.sequence_gap.res.body.items[0].bookId == "B0105"
+
   bulk_suspend_rolled_back:
     desc: 一括停止は取り消されたため、M0006は利用可能のまま
     req:
@@ -81,9 +111,15 @@ steps:
           headers:
             X-Test-Scenario: LIB-005
           body: null
+  dump_bulk_suspend_rolled_back:
+    dump:
+      expr: steps.bulk_suspend_rolled_back.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/bulk_suspend_rolled_back.json'
+  check_bulk_suspend_rolled_back:
     test: |
-      current.res.status == 200 &&
-      current.res.body.status == "ACTIVE"
+      steps.bulk_suspend_rolled_back.res.status == 200 &&
+      steps.bulk_suspend_rolled_back.res.body.status == "ACTIVE"
+
   single_suspend:
     desc: 個別停止に切り替えたM0008だけがSUSPENDEDになっている
     req:
@@ -92,9 +128,15 @@ steps:
           headers:
             X-Test-Scenario: LIB-005
           body: null
+  dump_single_suspend:
+    dump:
+      expr: steps.single_suspend.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/single_suspend.json'
+  check_single_suspend:
     test: |
-      current.res.status == 200 &&
-      current.res.body.status == "SUSPENDED"
+      steps.single_suspend.res.status == 200 &&
+      steps.single_suspend.res.body.status == "SUSPENDED"
+
   suspended_cannot_borrow:
     desc: 停止中のM0008は借りられない（409 MEMBER_SUSPENDED）
     req:
@@ -106,9 +148,15 @@ steps:
             application/json:
               memberId: M0008
               bookId: B0102
+  dump_suspended_cannot_borrow:
+    dump:
+      expr: steps.suspended_cannot_borrow.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/suspended_cannot_borrow.json'
+  check_suspended_cannot_borrow:
     test: |
-      current.res.status == 409 &&
-      current.res.body.code == "MEMBER_SUSPENDED"
+      steps.suspended_cannot_borrow.res.status == 409 &&
+      steps.suspended_cannot_borrow.res.body.code == "MEMBER_SUSPENDED"
+
   api_duplicate_isbn:
     desc: APIからもB0101と同じISBNでは登録できない（409 DUPLICATE_BOOK）
     req:
@@ -124,9 +172,15 @@ steps:
               author: 試験 花子
               genre: TEST
               totalCopies: 1
+  dump_api_duplicate_isbn:
+    dump:
+      expr: steps.api_duplicate_isbn.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/api_duplicate_isbn.json'
+  check_api_duplicate_isbn:
     test: |
-      current.res.status == 409 &&
-      current.res.body.code == "DUPLICATE_BOOK"
+      steps.api_duplicate_isbn.res.status == 409 &&
+      steps.api_duplicate_isbn.res.body.code == "DUPLICATE_BOOK"
+
   api_register_b0103:
     desc: 正しいISBNでB0103を登録し直すと201で登録される
     req:
@@ -142,10 +196,16 @@ steps:
               author: 試験 花子
               genre: TEST
               totalCopies: 1
+  dump_api_register_b0103:
+    dump:
+      expr: steps.api_register_b0103.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/api_register_b0103.json'
+  check_api_register_b0103:
     test: |
-      current.res.status == 201 &&
-      current.res.body.bookId == "B0103" &&
-      current.res.body.availableCopies == 1
+      steps.api_register_b0103.res.status == 201 &&
+      steps.api_register_b0103.res.body.bookId == "B0103" &&
+      steps.api_register_b0103.res.body.availableCopies == 1
+
   db_hook_log:
     desc: 自律型トランザクションで書いたROLLBACKのログが残っていることをDBで確認する
     db:

@@ -2,7 +2,7 @@
   "generator": "runnora-docgen",
   "scenario": "DEMO 事後処理の整合性検証がDB不整合を検知できることの確認（exit 4 が期待値）",
   "source": "runbooks/demo/hook-failure-detection.yml",
-  "sha256": "45b2c39cc4adf07d6b71e5e001fa2a595eab2b9bde67d8f4728489f4fee95771",
+  "sha256": "ad7987a1cc660de74197dbff32a2d58ab9f27e06916239b5123e4deeace7d476",
   "files": [
     "after.qmd",
     "before.qmd",
@@ -14,7 +14,7 @@
     {
       "kind": "runbook",
       "path": "runbooks/demo/hook-failure-detection.yml",
-      "sha256": "45b2c39cc4adf07d6b71e5e001fa2a595eab2b9bde67d8f4728489f4fee95771"
+      "sha256": "ad7987a1cc660de74197dbff32a2d58ab9f27e06916239b5123e4deeace7d476"
     },
     {
       "kind": "config",

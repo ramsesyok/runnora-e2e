@@ -19,7 +19,7 @@
     {
       "kind": "runbook",
       "path": "runbooks/contract/get_getBook.template.yml",
-      "sha256": "7cbe62360273d22c5f788bebeb7100cf534cb47e4f9b087c75661821c44cb7ce"
+      "sha256": "c2020f733c7d1dae45a418814d5e7897107b5361012d38244d70bcdbdd5185f2"
     },
     {
       "kind": "json",
