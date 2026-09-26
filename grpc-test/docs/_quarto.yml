@@ -8,6 +8,7 @@ book:
     - unary.qmd
     - server-streaming.qmd
     - calculation-streaming.qmd
+    - series-analysis.qmd
 lang: ja
 format:
   html:

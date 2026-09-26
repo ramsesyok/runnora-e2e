@@ -1,0 +1,34 @@
+{
+  "generator": "runnora-docgen",
+  "scenario": "階層・配列を含む数値計算結果をパス別の許容誤差で比較する",
+  "source": "runbooks/series-analysis.yml",
+  "sha256": "de165ec9c6d2fc4a2936dda201db67ae7bfc02e752459deaa0399046d8c99072",
+  "files": [
+    "expectations.qmd",
+    "grpc-request.qmd",
+    "grpc.qmd",
+    "scenario.qmd"
+  ],
+  "inputs": [
+    {
+      "kind": "runbook",
+      "path": "runbooks/series-analysis.yml",
+      "sha256": "de165ec9c6d2fc4a2936dda201db67ae7bfc02e752459deaa0399046d8c99072"
+    },
+    {
+      "kind": "proto",
+      "path": "proto/library.proto",
+      "sha256": "ee81bf46dae244bd5d10e109e65960ac780dbf29ff0fcb2e8d65b97621edf1cb"
+    },
+    {
+      "kind": "json",
+      "path": "cases/series-analysis/request.json",
+      "sha256": "9880a9f40305e23d836ac57a10ab24f1962d6101b1d5f253b247dfc9819a7c56"
+    },
+    {
+      "kind": "config",
+      "path": "config.yaml",
+      "sha256": "07883df8d8280590475df5cb700d3927b3837d695bf4f90905a774fb06cce781"
+    }
+  ]
+}

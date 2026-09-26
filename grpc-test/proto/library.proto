@@ -6,6 +6,7 @@ service LibraryService {
   rpc GetBook(GetBookRequest) returns (GetBookResponse);
   rpc ListBooks(ListBooksRequest) returns (stream Book);
   rpc Calculate(CalculateRequest) returns (stream CalculationUpdate);
+  rpc AnalyzeSeries(AnalyzeSeriesRequest) returns (AnalyzeSeriesResponse);
 }
 
 message GetBookRequest {
@@ -41,4 +42,46 @@ message CalculationUpdate {
 message CalculationSummary {
   int32 count = 1;
   int32 total = 2;
+}
+
+message AnalyzeSeriesRequest {
+  repeated NumericSeries series = 1;
+}
+
+message NumericSeries {
+  string name = 1;
+  double weight = 2;
+  repeated double values = 3;
+}
+
+message AnalyzeSeriesResponse {
+  repeated SeriesAnalysis series = 1;
+  PortfolioSummary portfolio = 2;
+}
+
+message SeriesAnalysis {
+  string name = 1;
+  double weight = 2;
+  repeated SampleAnalysis samples = 3;
+  SeriesStatistics statistics = 4;
+}
+
+message SampleAnalysis {
+  int32 index = 1;
+  double input = 2;
+  double weighted = 3;
+  double deviation = 4;
+}
+
+message SeriesStatistics {
+  int32 count = 1;
+  double sum = 2;
+  double mean = 3;
+  double variance = 4;
+}
+
+message PortfolioSummary {
+  int32 series_count = 1;
+  double total_weight = 2;
+  double weighted_mean = 3;
 }
