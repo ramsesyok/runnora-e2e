@@ -3,7 +3,9 @@
   "description": "M0001 が B0001 を借りる",
   "pathParams": {},
   "queryParams": {},
-  "headers": {},
+  "headers": {
+    "X-Test-Case": "createLoan/created"
+  },
   "requestBody": {
     "memberId": "M0001",
     "bookId": "B0001"

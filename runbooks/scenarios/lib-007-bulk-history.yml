@@ -18,6 +18,8 @@ steps:
     req:
       /members/M0004/loans?status=RETURNED:
         get:
+          headers:
+            X-Test-Scenario: LIB-007
           body: null
     test: |
       current.res.status == 200 &&
@@ -32,6 +34,8 @@ steps:
     req:
       /members/M0004/loans?status=ACTIVE:
         get:
+          headers:
+            X-Test-Scenario: LIB-007
           body: null
     test: |
       current.res.status == 200 &&
@@ -41,6 +45,8 @@ steps:
     req:
       /members/M0004:
         get:
+          headers:
+            X-Test-Scenario: LIB-007
           body: null
     test: |
       current.res.status == 200 &&
@@ -51,6 +57,8 @@ steps:
     req:
       /loans:
         post:
+          headers:
+            X-Test-Scenario: LIB-007
           body:
             application/json:
               memberId: M0004

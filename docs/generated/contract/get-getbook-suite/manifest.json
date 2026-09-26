@@ -24,7 +24,7 @@
     {
       "kind": "json",
       "path": "cases/contract/books/get_getBook/01_B0001.json",
-      "sha256": "20d5b61c8f2e61d7514e68e914014b40da1836b32c831e12704c942088ce6069"
+      "sha256": "7be1681e6717aab282820aa4818d6bdd0e35e83cca42ee1d1548cd84691bdf0e"
     },
     {
       "kind": "json",
@@ -34,7 +34,7 @@
     {
       "kind": "json",
       "path": "cases/contract/books/get_getBook/02_not_found.json",
-      "sha256": "ae27cd7db32296d8304c49ac08828951d8aebfb13b4d762617c72658cc74d440"
+      "sha256": "d14c3793316c15ada61564e0b5b18473f2748897996e1d697df7cab73be15ae1"
     },
     {
       "kind": "json",

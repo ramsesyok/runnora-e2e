@@ -24,7 +24,7 @@
     {
       "kind": "json",
       "path": "cases/contract/members/get_listMemberLoans/01_M0002.json",
-      "sha256": "fd08b7c51b7c9b068bebb3758ee35215ff05c7f135501035f8ef3202f023e85e"
+      "sha256": "29528d639e389bdd2c8ced409478696db37dc97608f2ca5068eb5b81b69fa247"
     },
     {
       "kind": "json",
@@ -34,7 +34,7 @@
     {
       "kind": "json",
       "path": "cases/contract/members/get_listMemberLoans/02_not_found.json",
-      "sha256": "b4be0b69bed1e53bb3b3b7cdc7e7ef6f7dee560533bdeaaa5cef30d35d9f5a9d"
+      "sha256": "a27d130ba7b0fd7019b851ff28745323aa310d3de7f3dd3c216683dac897cb73"
     },
     {
       "kind": "json",

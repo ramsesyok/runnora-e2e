@@ -5,7 +5,9 @@
     "memberId": "M0003"
   },
   "queryParams": {},
-  "headers": {},
+  "headers": {
+    "X-Test-Case": "getMember/M0003_suspended"
+  },
   "requestBody": null,
   "expect": {
     "status": 200,

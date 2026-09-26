@@ -6,7 +6,9 @@
     "genre": "NOVEL",
     "availableOnly": ""
   },
-  "headers": {},
+  "headers": {
+    "X-Test-Case": "listBooks/novel"
+  },
   "requestBody": null,
   "expect": {
     "status": 200,

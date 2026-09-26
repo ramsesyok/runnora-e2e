@@ -5,7 +5,9 @@
     "memberId": "M0001"
   },
   "queryParams": {},
-  "headers": {},
+  "headers": {
+    "X-Test-Case": "getMember/M0001"
+  },
   "requestBody": null,
   "expect": {
     "status": 200,

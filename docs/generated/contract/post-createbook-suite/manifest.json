@@ -25,7 +25,7 @@
     {
       "kind": "json",
       "path": "cases/contract/books/post_createBook/01_created.json",
-      "sha256": "d4a77816e05e4b345d67f101a4960354406079b5e07a7ef69d2cb579d1ceb5b5"
+      "sha256": "0a3e9fdbc6ccc073f2e6cd005404c84fc21e2340a7c0aadd6d9a49653c5c519f"
     },
     {
       "kind": "json",
@@ -35,7 +35,7 @@
     {
       "kind": "json",
       "path": "cases/contract/books/post_createBook/02_duplicate_isbn.json",
-      "sha256": "881dec66130124050eb8ab330bfb85deee76472ee95feda3c2bcc70873e54501"
+      "sha256": "bf1e0960b0245378babadadbe4277e8e8d0687dd55c59c6672e3d2a7a25a081d"
     },
     {
       "kind": "json",
@@ -45,7 +45,7 @@
     {
       "kind": "json",
       "path": "cases/contract/books/post_createBook/03_invalid_isbn.json",
-      "sha256": "8e01093cf239b694c67f48fbd44b1025613395b14c95a244e9681eece553f955"
+      "sha256": "6c882a802e2ee330df36993924044d6343f514d6045f435a7e6fdf75d5d5476d"
     },
     {
       "kind": "json",

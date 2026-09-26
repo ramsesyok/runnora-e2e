@@ -5,7 +5,9 @@
     "bookId": "B9999"
   },
   "queryParams": {},
-  "headers": {},
+  "headers": {
+    "X-Test-Case": "getBook/not_found"
+  },
   "requestBody": null,
   "expect": {
     "status": 404,

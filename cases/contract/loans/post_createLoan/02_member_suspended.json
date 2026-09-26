@@ -3,7 +3,9 @@
   "description": "利用停止中の M0003 は 409",
   "pathParams": {},
   "queryParams": {},
-  "headers": {},
+  "headers": {
+    "X-Test-Case": "createLoan/member_suspended"
+  },
   "requestBody": {
     "memberId": "M0003",
     "bookId": "B0001"

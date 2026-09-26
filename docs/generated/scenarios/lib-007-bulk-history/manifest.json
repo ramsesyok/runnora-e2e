@@ -2,7 +2,7 @@
   "generator": "runnora-docgen",
   "scenario": "LIB-007 BULK COLLECT/FORALLで投入した大量の貸出履歴を照会する",
   "source": "runbooks/scenarios/lib-007-bulk-history.yml",
-  "sha256": "cc62e1459178a654a4377331cc3f6d721570abe36edeac67eff79e44a1122163",
+  "sha256": "3eeedb2b8e42a3974491c32b3a675df9d16b91fc25207f8c535301d03d2949b7",
   "files": [
     "after.qmd",
     "before.qmd",
@@ -15,7 +15,7 @@
     {
       "kind": "runbook",
       "path": "runbooks/scenarios/lib-007-bulk-history.yml",
-      "sha256": "cc62e1459178a654a4377331cc3f6d721570abe36edeac67eff79e44a1122163"
+      "sha256": "3eeedb2b8e42a3974491c32b3a675df9d16b91fc25207f8c535301d03d2949b7"
     },
     {
       "kind": "config",

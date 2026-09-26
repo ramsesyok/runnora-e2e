@@ -24,7 +24,7 @@
     {
       "kind": "json",
       "path": "cases/contract/books/get_listBooks/01_novel.json",
-      "sha256": "318fd1dbdac3ea2a62c2cef543c7da3e354d1da5f1a987fcc83791575e49530f"
+      "sha256": "f4ef47f78924e1cf73131289b986b2289419ec3fb670fc2efdb026fdeb5aacd0"
     },
     {
       "kind": "json",
@@ -34,7 +34,7 @@
     {
       "kind": "json",
       "path": "cases/contract/books/get_listBooks/02_tech_available.json",
-      "sha256": "570d99bbe2fad9632da5fe5ecf10d63800c89ba3b4897c10358caf5b94e54c1a"
+      "sha256": "5894e1991576a2bdec254a0491e8bce4fda7b19ea491651820e23f62e3ce93b1"
     },
     {
       "kind": "json",
@@ -44,7 +44,7 @@
     {
       "kind": "json",
       "path": "cases/contract/books/get_listBooks/03_invalid_genre.json",
-      "sha256": "08ebf17f2533f5711562d317a1d845c7d52791511aa683dd77c5f840130d0e01"
+      "sha256": "32f394ec141978f222ca5901a4bb77f8efc890df7afc90a398b2041e117fff9b"
     },
     {
       "kind": "json",

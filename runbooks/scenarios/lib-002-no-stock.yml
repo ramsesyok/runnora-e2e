@@ -15,6 +15,8 @@ steps:
     req:
       /loans:
         post:
+          headers:
+            X-Test-Scenario: LIB-002
           body:
             application/json:
               memberId: M0001
@@ -32,6 +34,8 @@ steps:
     req:
       /books/B0002:
         get:
+          headers:
+            X-Test-Scenario: LIB-002
           body: null
     test: |
       current.res.status == 200 &&
@@ -41,6 +45,8 @@ steps:
     req:
       /books?genre=NOVEL&availableOnly=true:
         get:
+          headers:
+            X-Test-Scenario: LIB-002
           body: null
     test: |
       current.res.status == 200 &&
@@ -51,6 +57,8 @@ steps:
     req:
       /loans:
         post:
+          headers:
+            X-Test-Scenario: LIB-002
           body:
             application/json:
               memberId: M0002
@@ -69,6 +77,8 @@ steps:
     req:
       /loans/{{ first_loan_id }}/return:
         post:
+          headers:
+            X-Test-Scenario: LIB-002
           body:
             application/json: {}
     test: |
@@ -79,6 +89,8 @@ steps:
     req:
       /loans:
         post:
+          headers:
+            X-Test-Scenario: LIB-002
           body:
             application/json:
               memberId: M0002
@@ -92,6 +104,8 @@ steps:
     req:
       /books/B0002:
         get:
+          headers:
+            X-Test-Scenario: LIB-002
           body: null
     test: |
       current.res.status == 200 &&

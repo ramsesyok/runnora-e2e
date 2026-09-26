@@ -6,7 +6,9 @@
     "genre": "TECH",
     "availableOnly": "true"
   },
-  "headers": {},
+  "headers": {
+    "X-Test-Case": "listBooks/tech_available"
+  },
   "requestBody": null,
   "expect": {
     "status": 200,

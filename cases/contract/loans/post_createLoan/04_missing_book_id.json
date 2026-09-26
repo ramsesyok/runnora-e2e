@@ -3,7 +3,9 @@
   "description": "bookId なしは 400",
   "pathParams": {},
   "queryParams": {},
-  "headers": {},
+  "headers": {
+    "X-Test-Case": "createLoan/missing_book_id"
+  },
   "requestBody": {
     "memberId": "M0001"
   },

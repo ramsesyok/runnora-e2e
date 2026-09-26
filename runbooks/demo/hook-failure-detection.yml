@@ -16,6 +16,8 @@ steps:
     req:
       /health:
         get:
+          headers:
+            X-Test-Scenario: DEMO
           body: null
     test: |
       current.res.status == 200 &&

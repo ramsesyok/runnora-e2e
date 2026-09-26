@@ -24,7 +24,7 @@
     {
       "kind": "json",
       "path": "cases/contract/members/get_getMember/01_M0001.json",
-      "sha256": "4c22af8564b056ebff7676ff64c73ce831cf69e8ebb9edbdc507ac853101d598"
+      "sha256": "8f527de0d64cad52c8afb3369d91e87fc23b1d689b680e6e658bbb1a4543ebbf"
     },
     {
       "kind": "json",
@@ -34,7 +34,7 @@
     {
       "kind": "json",
       "path": "cases/contract/members/get_getMember/02_M0003_suspended.json",
-      "sha256": "9f986b1359567e5fbab3ad82dc11ff7483cf03ea23c161f8766dd912c6dea358"
+      "sha256": "579d8fa196a4e9f68cd6f906b731a03c841ffc40eac53b40bc96bcf246ab3095"
     },
     {
       "kind": "json",
@@ -44,7 +44,7 @@
     {
       "kind": "json",
       "path": "cases/contract/members/get_getMember/03_not_found.json",
-      "sha256": "b116d761a9a660c798f8ddbd3143f22933193ac33915e733124f98392eb90586"
+      "sha256": "12d5012aade8cea3df166a2ce5e6628bf5571f60823c64d6cd335eb905223383"
     },
     {
       "kind": "json",

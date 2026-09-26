@@ -6,7 +6,9 @@
     "genre": "COMIC",
     "availableOnly": ""
   },
-  "headers": {},
+  "headers": {
+    "X-Test-Case": "listBooks/invalid_genre"
+  },
   "requestBody": null,
   "expect": {
     "status": 400,

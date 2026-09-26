@@ -3,7 +3,9 @@
   "description": "新しい蔵書 B0900 を登録する",
   "pathParams": {},
   "queryParams": {},
-  "headers": {},
+  "headers": {
+    "X-Test-Case": "createBook/created"
+  },
   "requestBody": {
     "bookId": "B0900",
     "isbn": "9784000000900",

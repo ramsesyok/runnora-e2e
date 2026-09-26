@@ -25,7 +25,7 @@
     {
       "kind": "json",
       "path": "cases/contract/loans/post_createLoan/01_created.json",
-      "sha256": "c716cbf9ade922d12e28a1e73b9f9ad185beceba6aebf668c77c806e71027cec"
+      "sha256": "c595af7222be6628754d40777ff20fd221247b1a70d3b35ef00746675975be5f"
     },
     {
       "kind": "json",
@@ -35,7 +35,7 @@
     {
       "kind": "json",
       "path": "cases/contract/loans/post_createLoan/02_member_suspended.json",
-      "sha256": "6535185cc85731cae48dc44807de1ee1eb5d76a068ef840c524c4909cc819cd3"
+      "sha256": "2ebc53ef5a648db04fb1e45259795989158bf1c53db19775cdaad03bc9700fa4"
     },
     {
       "kind": "json",
@@ -45,7 +45,7 @@
     {
       "kind": "json",
       "path": "cases/contract/loans/post_createLoan/03_book_not_found.json",
-      "sha256": "620d86122f9309afe60d802c8ec7ad08a66f63970e835e6a1f33ca00ab7d1da4"
+      "sha256": "9d17b56b6b1d295ef07277a25672b709c4170fa5d41ad1db7cde62b971be254d"
     },
     {
       "kind": "json",
@@ -55,7 +55,7 @@
     {
       "kind": "json",
       "path": "cases/contract/loans/post_createLoan/04_missing_book_id.json",
-      "sha256": "5ed8109f8dfa735a29ee82782a344d9d184c484f5339f082af21d1e5dbaefc16"
+      "sha256": "6508eba15a2b4f264ea7f29f1c3ed5c0d81d7117aecbd0f1cafda5c211efa33c"
     },
     {
       "kind": "json",

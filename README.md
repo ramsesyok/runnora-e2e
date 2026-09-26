@@ -126,6 +126,9 @@ runnora を直接呼ぶ例（シナリオ LIB-005）:
 `90_verify_integrity` は「貸出可能冊数 = 所蔵 − 貸出中」などの不変条件をカーソル FOR LOOP で検証し、
 違反があれば `RAISE_APPLICATION_ERROR` で runnora を exit 4 にします。
 
+API が参照しないテスト用ヘッダを付けて送っています（手順書の HTTP 呼び出し表の Headers 欄に出ます）。
+契約テストは `X-Test-Case: <operationId>/<ケース名>`（ケース JSON の `headers`）、シナリオ試験は `X-Test-Scenario: <シナリオ ID>` です。
+
 ## モックの戻り値と期待値の共有
 
 oapi2wire のモックは、runbook を書きながら動かして確かめる相手として使います。
@@ -158,7 +161,7 @@ runbooks/contract/get_getMember.suite.yml
 - 実 API: 生成 8/8、契約 8/8、シナリオ 7/7 成功、検知確認は期待どおり exit 4
   （`ORA-20100: integrity check failed (1): B0001 available=2 expected=3`）
 - OpenAPI カバレッジ（契約 + シナリオ）: 8/8 operation
-- 手順書: HTML（`docs/_book/`）と PDF（`docs/design-doc.pdf`、115 ページ）を発行
+- 手順書: HTML（`docs/_book/`）と PDF（`docs/design-doc.pdf`、116 ページ）を発行
 - 期待値を 1 項目だけ誤らせた契約ケースが失敗すること（検証が空振りしていないこと）
 
 ## 作成中に分かったこと（ツールへのフィードバック）
@@ -177,6 +180,7 @@ runbooks/contract/get_getMember.suite.yml
 | 10 | ddq | PlantUML サーバを 127.0.0.1:18080 で探すため WireMock と衝突する | WireMock 停止後に手順書を生成 |
 | 11 | go-ora | TZ なし `TIMESTAMP` と `SYSTIMESTAMP` の比較がセッション TZ 依存で、go-ora 接続では 9 時間ずれて失敗した | ログ列を `TIMESTAMP WITH TIME ZONE` に |
 | 12 | runn | `loop`（`until` なし）は最後の回の失敗しか報告しない。`runnora generate` の suite（loop + include でケースを回す形）は、ケースを増やすと途中のケースの失敗を見逃す | 契約 suite はケースごとに include ステップを並べる形に変更。`contract-check` が loop の使用も検出 |
+| 13 | runnora-docgen | HTTP 呼び出し表の Query 欄が常に空（runn はクエリを URL に書くが、docgen は `query` キーだけを見ていた）。表のセルで英数字の語が途中改行され、HTML に空白が入る（`tech_a vailable`） | runnora-docgen を修正（[ramsesyok/runnora-docgen#6](https://github.com/ramsesyok/runnora-docgen/pull/6)） |
 
 OpenAPI 応答検証（`openapi3` ランナー）は、作成時に「`GET /books` 等が 400 を返すのに OpenAPI に未定義」
 という仕様漏れを検出しました（OpenAPI を修正済み）。

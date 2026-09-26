@@ -3,7 +3,9 @@
   "description": "API と DB が稼働中",
   "pathParams": {},
   "queryParams": {},
-  "headers": {},
+  "headers": {
+    "X-Test-Case": "getHealth/up"
+  },
   "requestBody": null,
   "expect": {
     "status": 200,

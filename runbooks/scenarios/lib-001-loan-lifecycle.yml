@@ -16,6 +16,8 @@ steps:
     req:
       /members/M0001:
         get:
+          headers:
+            X-Test-Scenario: LIB-001
           body: null
     test: |
       current.res.status == 200 &&
@@ -27,6 +29,8 @@ steps:
     req:
       /books/B0001:
         get:
+          headers:
+            X-Test-Scenario: LIB-001
           body: null
     test: |
       current.res.status == 200 &&
@@ -37,6 +41,8 @@ steps:
     req:
       /loans:
         post:
+          headers:
+            X-Test-Scenario: LIB-001
           body:
             application/json:
               memberId: M0001
@@ -69,6 +75,8 @@ steps:
     req:
       /books/B0001:
         get:
+          headers:
+            X-Test-Scenario: LIB-001
           body: null
     test: |
       current.res.status == 200 &&
@@ -78,6 +86,8 @@ steps:
     req:
       /members/M0001/loans?status=ACTIVE:
         get:
+          headers:
+            X-Test-Scenario: LIB-001
           body: null
     test: |
       current.res.status == 200 &&
@@ -88,6 +98,8 @@ steps:
     req:
       /loans/{{ loan_id }}/return:
         post:
+          headers:
+            X-Test-Scenario: LIB-001
           body:
             application/json: {}
     test: |
@@ -100,6 +112,8 @@ steps:
     req:
       /loans/{{ loan_id }}/return:
         post:
+          headers:
+            X-Test-Scenario: LIB-001
           body:
             application/json: {}
     test: |
@@ -110,6 +124,8 @@ steps:
     req:
       /books/B0001:
         get:
+          headers:
+            X-Test-Scenario: LIB-001
           body: null
     test: |
       current.res.status == 200 &&
@@ -119,6 +135,8 @@ steps:
     req:
       /members/M0001:
         get:
+          headers:
+            X-Test-Scenario: LIB-001
           body: null
     test: |
       current.res.status == 200 &&

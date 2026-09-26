@@ -2,7 +2,7 @@
   "generator": "runnora-docgen",
   "scenario": "LIB-005 SAVEPOINTで一部だけ確定した初期データをAPIから確認する",
   "source": "runbooks/scenarios/lib-005-savepoint.yml",
-  "sha256": "b911fc62436a6e27db1e820e3ca15d354e537de23694851eda354eb07e0dbc34",
+  "sha256": "d8a6369f1b9f7d4a3041992134a5fd4d6eec2b88bcbc3b176a7ef798a14dd341",
   "files": [
     "after.qmd",
     "before.qmd",
@@ -15,7 +15,7 @@
     {
       "kind": "runbook",
       "path": "runbooks/scenarios/lib-005-savepoint.yml",
-      "sha256": "b911fc62436a6e27db1e820e3ca15d354e537de23694851eda354eb07e0dbc34"
+      "sha256": "d8a6369f1b9f7d4a3041992134a5fd4d6eec2b88bcbc3b176a7ef798a14dd341"
     },
     {
       "kind": "config",
