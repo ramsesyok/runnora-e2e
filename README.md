@@ -9,9 +9,9 @@ BULK COLLECT/FORALL、例外処理、自律型トランザクションなど）�
 |---|---|---|
 | API 仕様 (正本) | [openapi/library-api.yaml](openapi/library-api.yaml) | 手書き |
 | API サンプル実装 | [api/](api/main.go)（Go + go-ora）、[db/](db/)（DDL） | 手書き |
-| API モック | [mock/](mock/mock-cases.yaml) → `mock/wiremock-out/` | `oapi2wire init` の雛形を編集 → `oapi2wire build` |
+| API モック | [mock/](mock/mock-cases.yaml) + [fixtures/responses/](fixtures/responses/) → `mock/wiremock-out/` | `oapi2wire init` の雛形を編集 → `oapi2wire build` |
 | 生成テスト | [runbooks/generated/](runbooks/generated/), [cases/generated/](cases/generated/) | `runnora generate` |
-| 契約テスト | [runbooks/contract/](runbooks/contract/), [cases/contract/](cases/contract/) | 生成 template を複製して拡張 |
+| 契約テスト | [runbooks/contract/](runbooks/contract/), [cases/contract/](cases/contract/) | 生成 template を複製して拡張。期待本文はモックの戻り値と同じ `fixtures/responses/` を参照 |
 | シナリオ試験 | [runbooks/scenarios/](runbooks/scenarios/), [sql/](sql/README.md) | 手書き（PL/SQL 前後処理付き） |
 | API ドキュメント・テスト手順書 | [docs/design-doc.pdf](docs/design-doc.pdf)、`docs/_book/`（HTML） | `tools/openapi-doc` + `runnora-docgen` + `ddq` |
 
@@ -37,7 +37,8 @@ runnora-e2e/
 ├─ api/                          サンプル実装（Go）        → 127.0.0.1:18081
 ├─ db/                           スキーマ DDL（SQL*Plus で実行）
 ├─ docker-compose.yml            Oracle Database Free 23ai → 127.0.0.1:1522/FREEPDB1
-├─ mock/                         oapi2wire 入力（case YAML・応答 JSON） → WireMock 127.0.0.1:18080
+├─ mock/                         oapi2wire の case YAML → WireMock 127.0.0.1:18080
+├─ fixtures/responses/           応答本文（モックの戻り値 = 契約テストの期待値。両方から参照）
 ├─ config.yaml                   runnora 設定（実 API 用。共通 PL/SQL フック）
 ├─ config.mock.yaml              runnora 設定（モック用。DB なし）
 ├─ sql/common/                   共通 前処理（リセット・シード）/ 後処理（不変条件検証）
@@ -48,6 +49,7 @@ runnora-e2e/
 ├─ runbooks/demo/                事後検証が不整合を検知することの確認（exit 4 が期待値）
 ├─ cases/                        ケース JSON（generated / contract）
 ├─ tools/openapi-doc/            OpenAPI → 手順書 API 仕様章（.qmd）の変換
+├─ tools/contract-check/         契約ケースとモックケースが同じ応答ファイルを指しているかの検査
 ├─ docs/                         手順書（ddq / Quarto book）。docs/generated/ は生成物
 └─ scripts/                      実行スクリプト（PowerShell 5.1 / 7 両対応）
 ```
@@ -106,7 +108,7 @@ runnora を直接呼ぶ例（シナリオ LIB-005）:
 | 種類 | 実行先 | 本数 | 検証 |
 |---|---|---|---|
 | 生成テスト | モック / 実 API | 8 suite | OpenAPI example で呼び出しステータスを確認 |
-| 契約テスト | モック / 実 API | 8 suite・21 ケース | ステータス + 本文の一部 + **OpenAPI 応答スキーマ検証**（`openapi3` ランナー） |
+| 契約テスト | モック / 実 API | 8 suite・21 ケース | ステータス + **本文の全体一致（モックと共有する期待ファイル）** + **OpenAPI 応答スキーマ検証**（`openapi3` ランナー） |
 | シナリオ試験 | 実 API | 7 runbook・59 手順 | 状態変化・ID 引き継ぎ・**DB 直接照会（runn DB ランナー）**・前後処理での DB 検証 |
 | 検知確認 | 実 API | 1 | 事後検証が DB 不整合を検知して exit 4 |
 
@@ -124,6 +126,30 @@ runnora を直接呼ぶ例（シナリオ LIB-005）:
 `90_verify_integrity` は「貸出可能冊数 = 所蔵 − 貸出中」などの不変条件をカーソル FOR LOOP で検証し、
 違反があれば `RAISE_APPLICATION_ERROR` で runnora を exit 4 にします。
 
+## モックの戻り値と期待値の共有
+
+oapi2wire のモックは、runbook を書きながら動かして確かめる相手として使います。
+そのためモックの戻り値と runbook の期待値を同じファイル（`fixtures/responses/<operationId>/<caseId>.json`）にしています。
+
+```text
+mock/mock-cases.yaml            - id: getMember_M0001 ... bodyFile: getMember/getMember_M0001.json
+                                                                     │（oapi2wire --responses-root fixtures/responses）
+fixtures/responses/getMember/getMember_M0001.json  ◀────────────────┤
+                                                                     │（json://）
+runbooks/contract/get_getMember.suite.yml
+  M0001:
+    include:
+      vars:
+        case:     json://../../cases/contract/members/get_getMember/01_M0001.json   ← 入力・ステータス・mockCase・ignorePaths
+        expected: json://../../fixtures/responses/getMember/getMember_M0001.json
+```
+
+- 契約ケースとモックケースは 1 対 1（`expect.mockCase`）。組合せの誤りは `tools/contract-check` が `mock-build.ps1` の中で検出します。
+- 本文は `compare` で全体一致。実装で変わる項目（貸出 ID・日付）だけ `ignorePaths`（jq 形式）で除外します。
+- モックに流したときの本文比較は同じファイル同士なので、モックで確かめられるのは「正しいケースが選ばれること・ステータス・OpenAPI スキーマ」です。本文の正しさは実 API に流して確かめます。
+- suite はケースごとに include ステップを並べ、`loop` は使いません（下表 #12）。
+- この形の suite を手順書にするには、include の `vars` の `json://` を読む runnora-docgen が必要です（runnora-docgen のブランチ `feature/include-vars-json`）。
+
 ## 検証結果（2026-09-26、Windows 11 / Windows PowerShell 5.1）
 
 `./scripts/run-all.ps1` で次を確認しました。
@@ -132,7 +158,7 @@ runnora を直接呼ぶ例（シナリオ LIB-005）:
 - 実 API: 生成 8/8、契約 8/8、シナリオ 7/7 成功、検知確認は期待どおり exit 4
   （`ORA-20100: integrity check failed (1): B0001 available=2 expected=3`）
 - OpenAPI カバレッジ（契約 + シナリオ）: 8/8 operation
-- 手順書: HTML（`docs/_book/`）と PDF（`docs/design-doc.pdf`、108 ページ）を発行
+- 手順書: HTML（`docs/_book/`）と PDF（`docs/design-doc.pdf`、112 ページ）を発行
 - 期待値を 1 項目だけ誤らせた契約ケースが失敗すること（検証が空振りしていないこと）
 
 ## 作成中に分かったこと（ツールへのフィードバック）
@@ -150,6 +176,7 @@ runnora を直接呼ぶ例（シナリオ LIB-005）:
 | 9 | runnora-docgen | DB 照会ステップは SQL が表に出ず「検証のみ」になる | 手順書本文で補足 |
 | 10 | ddq | PlantUML サーバを 127.0.0.1:18080 で探すため WireMock と衝突する | WireMock 停止後に手順書を生成 |
 | 11 | go-ora | TZ なし `TIMESTAMP` と `SYSTIMESTAMP` の比較がセッション TZ 依存で、go-ora 接続では 9 時間ずれて失敗した | ログ列を `TIMESTAMP WITH TIME ZONE` に |
+| 12 | runn | `loop`（`until` なし）は最後の回の失敗しか報告しない。`runnora generate` の suite（loop + include でケースを回す形）は、ケースを増やすと途中のケースの失敗を見逃す | 契約 suite はケースごとに include ステップを並べる形に変更。`contract-check` が loop の使用も検出 |
 
 OpenAPI 応答検証（`openapi3` ランナー）は、作成時に「`GET /books` 等が 400 を返すのに OpenAPI に未定義」
 という仕様漏れを検出しました（OpenAPI を修正済み）。

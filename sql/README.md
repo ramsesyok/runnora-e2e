@@ -15,7 +15,7 @@ runnora はフックファイルの **内容全体を 1 文として** go-ora �
 | `RAISE_APPLICATION_ERROR` | ○ | runnora は exit 4（フック失敗）で終了する。事後条件のアサーションに使える |
 
 フックは runbook 1 本ごとに `before → runbook → after` の順で実行されます
-（suite の `include` + `loop` でも 1 回だけ）。after は before や runbook が失敗しても実行されます。
+（suite が `include` で template を何度呼んでも 1 回だけ）。after は before や runbook が失敗しても実行されます。
 
 ## 実行順序
 

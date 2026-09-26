@@ -11,10 +11,12 @@
   "requestBody": null,
   "expect": {
     "status": 200,
-    "bodyMode": "subset",
-    "body": {
-      "total": 2
-    },
-    "ignorePaths": []
+    "mockCase": "listMemberLoans_M0002",
+    "bodyMode": "exact",
+    "ignorePaths": [
+      ".items[].loanedAt",
+      ".items[].dueDate",
+      ".items[].returnedAt"
+    ]
   }
 }

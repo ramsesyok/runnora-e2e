@@ -2,11 +2,10 @@
   "generator": "runnora-docgen",
   "scenario": "契約 createBook 蔵書を登録する（モック・実APIの両方で実行する）",
   "source": "runbooks/contract/post_createBook.suite.yml",
-  "sha256": "4a6541a9e5c31bb39ba1d88452e111c98a7841002cc971e7b8a83670a73013a5",
+  "sha256": "bf496b77522b6ce26a17bdb6bd6ff7c4d40050e51f0cf26c7ea5e6a4c9bb043a",
   "files": [
     "after.qmd",
     "before.qmd",
-    "cases.qmd",
     "expectations.qmd",
     "http.qmd",
     "request-json.qmd",
@@ -16,27 +15,42 @@
     {
       "kind": "runbook",
       "path": "runbooks/contract/post_createBook.suite.yml",
-      "sha256": "4a6541a9e5c31bb39ba1d88452e111c98a7841002cc971e7b8a83670a73013a5"
+      "sha256": "bf496b77522b6ce26a17bdb6bd6ff7c4d40050e51f0cf26c7ea5e6a4c9bb043a"
     },
     {
       "kind": "runbook",
       "path": "runbooks/contract/post_createBook.template.yml",
-      "sha256": "5b0da13612af6b05a051feaafd2df9b442407b9678636923809fe46669a6cff1"
+      "sha256": "d70a5226dd34ffee4c30ab8c113bb9121762c5fd4f203d424b24dde52e6571b2"
     },
     {
-      "kind": "case",
+      "kind": "json",
       "path": "cases/contract/books/post_createBook/01_created.json",
-      "sha256": "88b15f42b91e0b95efa05f724d62eb7d9566b58ce928b183db5ad1dcf88ad9d6"
+      "sha256": "d4a77816e05e4b345d67f101a4960354406079b5e07a7ef69d2cb579d1ceb5b5"
     },
     {
-      "kind": "case",
+      "kind": "json",
+      "path": "fixtures/responses/createBook/createBook_default.json",
+      "sha256": "c42f26e0475de0e0650bf93a5fa52b4a9673021c8ed74b79c1b323e3044d6f6a"
+    },
+    {
+      "kind": "json",
       "path": "cases/contract/books/post_createBook/02_duplicate_isbn.json",
-      "sha256": "61f4f6a1eb4ea607fab1be9214d450753cde58beb32cec63d07648a18d563197"
+      "sha256": "881dec66130124050eb8ab330bfb85deee76472ee95feda3c2bcc70873e54501"
     },
     {
-      "kind": "case",
+      "kind": "json",
+      "path": "fixtures/responses/createBook/createBook_duplicate_isbn.json",
+      "sha256": "efa96b600b244503d4d5c1744249f47fc8a152ac46b39efe49ffca85b5f14867"
+    },
+    {
+      "kind": "json",
       "path": "cases/contract/books/post_createBook/03_invalid_isbn.json",
-      "sha256": "b9cac00590912d19c9ee1810c4fc6a8ba42c4cbe9f0427af693ca3540a78ec78"
+      "sha256": "8e01093cf239b694c67f48fbd44b1025613395b14c95a244e9681eece553f955"
+    },
+    {
+      "kind": "json",
+      "path": "fixtures/responses/createBook/createBook_invalid_isbn.json",
+      "sha256": "94ac4263342ad550dee92786f36c6dc92c25e5c298381380fd3825529c2eb46c"
     },
     {
       "kind": "config",

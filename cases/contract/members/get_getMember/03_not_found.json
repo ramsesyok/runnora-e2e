@@ -9,10 +9,8 @@
   "requestBody": null,
   "expect": {
     "status": 404,
-    "bodyMode": "subset",
-    "body": {
-      "code": "NOT_FOUND"
-    },
+    "mockCase": "getMember_not_found",
+    "bodyMode": "exact",
     "ignorePaths": []
   }
 }

@@ -14,10 +14,8 @@
   },
   "expect": {
     "status": 409,
-    "bodyMode": "subset",
-    "body": {
-      "code": "DUPLICATE_BOOK"
-    },
+    "mockCase": "createBook_duplicate_isbn",
+    "bodyMode": "exact",
     "ignorePaths": []
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "tech_available",
-  "description": "貸出可能な技術書の検索は 200",
+  "description": "貸出可能な技術書（B0003 は contract_setup で 1 冊貸出中）",
   "pathParams": {},
   "queryParams": {
     "genre": "TECH",
@@ -10,8 +10,8 @@
   "requestBody": null,
   "expect": {
     "status": 200,
-    "bodyMode": "subset",
-    "body": {},
+    "mockCase": "listBooks_tech_available",
+    "bodyMode": "exact",
     "ignorePaths": []
   }
 }

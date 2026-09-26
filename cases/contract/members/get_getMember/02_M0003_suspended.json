@@ -9,11 +9,8 @@
   "requestBody": null,
   "expect": {
     "status": 200,
-    "bodyMode": "subset",
-    "body": {
-      "memberId": "M0003",
-      "status": "SUSPENDED"
-    },
+    "mockCase": "getMember_M0003_suspended",
+    "bodyMode": "exact",
     "ignorePaths": []
   }
 }

@@ -4,10 +4,6 @@
 
 {{< include ../../generated/contract/post-createbook-suite/scenario.qmd >}}
 
-### ケースデータ
-
-{{< include ../../generated/contract/post-createbook-suite/cases.qmd >}}
-
 ### HTTP 呼び出し
 
 {{< include ../../generated/contract/post-createbook-suite/http.qmd >}}

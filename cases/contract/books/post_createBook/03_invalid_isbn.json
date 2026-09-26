@@ -14,10 +14,8 @@
   },
   "expect": {
     "status": 400,
-    "bodyMode": "subset",
-    "body": {
-      "code": "VALIDATION_ERROR"
-    },
+    "mockCase": "createBook_invalid_isbn",
+    "bodyMode": "exact",
     "ignorePaths": []
   }
 }

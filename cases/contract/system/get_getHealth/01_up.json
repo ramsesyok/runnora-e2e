@@ -7,11 +7,8 @@
   "requestBody": null,
   "expect": {
     "status": 200,
-    "bodyMode": "subset",
-    "body": {
-      "status": "UP",
-      "database": "UP"
-    },
+    "mockCase": "getHealth_default",
+    "bodyMode": "exact",
     "ignorePaths": []
   }
 }

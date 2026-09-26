@@ -7,8 +7,8 @@ OpenAPI を唯一の正本とし、そこから次の順で資産を作る。人
 | 順 | 作業 | ツール | 入力 | 出力 |
 |----|------|--------|------|------|
 | 1 | API 仕様を書く | - | - | **`openapi/library-api.yaml`** |
-| 2 | モックの雛形を作る | `oapi2wire init` | OpenAPI | `mock/mock-cases.yaml`, `mock/mock-responses/` |
-| 3 | 返し分けを書く | - | 雛形 | **`mock/mock-cases.yaml`, `mock/mock-responses/`** |
+| 2 | モックの雛形を作る | `oapi2wire init` | OpenAPI | `mock/mock-cases.yaml`, `fixtures/responses/` |
+| 3 | 返し分けを書く | - | 雛形 | **`mock/mock-cases.yaml`, `fixtures/responses/`** |
 | 4 | モックを生成する | `oapi2wire validate` / `build` | OpenAPI + case YAML | `mock/wiremock-out/` |
 | 5 | テストの雛形を生成する | `runnora generate` | OpenAPI | `runbooks/generated/`, `cases/generated/` |
 | 6 | 契約テストを書く | - | 生成 template を複製 | **`runbooks/contract/`, `cases/contract/`** |
@@ -17,10 +17,10 @@ OpenAPI を唯一の正本とし、そこから次の順で資産を作る。人
 
 : 資産の流れ {#tbl-asset-flow}
 
-モックと実装が同じ契約テストに合格するよう、次の値を 3 か所でそろえている。
+モックと実装が同じ契約テストに合格するよう、次の値をそろえている。
 
 - OpenAPI の `example`（生成テストの入力・期待値になる）
-- モックの返し分け条件と応答 JSON（`mock/`）
+- 応答本文 `fixtures/responses/`：**モックの戻り値と契約テストの期待値を同じファイルで共有**する（@sec-mock-design）
 - 実 DB の初期データ（`sql/common/10_seed_master.sql`）
 
 ## 初期データ {#sec-seed}
@@ -47,7 +47,7 @@ runbook を実行するたびに、共通前処理がデータを全削除して
 ### 実行順序
 
 runnora は runbook 1 本ごとに次の順で処理する。後処理は runbook が失敗しても実行される。
-suite が `include` + `loop` で template を繰り返しても、前後処理は suite 1 本につき 1 回である。
+suite が `include` で template を何度呼んでも、前後処理は suite 1 本につき 1 回である。
 
 | 順 | 区分 | ファイル | 役割 |
 |----|------|----------|------|
@@ -100,19 +100,41 @@ runnora はフックファイルの内容全体を 1 つの文として実行す
 
 : 使用している PL/SQL 構文 {#tbl-plsql-syntax}
 
-## モックの返し分け {#sec-mock-design}
+## モックと期待値の共有 {#sec-mock-design}
+
+oapi2wire のモックは、runbook を書きながら動かして確かめる相手として使う。
+そのため、**モックの戻り値と runbook の期待値を同じファイルにする**。
+
+| 役割 | ファイル | 参照のしかた |
+|------|----------|--------------|
+| 応答本文（正本） | `fixtures/responses/<operationId>/<caseId>.json` | - |
+| モックの返し分け | `mock/mock-cases.yaml` | ケース `<caseId>` の `bodyFile`（oapi2wire `--responses-root fixtures/responses`） |
+| 契約ケース | `cases/contract/**/NN_<name>.json` | 入力・期待ステータス・`expect.mockCase`（= `<caseId>`）・`expect.ignorePaths` |
+| 契約 suite | `runbooks/contract/*.suite.yml` | ケースごとの include ステップに `vars.case` と `vars.expected`（= 同じ bodyFile）を並べる |
+
+: 応答本文の共有 {#tbl-shared-fixtures}
+
+- 検証は `compare(応答本文, 期待ファイル, ignorePaths)` による**全体一致**。実装で値が変わる項目
+  （貸出 ID・日付）だけを `ignorePaths`（jq 形式、例 `.items[].loanedAt`）で除外する。
+- 契約ケースとモックケースは 1 対 1。ケースの組合せ（`mockCase`・`bodyFile`・ステータス）の一致は
+  `tools/contract-check` が `scripts/mock-build.ps1` の中で検査する。
+- モックに対する本文比較は同じファイル同士の比較になるため、モックで確かめられるのは
+  「入力に対して正しいケースが選ばれること」「ステータス」「OpenAPI 応答スキーマ」である。
+  本文そのものの正しさは実 API に対する契約テストで確かめる。
+- suite ではケースごとに include ステップを並べ、`loop` は使わない。runn の `loop`（`until` なし）は
+  最後の回の失敗しか報告しないため、途中のケースの失敗を見逃す（作成時に実機で確認）。
 
 WireMock は状態を持たないため、返し分けは「入力 → 固定応答」の対応で定義する。
-各 operation に fallback を置き、想定外の入力には 404 / 400 を返す（未定義の組合せを 501 にしない）。
+各 operation に fallback を置き、契約ケース以外の想定外の入力には 404 / 400 を返す（未定義の組合せを 501 にしない）。
 
 | operation | 条件 | 応答 |
 |-----------|------|------|
 | listBooks | genre=NOVEL / genre=TECH & availableOnly=true / 定義外 genre / その他 | 200 / 200 / 400 / 200（全件） |
-| getBook | B0001・B0002 / その他 | 200 / 404 |
-| createBook | B0900 の登録 / ISBN 9784000000001 / その他 | 201 / 409 / 400 |
-| getMember | M0001・M0003 / その他 | 200 / 404 |
-| listMemberLoans | M0001・M0002 / その他 | 200 / 404 |
-| createLoan | M0001+B0001 / memberId=M0003 / bookId=B9999 / その他 | 201 / 409 / 404 / 400 |
-| returnLoan | loanId=1 / loanId=2 / その他 | 200 / 409 / 404 |
+| getBook | B0001・B0002 / B9999 / その他 | 200 / 404 / 404 |
+| createBook | B0900 の登録 / ISBN 9784000000001 / ISBN 978400 / その他 | 201 / 409 / 400 / 400 |
+| getMember | M0001・M0003 / M9999 / その他 | 200 / 404 / 404 |
+| listMemberLoans | M0001・M0002 / M9999 / その他 | 200 / 404 / 404 |
+| createLoan | M0001+B0001 / memberId=M0003 / bookId=B9999 / {memberId: M0001} のみ / その他 | 201 / 409 / 404 / 400 / 400 |
+| returnLoan | loanId=1 / loanId=2 / loanId=9999 / その他 | 200 / 409 / 404 / 404 |
 
 : モックの返し分け（`mock/mock-cases.yaml`） {#tbl-mock-cases}

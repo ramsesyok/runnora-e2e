@@ -10,10 +10,8 @@
   "requestBody": null,
   "expect": {
     "status": 400,
-    "bodyMode": "subset",
-    "body": {
-      "code": "VALIDATION_ERROR"
-    },
+    "mockCase": "listBooks_invalid_genre",
+    "bodyMode": "exact",
     "ignorePaths": []
   }
 }

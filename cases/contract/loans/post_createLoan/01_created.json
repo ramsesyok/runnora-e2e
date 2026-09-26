@@ -10,13 +10,12 @@
   },
   "expect": {
     "status": 201,
-    "bodyMode": "subset",
-    "body": {
-      "memberId": "M0001",
-      "bookId": "B0001",
-      "status": "ACTIVE",
-      "returnedAt": null
-    },
-    "ignorePaths": []
+    "mockCase": "createLoan_default",
+    "bodyMode": "exact",
+    "ignorePaths": [
+      ".loanId",
+      ".loanedAt",
+      ".dueDate"
+    ]
   }
 }

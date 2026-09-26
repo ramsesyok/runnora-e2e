@@ -10,10 +10,8 @@
   },
   "expect": {
     "status": 409,
-    "bodyMode": "subset",
-    "body": {
-      "code": "MEMBER_SUSPENDED"
-    },
+    "mockCase": "createLoan_member_suspended",
+    "bodyMode": "exact",
     "ignorePaths": []
   }
 }

@@ -2,11 +2,10 @@
   "generator": "runnora-docgen",
   "scenario": "契約 createLoan 本を貸し出す（モック・実APIの両方で実行する）",
   "source": "runbooks/contract/post_createLoan.suite.yml",
-  "sha256": "c6704ddfe433c8e1f499c29e21edd1d9e35a2b886672c161a80b242ae0a8a35b",
+  "sha256": "fc83231244ef53ff5372fa8791f3867f500fc9cdac86b0e44254067968131f46",
   "files": [
     "after.qmd",
     "before.qmd",
-    "cases.qmd",
     "expectations.qmd",
     "http.qmd",
     "request-json.qmd",
@@ -16,32 +15,52 @@
     {
       "kind": "runbook",
       "path": "runbooks/contract/post_createLoan.suite.yml",
-      "sha256": "c6704ddfe433c8e1f499c29e21edd1d9e35a2b886672c161a80b242ae0a8a35b"
+      "sha256": "fc83231244ef53ff5372fa8791f3867f500fc9cdac86b0e44254067968131f46"
     },
     {
       "kind": "runbook",
       "path": "runbooks/contract/post_createLoan.template.yml",
-      "sha256": "d0a8d2b528423a4419d1db9aa0e4258c8b51eb8b7ee2540e7f2cc52d853faae0"
+      "sha256": "2acd60d2b406e08a3434da83f32680fd2f4d813223d58228891241eab2707bc7"
     },
     {
-      "kind": "case",
+      "kind": "json",
       "path": "cases/contract/loans/post_createLoan/01_created.json",
-      "sha256": "c6c1bea9df53a1e3c12cbc500c3d05b825faa8bdfd5981e38e290942a615441b"
+      "sha256": "c716cbf9ade922d12e28a1e73b9f9ad185beceba6aebf668c77c806e71027cec"
     },
     {
-      "kind": "case",
+      "kind": "json",
+      "path": "fixtures/responses/createLoan/createLoan_default.json",
+      "sha256": "68510ef671069c76834c38f1270e7d4e259fbb1e119358bfe2dfa89f2bad1483"
+    },
+    {
+      "kind": "json",
+      "path": "fixtures/responses/createLoan/createLoan_member_suspended.json",
+      "sha256": "48536d59b2155ed94b7d82b47bd3380323c4ecd28919f51496736d9726edd028"
+    },
+    {
+      "kind": "json",
       "path": "cases/contract/loans/post_createLoan/02_member_suspended.json",
-      "sha256": "98476fd484e6679df0053193ff04e1afd9458501347aa1c9c6c1a965991ca15b"
+      "sha256": "6535185cc85731cae48dc44807de1ee1eb5d76a068ef840c524c4909cc819cd3"
     },
     {
-      "kind": "case",
+      "kind": "json",
       "path": "cases/contract/loans/post_createLoan/03_book_not_found.json",
-      "sha256": "08638849763df433bc638eef8bc62d5f458f64ea904fdd2d847e4e9b77852c12"
+      "sha256": "620d86122f9309afe60d802c8ec7ad08a66f63970e835e6a1f33ca00ab7d1da4"
     },
     {
-      "kind": "case",
+      "kind": "json",
+      "path": "fixtures/responses/createLoan/createLoan_book_not_found.json",
+      "sha256": "5eded1e42d5f3cbede4113dcc413bfebe30933ce6d8fab266c2922cceded5168"
+    },
+    {
+      "kind": "json",
       "path": "cases/contract/loans/post_createLoan/04_missing_book_id.json",
-      "sha256": "9f436a157ed816a429badaecb591e2a3075781c9b9bdbf30774ea8dc657dfefa"
+      "sha256": "5ed8109f8dfa735a29ee82782a344d9d184c484f5339f082af21d1e5dbaefc16"
+    },
+    {
+      "kind": "json",
+      "path": "fixtures/responses/createLoan/createLoan_missing_book_id.json",
+      "sha256": "4901327762ea5af469b60c5ac10a63c680e2126c70ddc212062b5b7ea4397799"
     },
     {
       "kind": "config",

@@ -11,10 +11,8 @@
   "requestBody": null,
   "expect": {
     "status": 404,
-    "bodyMode": "subset",
-    "body": {
-      "code": "NOT_FOUND"
-    },
+    "mockCase": "listMemberLoans_not_found",
+    "bodyMode": "exact",
     "ignorePaths": []
   }
 }

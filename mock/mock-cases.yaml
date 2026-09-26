@@ -1,6 +1,9 @@
 # oapi2wire case YAML
 #   oapi2wire init で雛形を作り、返し分け条件を手で追記したもの。
-#   契約テスト (runbooks/contract/, cases/contract/) と同じ入力で同じステータス・code を返すように揃えている。
+#   応答本文 (bodyFile) は fixtures/responses/ に置き、契約テストの期待値としても同じファイルを使う
+#   (oapi2wire は --responses-root fixtures/responses で参照する)。
+#   契約ケース (cases/contract/**.json の expect.mockCase) とモックケースの id は 1 対 1 に対応させる。
+#   fallback は契約ケース以外の想定外入力に対する汎用応答 (fixtures/responses/common/)。
 #   モックは状態を持たないため、状態変化 (貸出で在庫が減る等) は実 API のシナリオテストで確認する。
 version: 1
 defaults:
@@ -84,6 +87,17 @@ cases:
       status: 200
       bodyFile: getBook/getBook_B0002.json
 
+  - id: getBook_not_found
+    operationId: getBook
+    priority: 12
+    request:
+      pathParams:
+        bookId:
+          equalTo: "B9999"
+    response:
+      status: 404
+      bodyFile: getBook/getBook_not_found.json
+
   - id: getBook_fallback
     operationId: getBook
     fallback: true
@@ -119,6 +133,17 @@ cases:
       status: 409
       bodyFile: createBook/createBook_duplicate_isbn.json
 
+  - id: createBook_invalid_isbn
+    operationId: createBook
+    priority: 11
+    request:
+      body:
+        matchesJsonPath:
+          - "$[?(@.isbn == '978400')]"
+    response:
+      status: 400
+      bodyFile: createBook/createBook_invalid_isbn.json
+
   - id: createBook_fallback
     operationId: createBook
     fallback: true
@@ -150,6 +175,17 @@ cases:
       status: 200
       bodyFile: getMember/getMember_M0003_suspended.json
 
+  - id: getMember_not_found
+    operationId: getMember
+    priority: 12
+    request:
+      pathParams:
+        memberId:
+          equalTo: "M9999"
+    response:
+      status: 404
+      bodyFile: getMember/getMember_not_found.json
+
   - id: getMember_fallback
     operationId: getMember
     fallback: true
@@ -179,6 +215,17 @@ cases:
     response:
       status: 200
       bodyFile: listMemberLoans/listMemberLoans_M0002.json
+
+  - id: listMemberLoans_not_found
+    operationId: listMemberLoans
+    priority: 12
+    request:
+      pathParams:
+        memberId:
+          equalTo: "M9999"
+    response:
+      status: 404
+      bodyFile: listMemberLoans/listMemberLoans_not_found.json
 
   - id: listMemberLoans_fallback
     operationId: listMemberLoans
@@ -223,7 +270,18 @@ cases:
           - "$.memberId"
     response:
       status: 404
-      bodyFile: common/not_found.json
+      bodyFile: createLoan/createLoan_book_not_found.json
+
+  - id: createLoan_missing_book_id
+    operationId: createLoan
+    priority: 30
+    request:
+      body:
+        equalToJson:
+          memberId: "M0001"
+    response:
+      status: 400
+      bodyFile: createLoan/createLoan_missing_book_id.json
 
   - id: createLoan_fallback
     operationId: createLoan
@@ -254,6 +312,17 @@ cases:
     response:
       status: 409
       bodyFile: returnLoan/returnLoan_2_already_returned.json
+
+  - id: returnLoan_not_found
+    operationId: returnLoan
+    priority: 12
+    request:
+      pathParams:
+        loanId:
+          equalTo: "9999"
+    response:
+      status: 404
+      bodyFile: returnLoan/returnLoan_not_found.json
 
   - id: returnLoan_fallback
     operationId: returnLoan

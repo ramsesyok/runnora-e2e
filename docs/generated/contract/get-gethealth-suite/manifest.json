@@ -2,11 +2,10 @@
   "generator": "runnora-docgen",
   "scenario": "契約 getHealth 稼働状態を確認する（モック・実APIの両方で実行する）",
   "source": "runbooks/contract/get_getHealth.suite.yml",
-  "sha256": "d497a4a5aa4497eba90f06ce0ee87294aeda7879e2a69aa8c5257366e06173c8",
+  "sha256": "5a471188e4fc9afa93ce53b3b5d57edca92ad339017059479fce4a393cece85e",
   "files": [
     "after.qmd",
     "before.qmd",
-    "cases.qmd",
     "expectations.qmd",
     "http.qmd",
     "scenario.qmd"
@@ -15,17 +14,22 @@
     {
       "kind": "runbook",
       "path": "runbooks/contract/get_getHealth.suite.yml",
-      "sha256": "d497a4a5aa4497eba90f06ce0ee87294aeda7879e2a69aa8c5257366e06173c8"
+      "sha256": "5a471188e4fc9afa93ce53b3b5d57edca92ad339017059479fce4a393cece85e"
     },
     {
       "kind": "runbook",
       "path": "runbooks/contract/get_getHealth.template.yml",
-      "sha256": "8d62139487836d28795980f55b36f54e65d07909921082f4ac8d161df65e95c5"
+      "sha256": "fe962c4c8c97cac0f7c5045d42097f72c9c7681bef72db43627d96c82a28b029"
     },
     {
-      "kind": "case",
+      "kind": "json",
       "path": "cases/contract/system/get_getHealth/01_up.json",
-      "sha256": "175dc237d0eecabee28da59e7e616cec61acd7ece6a771be502b1642d99af3e5"
+      "sha256": "2f697bfcecec3f29e4a217d07c942b11b4875e92fdc121152f3dbc3451ff38a8"
+    },
+    {
+      "kind": "json",
+      "path": "fixtures/responses/getHealth/getHealth_default.json",
+      "sha256": "6deeff395dbb3e5597659a1e69c2ee40a5feff5de89be258a3a4cac425180ebb"
     },
     {
       "kind": "config",

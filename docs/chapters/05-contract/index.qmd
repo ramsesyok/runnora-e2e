@@ -2,9 +2,10 @@
 
 契約テストは、同じケース JSON を**モック（WireMock）と実装（実 API）の両方**に流し、
 どちらも OpenAPI どおりに応答することを確認する。各 suite は `runnora generate` が作った
-template を `runbooks/contract/` に複製し、次の 2 点を追加したものである。
+template を `runbooks/contract/` に複製し、次の 3 点を変えたものである。
 
-- 検証式にケース JSON の `expect.body` のトップレベル項目との一致（部分一致）を追加
+- 応答本文をモックの戻り値と同じファイル（`fixtures/responses/`）と全体一致で比較する（実装で変わる項目は除外。@sec-mock-design）
+- suite はケースごとに include ステップを並べる（生成 suite の `loop` は途中のケースの失敗を報告しないため）
 - ランナーに `openapi3` を指定し、応答を OpenAPI の応答定義・スキーマで自動検証
   （作成時、`GET /books` などの 400 応答が OpenAPI に未定義であることをこの検証で検出し、定義を補った）
 

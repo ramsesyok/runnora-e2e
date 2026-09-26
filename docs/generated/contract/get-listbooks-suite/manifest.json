@@ -2,11 +2,10 @@
   "generator": "runnora-docgen",
   "scenario": "契約 listBooks 蔵書を検索する（モック・実APIの両方で実行する）",
   "source": "runbooks/contract/get_listBooks.suite.yml",
-  "sha256": "1a044eb164ae5c93a49f81c87bcf1c9fd9b4c9bcd307f23ff4864531fc51759d",
+  "sha256": "ba0da6193692eafecd5deaab9c0661c17663310b0b0ff502724feb9a8cd94dca",
   "files": [
     "after.qmd",
     "before.qmd",
-    "cases.qmd",
     "expectations.qmd",
     "http.qmd",
     "scenario.qmd"
@@ -15,27 +14,42 @@
     {
       "kind": "runbook",
       "path": "runbooks/contract/get_listBooks.suite.yml",
-      "sha256": "1a044eb164ae5c93a49f81c87bcf1c9fd9b4c9bcd307f23ff4864531fc51759d"
+      "sha256": "ba0da6193692eafecd5deaab9c0661c17663310b0b0ff502724feb9a8cd94dca"
     },
     {
       "kind": "runbook",
       "path": "runbooks/contract/get_listBooks.template.yml",
-      "sha256": "04abbf14d2b8b120197b8309aecfb4bbdc9a11a75e2a6a41a635ef5b4cf5bf4e"
+      "sha256": "90828bf7e57e7fc12a204b7c53f1d122d305dfed66a63fa7f896764a1121b9b6"
     },
     {
-      "kind": "case",
+      "kind": "json",
       "path": "cases/contract/books/get_listBooks/01_novel.json",
-      "sha256": "e1e6c6ea21667f18fa02f13ab9795e86c700ad735d05d13e8bb4dd4fdaf41f67"
+      "sha256": "318fd1dbdac3ea2a62c2cef543c7da3e354d1da5f1a987fcc83791575e49530f"
     },
     {
-      "kind": "case",
+      "kind": "json",
+      "path": "fixtures/responses/listBooks/listBooks_novel.json",
+      "sha256": "72b9a0ccbcd5d1e30cc21e906c4259d1b113bc01b6155a1635139eaf5f7bd6e0"
+    },
+    {
+      "kind": "json",
       "path": "cases/contract/books/get_listBooks/02_tech_available.json",
-      "sha256": "123bcb6f03badade8ed44d39a87a26d87c7e49166b7d8db0a40aad0e374dfe31"
+      "sha256": "570d99bbe2fad9632da5fe5ecf10d63800c89ba3b4897c10358caf5b94e54c1a"
     },
     {
-      "kind": "case",
+      "kind": "json",
+      "path": "fixtures/responses/listBooks/listBooks_tech_available.json",
+      "sha256": "b72ee393f74963a1da630ab3b80a9a36b53b539c1ce221b77cf29fdd8c1fb5de"
+    },
+    {
+      "kind": "json",
+      "path": "fixtures/responses/listBooks/listBooks_invalid_genre.json",
+      "sha256": "8d38d408cf922f4201b7ab4d8f2c47bd5eef4cccc62055b3aff4c3eb8e209bac"
+    },
+    {
+      "kind": "json",
       "path": "cases/contract/books/get_listBooks/03_invalid_genre.json",
-      "sha256": "3df3e5d1d7135596fcb99d8257b2c973f5f479b78bfb8a9197732c97e785deac"
+      "sha256": "08ebf17f2533f5711562d317a1d845c7d52791511aa683dd77c5f840130d0e01"
     },
     {
       "kind": "config",

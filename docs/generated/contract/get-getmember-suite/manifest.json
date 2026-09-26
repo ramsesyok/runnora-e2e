@@ -2,11 +2,10 @@
   "generator": "runnora-docgen",
   "scenario": "契約 getMember 会員と貸出状況を取得する（モック・実APIの両方で実行する）",
   "source": "runbooks/contract/get_getMember.suite.yml",
-  "sha256": "04fd82bafec4f484307cc6cc055aa190085742445dd81d0dcfc6631a98edf065",
+  "sha256": "ea7c15ea4fc7e60db1dc231821103f2b7893f67fd617ded7005c871a77d98cb6",
   "files": [
     "after.qmd",
     "before.qmd",
-    "cases.qmd",
     "expectations.qmd",
     "http.qmd",
     "scenario.qmd"
@@ -15,27 +14,42 @@
     {
       "kind": "runbook",
       "path": "runbooks/contract/get_getMember.suite.yml",
-      "sha256": "04fd82bafec4f484307cc6cc055aa190085742445dd81d0dcfc6631a98edf065"
+      "sha256": "ea7c15ea4fc7e60db1dc231821103f2b7893f67fd617ded7005c871a77d98cb6"
     },
     {
       "kind": "runbook",
       "path": "runbooks/contract/get_getMember.template.yml",
-      "sha256": "60186d6d5d8d3bc35dc8a2c6fad9fc3de385f355cd7be1f23780b2f6e48daf52"
+      "sha256": "5a9de26785d6a414b83cfc0377ec4c9b1c2ce544904df6813ab9506c4a431b5c"
     },
     {
-      "kind": "case",
+      "kind": "json",
       "path": "cases/contract/members/get_getMember/01_M0001.json",
-      "sha256": "bc4da9548a650d892214819aa9703631e883dbc2d6943b1d91ef173fdf339272"
+      "sha256": "4c22af8564b056ebff7676ff64c73ce831cf69e8ebb9edbdc507ac853101d598"
     },
     {
-      "kind": "case",
+      "kind": "json",
+      "path": "fixtures/responses/getMember/getMember_M0001.json",
+      "sha256": "99235023d50fca7354064086db362f55324647e7605f56adba937540c900d80f"
+    },
+    {
+      "kind": "json",
       "path": "cases/contract/members/get_getMember/02_M0003_suspended.json",
-      "sha256": "5ca998259e28516c8fd3d29ea542d809a114181d3739af4873265f016a66c6d8"
+      "sha256": "9f986b1359567e5fbab3ad82dc11ff7483cf03ea23c161f8766dd912c6dea358"
     },
     {
-      "kind": "case",
+      "kind": "json",
+      "path": "fixtures/responses/getMember/getMember_M0003_suspended.json",
+      "sha256": "fa2da929736d420dd2a9d8365c4ef2e2926e6fb6818417c5709a7e43b3d08635"
+    },
+    {
+      "kind": "json",
       "path": "cases/contract/members/get_getMember/03_not_found.json",
-      "sha256": "9cff48af1064fc94f87433ea0bb622207e917d17f07829f285a77cde4dc4a3cd"
+      "sha256": "b116d761a9a660c798f8ddbd3143f22933193ac33915e733124f98392eb90586"
+    },
+    {
+      "kind": "json",
+      "path": "fixtures/responses/getMember/getMember_not_found.json",
+      "sha256": "dd01cc608a6f6cdd17b2098480bb16a0c878c742f86cf28ccc6bbc3a290f06d9"
     },
     {
       "kind": "config",

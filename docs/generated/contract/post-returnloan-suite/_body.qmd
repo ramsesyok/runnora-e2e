@@ -4,10 +4,6 @@
 
 {{< include ../../generated/contract/post-returnloan-suite/scenario.qmd >}}
 
-### ケースデータ
-
-{{< include ../../generated/contract/post-returnloan-suite/cases.qmd >}}
-
 ### HTTP 呼び出し
 
 {{< include ../../generated/contract/post-returnloan-suite/http.qmd >}}

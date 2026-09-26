@@ -10,10 +10,8 @@
   },
   "expect": {
     "status": 404,
-    "bodyMode": "subset",
-    "body": {
-      "code": "NOT_FOUND"
-    },
+    "mockCase": "createLoan_book_not_found",
+    "bodyMode": "exact",
     "ignorePaths": []
   }
 }

@@ -1,5 +1,6 @@
 # runbooks/generated/ から複製して拡張した契約テスト用 template (生成物は再生成で上書きされるため)
-# 変更点: ステータスに加え、expect.body のトップレベル項目が応答と一致すること (subset) を検証する
+# 変更点: ステータスに加え、応答本文がモックと共有する期待ファイル (vars.expected) と一致することを
+#         compare で検証する (実 API で変わる項目は case.expect.ignorePaths で除外)
 desc: 蔵書を登録する contract template
 labels:
   - openapi
@@ -18,6 +19,7 @@ runners:
 
 vars:
   case: {}
+  expected: {}
 
 steps:
   call_api:
@@ -29,4 +31,4 @@ steps:
             application/json: "{{ vars.case.requestBody }}"
     test: |
       current.res.status == vars.case.expect.status &&
-      all(keys(vars.case.expect.body), { current.res.body[#] == vars.case.expect.body[#] })
+      compare(current.res.body, vars.expected, vars.case.expect.ignorePaths)

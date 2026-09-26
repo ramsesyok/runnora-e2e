@@ -2,11 +2,10 @@
   "generator": "runnora-docgen",
   "scenario": "契約 returnLoan 本を返却する（モック・実APIの両方で実行する）",
   "source": "runbooks/contract/post_returnLoan.suite.yml",
-  "sha256": "af01db4c32d06e8cc7caa0bcce2296c02df704a036823a9db595e1194ff229e2",
+  "sha256": "a1b50cca0a1849c5802e14be5f6d14a4a75e3788e18001feed929542f91b7511",
   "files": [
     "after.qmd",
     "before.qmd",
-    "cases.qmd",
     "expectations.qmd",
     "http.qmd",
     "request-json.qmd",
@@ -16,27 +15,42 @@
     {
       "kind": "runbook",
       "path": "runbooks/contract/post_returnLoan.suite.yml",
-      "sha256": "af01db4c32d06e8cc7caa0bcce2296c02df704a036823a9db595e1194ff229e2"
+      "sha256": "a1b50cca0a1849c5802e14be5f6d14a4a75e3788e18001feed929542f91b7511"
     },
     {
       "kind": "runbook",
       "path": "runbooks/contract/post_returnLoan.template.yml",
-      "sha256": "fd382429d7319cb467f48242e5ad483de0707bb55a67c94510ce54b2f64a38e7"
+      "sha256": "126fb2c29ad0919140a7bbe48e0a3b94a88c98ec840fad5fa1942276657e88e8"
     },
     {
-      "kind": "case",
+      "kind": "json",
       "path": "cases/contract/loans/post_returnLoan/01_returned.json",
-      "sha256": "262a09a37b4487544ebaad6a4d96af5e342f79fa026491ffd99571d0dba057a7"
+      "sha256": "707a2b426d7ec5ccfcd52b23a5a042569f4f9c7382eef16357db9b2e7397bb23"
     },
     {
-      "kind": "case",
+      "kind": "json",
+      "path": "fixtures/responses/returnLoan/returnLoan_1.json",
+      "sha256": "bbf6b6d55b04fde3cd0bf800551ff48a66a149652bfee888ea11891e187cd0dc"
+    },
+    {
+      "kind": "json",
       "path": "cases/contract/loans/post_returnLoan/02_already_returned.json",
-      "sha256": "14d0c5e7909f1bcaf67c8ac1f52c0d2caf215030ec266e999f732e9c39d9d630"
+      "sha256": "9fe5f5aafce60a99b58f2fb1076d9928ded47207682a227d2a71ddc1f3881673"
     },
     {
-      "kind": "case",
+      "kind": "json",
+      "path": "fixtures/responses/returnLoan/returnLoan_2_already_returned.json",
+      "sha256": "25e52737ef56d06b68e10c6bb929d70e817d60b1ade829838d090bf91990797b"
+    },
+    {
+      "kind": "json",
       "path": "cases/contract/loans/post_returnLoan/03_not_found.json",
-      "sha256": "a5dce02aeb4f5b43c1050fe840e6fe1bd59ebb35c321835382ddc91957c5a7f9"
+      "sha256": "14f3d1e35d5622ab5b838bbd8f7e6a5bb34da10620d27b2d79870474edea975c"
+    },
+    {
+      "kind": "json",
+      "path": "fixtures/responses/returnLoan/returnLoan_not_found.json",
+      "sha256": "bf7d996fd66b2ffa53b92cfece6aade3ba9163393db356f0755b921e46c4a776"
     },
     {
       "kind": "config",

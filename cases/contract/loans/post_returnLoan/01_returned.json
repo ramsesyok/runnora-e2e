@@ -9,13 +9,12 @@
   "requestBody": {},
   "expect": {
     "status": 200,
-    "bodyMode": "subset",
-    "body": {
-      "loanId": 1,
-      "memberId": "M0002",
-      "bookId": "B0003",
-      "status": "RETURNED"
-    },
-    "ignorePaths": []
+    "mockCase": "returnLoan_1",
+    "bodyMode": "exact",
+    "ignorePaths": [
+      ".loanedAt",
+      ".dueDate",
+      ".returnedAt"
+    ]
   }
 }

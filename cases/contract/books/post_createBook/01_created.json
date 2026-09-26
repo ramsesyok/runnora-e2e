@@ -14,12 +14,8 @@
   },
   "expect": {
     "status": 201,
-    "bodyMode": "subset",
-    "body": {
-      "bookId": "B0900",
-      "totalCopies": 2,
-      "availableCopies": 2
-    },
+    "mockCase": "createBook_default",
+    "bodyMode": "exact",
     "ignorePaths": []
   }
 }

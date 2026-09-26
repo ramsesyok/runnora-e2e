@@ -9,10 +9,8 @@
   },
   "expect": {
     "status": 400,
-    "bodyMode": "subset",
-    "body": {
-      "code": "VALIDATION_ERROR"
-    },
+    "mockCase": "createLoan_missing_book_id",
+    "bodyMode": "exact",
     "ignorePaths": []
   }
 }

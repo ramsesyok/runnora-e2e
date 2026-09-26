@@ -2,11 +2,10 @@
   "generator": "runnora-docgen",
   "scenario": "契約 listMemberLoans 会員の貸出履歴を取得する（モック・実APIの両方で実行する）",
   "source": "runbooks/contract/get_listMemberLoans.suite.yml",
-  "sha256": "444c9056821009d0fd02e0e3c80cc2648919434245371321a30cb4b29ec027ee",
+  "sha256": "4249af53fad95f4d94d17c32a83040dd74e83405a3d2cede46db48992d7214dc",
   "files": [
     "after.qmd",
     "before.qmd",
-    "cases.qmd",
     "expectations.qmd",
     "http.qmd",
     "scenario.qmd"
@@ -15,22 +14,32 @@
     {
       "kind": "runbook",
       "path": "runbooks/contract/get_listMemberLoans.suite.yml",
-      "sha256": "444c9056821009d0fd02e0e3c80cc2648919434245371321a30cb4b29ec027ee"
+      "sha256": "4249af53fad95f4d94d17c32a83040dd74e83405a3d2cede46db48992d7214dc"
     },
     {
       "kind": "runbook",
       "path": "runbooks/contract/get_listMemberLoans.template.yml",
-      "sha256": "0877360145aedee09525cb07dfb25ed4aed323828580c2905de8018dc0dd2a96"
+      "sha256": "6a85f053086639420296c0428159da7488499e4cc2bcaee60011de05d0d52849"
     },
     {
-      "kind": "case",
+      "kind": "json",
       "path": "cases/contract/members/get_listMemberLoans/01_M0002.json",
-      "sha256": "e3ab5210b8bff49d26b45ebb43f19d17cfd8e599051bed3aa2e39c97c85f3c45"
+      "sha256": "fd08b7c51b7c9b068bebb3758ee35215ff05c7f135501035f8ef3202f023e85e"
     },
     {
-      "kind": "case",
+      "kind": "json",
+      "path": "fixtures/responses/listMemberLoans/listMemberLoans_M0002.json",
+      "sha256": "903235720fd049f1c7bacabd23d6804ebb0abfce3cfcde0d9a8681490715021e"
+    },
+    {
+      "kind": "json",
       "path": "cases/contract/members/get_listMemberLoans/02_not_found.json",
-      "sha256": "b008423cebd700cb70d0686c9633882aed6e2dac6fad8b490be0680426c61539"
+      "sha256": "b4be0b69bed1e53bb3b3b7cdc7e7ef6f7dee560533bdeaaa5cef30d35d9f5a9d"
+    },
+    {
+      "kind": "json",
+      "path": "fixtures/responses/listMemberLoans/listMemberLoans_not_found.json",
+      "sha256": "dd01cc608a6f6cdd17b2098480bb16a0c878c742f86cf28ccc6bbc3a290f06d9"
     },
     {
       "kind": "config",

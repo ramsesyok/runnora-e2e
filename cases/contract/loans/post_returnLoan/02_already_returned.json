@@ -9,10 +9,8 @@
   "requestBody": {},
   "expect": {
     "status": 409,
-    "bodyMode": "subset",
-    "body": {
-      "code": "ALREADY_RETURNED"
-    },
+    "mockCase": "returnLoan_2_already_returned",
+    "bodyMode": "exact",
     "ignorePaths": []
   }
 }

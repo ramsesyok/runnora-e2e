@@ -4,10 +4,6 @@
 
 {{< include ../../generated/contract/get-listmemberloans-suite/scenario.qmd >}}
 
-### ケースデータ
-
-{{< include ../../generated/contract/get-listmemberloans-suite/cases.qmd >}}
-
 ### HTTP 呼び出し
 
 {{< include ../../generated/contract/get-listmemberloans-suite/http.qmd >}}
