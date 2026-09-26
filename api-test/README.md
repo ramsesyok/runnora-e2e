@@ -108,6 +108,27 @@ runnora を直接呼ぶ例（シナリオ LIB-005）:
 
 ## テストの内容
 
+### runbook を読むときの早見表
+
+初めて読む場合は、単純な HTTP 呼び出しから始めて、期待値の比較、応答値の引き継ぎ、繰り返しの順に見ると追いやすいです。
+`runbooks/generated/` は再生成される雛形なので、書き方の参考には `runbooks/contract/` と `runbooks/scenarios/` を使ってください。
+
+| やりたいこと | 最初に見る場所 | 注目する記述 |
+|---|---|---|
+| HTTP を呼び、ステータスと応答を検証する | [get_getHealth.template.yml](runbooks/contract/get_getHealth.template.yml) | `req` と `test`。入力と期待値は [suite](runbooks/contract/get_getHealth.suite.yml) から渡す |
+| JSON 全体を期待ファイルと比較する | [get_getBook.template.yml](runbooks/contract/get_getBook.template.yml)、[B0001 ケース](cases/contract/books/get_getBook/01_B0001.json) | `compare(current.res.body, vars.expected, ...)` と `ignorePaths: []` |
+| 変動する項目だけ比較から除外する | [post_createLoan.template.yml](runbooks/contract/post_createLoan.template.yml)、[created ケース](cases/contract/loans/post_createLoan/01_created.json) | `ignorePaths` で貸出 ID と日時を除外し、残りの JSON 全体を比較する |
+| 複数ケースで同じ手順を使う | [post_createBook.suite.yml](runbooks/contract/post_createBook.suite.yml) | ケースごとの `include` と `vars.case` / `vars.expected` |
+| 応答の ID を次のリクエストに渡す | [LIB-001](runbooks/scenarios/lib-001-loan-lifecycle.yml) | `bind` で貸出 ID を保存し、返却 URL の `{{ loan_id }}` に使う |
+| 一覧から必要なデータを選ぶ | [LIB-003](runbooks/scenarios/lib-003-overdue.yml) | `filter(...)` で延滞中の貸出を選び、`bind` で ID を保存する |
+| 条件成立まで再試行する | [LIB-001](runbooks/scenarios/lib-001-loan-lifecycle.yml) | `member_loans` の `loop.until`。最大回数内に条件を満たさなければ失敗する |
+| 決まった回数だけ繰り返す | [LIB-007](runbooks/scenarios/lib-007-bulk-history.yml) | `inspect_history_books` の `loop.count` と 0 始まりの添字 `i` |
+| API と DB の状態を両方確かめる | [LIB-004](runbooks/scenarios/lib-004-loan-limit.yml) | HTTP の `req`、SQL の `db.query`、`current.rows` の検証 |
+
+`compare` は JSON の値を比較するため、オブジェクトのキー順や空白・改行は問いません。配列の要素順は比較対象です。
+`ignorePaths: []` は除外なしの全体比較です。現状の「除外あり」の例は ID と日時をまとめて除外しており、ID **だけ**を除外するケースはありません。
+`loop.until` のステップには、条件成立前に失敗する `test` を重ねず、成立条件を `until` に記述しています。
+
 | 種類 | 実行先 | 本数 | 検証 |
 |---|---|---|---|
 | 生成テスト | モック / 実 API | 8 suite | OpenAPI example で呼び出しステータスを確認 |
