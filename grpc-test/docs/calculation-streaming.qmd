@@ -1,0 +1,13 @@
+# 最終回だけに集計結果を含む配信 {.landscape-chapter}
+
+`Calculate` は入力値の累計を１件ずつ送る。最後の更新だけに `optional completion` を設定し、件数と合計を送る。
+入力と期待するメッセージ配列は `cases/calculation-streaming/` の JSON ファイルで管理する。
+期待 JSON では途中２件に `completion` を置かず、最後の１件だけに置く。配列全体の比較で有無、順序、値を確認する。
+
+{{< include generated/calculation-streaming/scenario.qmd >}}
+
+{{< include generated/calculation-streaming/grpc.qmd >}}
+
+{{< include generated/calculation-streaming/grpc-request.qmd >}}
+
+{{< include generated/calculation-streaming/expectations.qmd >}}

@@ -1,8 +1,8 @@
 {
   "generator": "runnora-docgen",
-  "scenario": "Unaryの応答を使ってServer streaming RPCの蔵書一覧を検証する",
+  "scenario": "Unaryの応答と検索条件の整合を確認してServer streaming RPCを検証する",
   "source": "runbooks/server-streaming.yml",
-  "sha256": "6297d6f88520184519e4396fe0a4eb1de885b0e9aecc956a0fc372fc94cb4b07",
+  "sha256": "5d5c85e0c44a09618d1128d32d2af2a4585dc219f58b6e3729a8dc2743c31858",
   "files": [
     "expectations.qmd",
     "grpc-request.qmd",
@@ -13,17 +13,37 @@
     {
       "kind": "runbook",
       "path": "runbooks/server-streaming.yml",
-      "sha256": "6297d6f88520184519e4396fe0a4eb1de885b0e9aecc956a0fc372fc94cb4b07"
+      "sha256": "5d5c85e0c44a09618d1128d32d2af2a4585dc219f58b6e3729a8dc2743c31858"
     },
     {
       "kind": "proto",
       "path": "proto/library.proto",
-      "sha256": "5bb59b2e8df6357ea19e81387e1038434932e2538f67fd8709c1d34fdf6a78fa"
+      "sha256": "baad43452ebc44d2a659f619c04fa672e76e2f940295099db4c47e4bdea81ca0"
+    },
+    {
+      "kind": "json",
+      "path": "cases/server-streaming/get-book-request.json",
+      "sha256": "b5a63b15d778db3abec5430306e18b8bfe3ca96fd2f194844838a1e9626c9195"
+    },
+    {
+      "kind": "json",
+      "path": "cases/server-streaming/get-book-expected.json",
+      "sha256": "7cf7c38b3e90c530c76939a1fa50bcc99bee50cb117eb58e8fb03a84344e8a42"
+    },
+    {
+      "kind": "json",
+      "path": "cases/server-streaming/list-books-request.json",
+      "sha256": "dfacf7e6166733cec9d3fdb166ee3faf82b0d3d627860d4e1c7325a2e0f72d66"
+    },
+    {
+      "kind": "json",
+      "path": "cases/server-streaming/list-books-expected.json",
+      "sha256": "2db3fab11d425ecfb1240aa33d16c87bf91b7f2272700c73fb2e10bc5e690918"
     },
     {
       "kind": "config",
       "path": "config.yaml",
-      "sha256": "99827be06c34f7974bdc60844f887138ad0a4cf32eb0820bf457adcd45b633b6"
+      "sha256": "07883df8d8280590475df5cb700d3927b3837d695bf4f90905a774fb06cce781"
     }
   ]
 }

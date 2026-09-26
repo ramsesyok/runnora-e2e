@@ -2,6 +2,9 @@ desc: Unary RPC で蔵書を1冊取得する
 labels:
   - grpc
   - unary
+vars:
+  request: json://../cases/unary/get-book-request.json
+  expected: json://../cases/unary/get-book-expected.json
 runners:
   greq:
     addr: 127.0.0.1:19090
@@ -15,11 +18,7 @@ steps:
     desc: B0003のタイトル、ジャンル、在庫数を確認する
     greq:
       sample.library.v1.LibraryService/GetBook:
-        message:
-          book_id: B0003
+        message: "{{ vars.request }}"
     test: |
-      current.res.status == 0 &&
-      current.res.message.book.book_id == "B0003" &&
-      current.res.message.book.title == "Go言語によるWebアプリ開発" &&
-      current.res.message.book.genre == "TECH" &&
-      current.res.message.book.available_copies == 2
+      current.res.status == vars.expected.status &&
+      compare(current.res.message, vars.expected.message)

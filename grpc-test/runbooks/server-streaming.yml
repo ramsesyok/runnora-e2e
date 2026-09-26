@@ -1,7 +1,12 @@
-desc: Unaryの応答を使ってServer streaming RPCの蔵書一覧を検証する
+desc: Unaryの応答と検索条件の整合を確認してServer streaming RPCを検証する
 labels:
   - grpc
   - server-streaming
+vars:
+  get_request: json://../cases/server-streaming/get-book-request.json
+  get_expected: json://../cases/server-streaming/get-book-expected.json
+  list_request: json://../cases/server-streaming/list-books-request.json
+  list_expected: json://../cases/server-streaming/list-books-expected.json
 runners:
   greq:
     addr: 127.0.0.1:19090
@@ -15,25 +20,20 @@ steps:
     desc: 検索条件に使う蔵書のジャンルをUnary RPCで取得する
     greq:
       sample.library.v1.LibraryService/GetBook:
-        message:
-          book_id: B0003
+        message: "{{ vars.get_request }}"
     test: |
-      current.res.status == 0 &&
-      current.res.message.book.genre == "TECH"
+      current.res.status == vars.get_expected.status &&
+      compare(current.res.message, vars.get_expected.message)
   save_genre:
-    desc: 応答のジャンルを後続のstreaming RPCへ渡す
+    desc: Unary応答のジャンルを保存し、JSONファイルの検索条件と照合する
     bind:
       genre: steps.get_book.res.message.book.genre
   list_books:
     desc: TECHの蔵書がID順に2件流れることを確認する
     greq:
       sample.library.v1.LibraryService/ListBooks:
-        message:
-          genre: "{{ genre }}"
+        message: "{{ vars.list_request }}"
     test: |
-      current.res.status == 0 &&
-      len(current.res.messages) == 2 &&
-      current.res.messages[0].book_id == "B0003" &&
-      current.res.messages[0].genre == genre &&
-      current.res.messages[1].book_id == "B0004" &&
-      current.res.messages[1].genre == genre
+      current.res.status == vars.list_expected.status &&
+      vars.list_request.genre == genre &&
+      compare(current.res.messages, vars.list_expected.messages)
