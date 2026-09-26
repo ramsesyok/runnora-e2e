@@ -1,0 +1,15 @@
+default:
+  abs: 1e-6
+  rel: 0
+tolerances:
+  # 各サンプルの加重値には絶対誤差を適用する。
+  - path: .series[].samples[].weighted
+    abs: 0.005
+  # 集計値には相対誤差を適用する。
+  - path: .series[].statistics
+    rel: 0.01
+  # より深いパスのルールが親の相対誤差より優先される。
+  - path: .series[].statistics.variance
+    abs: 0.0001
+  - path: .portfolio.weighted_mean
+    abs: 0.01

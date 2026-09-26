@@ -3,8 +3,15 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $projects = Split-Path (Split-Path $root -Parent) -Parent
 $runnora = [Environment]::GetEnvironmentVariable('RUNNORA_EXE')
-if (-not $runnora) { $runnora = Join-Path $projects 'runnora\runnora.exe' }
-if (-not (Test-Path -LiteralPath $runnora)) { throw "runnora が見つかりません: $runnora" }
+$runnoraProject = Join-Path $projects 'runnora'
+if ($runnora -and -not (Test-Path -LiteralPath $runnora)) { throw "runnora が見つかりません: $runnora" }
+if (-not $runnora -and -not (Test-Path -LiteralPath (Join-Path $runnoraProject 'go.mod'))) {
+    throw "runnora のソースが見つかりません: $runnoraProject"
+}
+$jsondiffProject = Join-Path $projects 'json-diff-with-epsilon'
+if (-not (Test-Path -LiteralPath (Join-Path $jsondiffProject 'go.mod'))) {
+    throw "json-diff-with-epsilon が見つかりません: $jsondiffProject"
+}
 
 Push-Location $root
 $proc = $null
@@ -12,8 +19,15 @@ try {
     New-Item -ItemType Directory -Force bin | Out-Null
     $reportDir = Join-Path $root ('reports\' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
     New-Item -ItemType Directory -Force $reportDir | Out-Null
-    go build -o bin/libraryd.exe ./cmd/libraryd
+    go build -buildvcs=false -o bin/libraryd.exe ./cmd/libraryd
     if ($LASTEXITCODE -ne 0) { throw 'gRPC サーバのビルドに失敗しました' }
+    go -C $jsondiffProject build -buildvcs=false -o (Join-Path $root 'bin/jsondiff-eps.exe') ./cmd/jsondiff-eps
+    if ($LASTEXITCODE -ne 0) { throw 'jsondiff-eps のビルドに失敗しました' }
+    if (-not $runnora) {
+        $runnora = Join-Path $root 'bin/runnora.exe'
+        go -C $runnoraProject build -buildvcs=false -o $runnora .
+        if ($LASTEXITCODE -ne 0) { throw 'runnora のビルドに失敗しました' }
+    }
     $proc = Start-Process -FilePath (Join-Path $root 'bin\libraryd.exe') -PassThru -WindowStyle Hidden `
         -ArgumentList @('-proto', 'proto/library.proto') `
         -RedirectStandardOutput (Join-Path $reportDir 'server.out.log') `
@@ -33,15 +47,17 @@ try {
         }
     }
     if (-not $ready) { throw 'gRPC サーバが 127.0.0.1:19090 で起動しませんでした' }
-    & $runnora run --config config.yaml --report-format text `
+    & $runnora run --config config.yaml --scopes run:exec --report-format text `
         --report-out (Join-Path $reportDir 'runnora.txt') `
-        runbooks/unary.yml runbooks/server-streaming.yml runbooks/calculation-streaming.yml
+        runbooks/unary.yml runbooks/server-streaming.yml runbooks/calculation-streaming.yml runbooks/series-analysis.yml
     if ($LASTEXITCODE -ne 0) {
-        Get-Content (Join-Path $reportDir 'runnora.txt')
+        if (Test-Path -LiteralPath (Join-Path $reportDir 'runnora.txt')) {
+            Get-Content (Join-Path $reportDir 'runnora.txt')
+        }
         throw 'runbook の実行に失敗しました'
     }
     Get-Content (Join-Path $reportDir 'runnora.txt')
-    & $runnora coverage --long runbooks/unary.yml runbooks/server-streaming.yml runbooks/calculation-streaming.yml |
+    & $runnora coverage --long runbooks/unary.yml runbooks/server-streaming.yml runbooks/calculation-streaming.yml runbooks/series-analysis.yml |
         Tee-Object -FilePath (Join-Path $reportDir 'coverage.txt')
     if ($LASTEXITCODE -ne 0) { throw 'カバレッジの確認に失敗しました' }
     Write-Host "レポート: $reportDir"

@@ -1,0 +1,6 @@
+{
+  "series": [
+    { "name": "alpha", "weight": 0.4, "values": [1.2, 2.4, 3.6] },
+    { "name": "beta", "weight": 0.6, "values": [10.0, 10.5, 11.0] }
+  ]
+}

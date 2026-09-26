@@ -2,7 +2,7 @@
   "generator": "runnora-docgen",
   "scenario": "計算結果を逐次配信し、最後のメッセージだけに集計結果を含める",
   "source": "runbooks/calculation-streaming.yml",
-  "sha256": "3f772d3be44283ef4f4896e1acd3ba5d879eac6228447ca9185f0c3c4e4a9925",
+  "sha256": "1901831af7c001c29fecd0274a392ac2b19bccd39e135695b20c569b92685e99",
   "files": [
     "expectations.qmd",
     "grpc-request.qmd",
@@ -13,12 +13,12 @@
     {
       "kind": "runbook",
       "path": "runbooks/calculation-streaming.yml",
-      "sha256": "3f772d3be44283ef4f4896e1acd3ba5d879eac6228447ca9185f0c3c4e4a9925"
+      "sha256": "1901831af7c001c29fecd0274a392ac2b19bccd39e135695b20c569b92685e99"
     },
     {
       "kind": "proto",
       "path": "proto/library.proto",
-      "sha256": "baad43452ebc44d2a659f619c04fa672e76e2f940295099db4c47e4bdea81ca0"
+      "sha256": "ee81bf46dae244bd5d10e109e65960ac780dbf29ff0fcb2e8d65b97621edf1cb"
     },
     {
       "kind": "json",

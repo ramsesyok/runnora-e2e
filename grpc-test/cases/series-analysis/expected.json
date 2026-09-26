@@ -1,0 +1,25 @@
+{
+  "series": [
+    {
+      "name": "alpha",
+      "weight": 0.4,
+      "samples": [
+        { "index": 1, "input": 1.2, "weighted": 0.481, "deviation": -1.2 },
+        { "index": 2, "input": 2.4, "weighted": 0.959, "deviation": 0 },
+        { "index": 3, "input": 3.6, "weighted": 1.441, "deviation": 1.2 }
+      ],
+      "statistics": { "count": 3, "sum": 7.201, "mean": 2.401, "variance": 0.96005 }
+    },
+    {
+      "name": "beta",
+      "weight": 0.6,
+      "samples": [
+        { "index": 1, "input": 10.0, "weighted": 6.001, "deviation": -0.5 },
+        { "index": 2, "input": 10.5, "weighted": 6.299, "deviation": 0 },
+        { "index": 3, "input": 11.0, "weighted": 6.601, "deviation": 0.5 }
+      ],
+      "statistics": { "count": 3, "sum": 31.501, "mean": 10.501, "variance": 0.16672 }
+    }
+  ],
+  "portfolio": { "series_count": 2, "total_weight": 1.0, "weighted_mean": 7.261 }
+}

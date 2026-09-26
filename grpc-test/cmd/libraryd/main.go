@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math"
 	"net"
 	"os"
 	"os/signal"
@@ -36,13 +37,20 @@ var books = []book{
 type libraryService interface{}
 
 type server struct {
-	getRequest  protoreflect.MessageDescriptor
-	getResponse protoreflect.MessageDescriptor
-	listRequest protoreflect.MessageDescriptor
-	bookMessage protoreflect.MessageDescriptor
-	calcRequest protoreflect.MessageDescriptor
-	calcUpdate  protoreflect.MessageDescriptor
-	calcSummary protoreflect.MessageDescriptor
+	getRequest       protoreflect.MessageDescriptor
+	getResponse      protoreflect.MessageDescriptor
+	listRequest      protoreflect.MessageDescriptor
+	bookMessage      protoreflect.MessageDescriptor
+	calcRequest      protoreflect.MessageDescriptor
+	calcUpdate       protoreflect.MessageDescriptor
+	calcSummary      protoreflect.MessageDescriptor
+	analysisRequest  protoreflect.MessageDescriptor
+	numericSeries    protoreflect.MessageDescriptor
+	analysisResponse protoreflect.MessageDescriptor
+	seriesAnalysis   protoreflect.MessageDescriptor
+	sampleAnalysis   protoreflect.MessageDescriptor
+	seriesStatistics protoreflect.MessageDescriptor
+	portfolioSummary protoreflect.MessageDescriptor
 }
 
 func main() {
@@ -64,16 +72,25 @@ func main() {
 	}
 	messages := file.Messages()
 	s := &server{
-		getRequest:  messages.ByName("GetBookRequest"),
-		getResponse: messages.ByName("GetBookResponse"),
-		listRequest: messages.ByName("ListBooksRequest"),
-		bookMessage: messages.ByName("Book"),
-		calcRequest: messages.ByName("CalculateRequest"),
-		calcUpdate:  messages.ByName("CalculationUpdate"),
-		calcSummary: messages.ByName("CalculationSummary"),
+		getRequest:       messages.ByName("GetBookRequest"),
+		getResponse:      messages.ByName("GetBookResponse"),
+		listRequest:      messages.ByName("ListBooksRequest"),
+		bookMessage:      messages.ByName("Book"),
+		calcRequest:      messages.ByName("CalculateRequest"),
+		calcUpdate:       messages.ByName("CalculationUpdate"),
+		calcSummary:      messages.ByName("CalculationSummary"),
+		analysisRequest:  messages.ByName("AnalyzeSeriesRequest"),
+		numericSeries:    messages.ByName("NumericSeries"),
+		analysisResponse: messages.ByName("AnalyzeSeriesResponse"),
+		seriesAnalysis:   messages.ByName("SeriesAnalysis"),
+		sampleAnalysis:   messages.ByName("SampleAnalysis"),
+		seriesStatistics: messages.ByName("SeriesStatistics"),
+		portfolioSummary: messages.ByName("PortfolioSummary"),
 	}
 	if s.getRequest == nil || s.getResponse == nil || s.listRequest == nil || s.bookMessage == nil ||
-		s.calcRequest == nil || s.calcUpdate == nil || s.calcSummary == nil {
+		s.calcRequest == nil || s.calcUpdate == nil || s.calcSummary == nil ||
+		s.analysisRequest == nil || s.numericSeries == nil || s.analysisResponse == nil ||
+		s.seriesAnalysis == nil || s.sampleAnalysis == nil || s.seriesStatistics == nil || s.portfolioSummary == nil {
 		log.Fatal("required messages not found in proto")
 	}
 
@@ -85,7 +102,10 @@ func main() {
 	g.RegisterService(&grpc.ServiceDesc{
 		ServiceName: string(svc.FullName()),
 		HandlerType: (*libraryService)(nil),
-		Methods:     []grpc.MethodDesc{{MethodName: "GetBook", Handler: s.getBook}},
+		Methods: []grpc.MethodDesc{
+			{MethodName: "GetBook", Handler: s.getBook},
+			{MethodName: "AnalyzeSeries", Handler: s.analyzeSeries},
+		},
 		Streams: []grpc.StreamDesc{
 			{StreamName: "ListBooks", Handler: s.listBooks, ServerStreams: true},
 			{StreamName: "Calculate", Handler: s.calculate, ServerStreams: true},
@@ -182,4 +202,78 @@ func (s *server) calculate(_ interface{}, stream grpc.ServerStream) error {
 		}
 	}
 	return nil
+}
+
+func (s *server) analyzeSeries(_ interface{}, ctx context.Context, decode func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	req := dynamicpb.NewMessage(s.analysisRequest)
+	if err := decode(req); err != nil {
+		return nil, err
+	}
+	handle := func(_ context.Context, _ interface{}) (interface{}, error) {
+		series := req.Get(s.analysisRequest.Fields().ByName("series")).List()
+		if series.Len() == 0 {
+			return nil, status.Error(codes.InvalidArgument, "series must not be empty")
+		}
+		res := dynamicpb.NewMessage(s.analysisResponse)
+		analyses := res.Mutable(s.analysisResponse.Fields().ByName("series")).List()
+		var totalWeight, weightedMeanSum float64
+		for i := 0; i < series.Len(); i++ {
+			input := series.Get(i).Message()
+			fields := s.numericSeries.Fields()
+			name := input.Get(fields.ByName("name")).String()
+			weight := input.Get(fields.ByName("weight")).Float()
+			values := input.Get(fields.ByName("values")).List()
+			if name == "" || values.Len() == 0 || weight <= 0 || math.IsNaN(weight) || math.IsInf(weight, 0) {
+				return nil, status.Errorf(codes.InvalidArgument, "series %d needs a name, positive finite weight and values", i)
+			}
+			var sum float64
+			for j := 0; j < values.Len(); j++ {
+				value := values.Get(j).Float()
+				if math.IsNaN(value) || math.IsInf(value, 0) {
+					return nil, status.Errorf(codes.InvalidArgument, "series %d value %d must be finite", i, j)
+				}
+				sum += value
+			}
+			mean := sum / float64(values.Len())
+			analysis := dynamicpb.NewMessage(s.seriesAnalysis)
+			analysisFields := s.seriesAnalysis.Fields()
+			analysis.Set(analysisFields.ByName("name"), protoreflect.ValueOfString(name))
+			analysis.Set(analysisFields.ByName("weight"), protoreflect.ValueOfFloat64(weight))
+			samples := analysis.Mutable(analysisFields.ByName("samples")).List()
+			var squaredDeviation float64
+			for j := 0; j < values.Len(); j++ {
+				value := values.Get(j).Float()
+				deviation := value - mean
+				squaredDeviation += deviation * deviation
+				sample := dynamicpb.NewMessage(s.sampleAnalysis)
+				sampleFields := s.sampleAnalysis.Fields()
+				sample.Set(sampleFields.ByName("index"), protoreflect.ValueOfInt32(int32(j+1)))
+				sample.Set(sampleFields.ByName("input"), protoreflect.ValueOfFloat64(value))
+				sample.Set(sampleFields.ByName("weighted"), protoreflect.ValueOfFloat64(value*weight))
+				sample.Set(sampleFields.ByName("deviation"), protoreflect.ValueOfFloat64(deviation))
+				samples.Append(protoreflect.ValueOfMessage(sample.ProtoReflect()))
+			}
+			stats := dynamicpb.NewMessage(s.seriesStatistics)
+			statsFields := s.seriesStatistics.Fields()
+			stats.Set(statsFields.ByName("count"), protoreflect.ValueOfInt32(int32(values.Len())))
+			stats.Set(statsFields.ByName("sum"), protoreflect.ValueOfFloat64(sum))
+			stats.Set(statsFields.ByName("mean"), protoreflect.ValueOfFloat64(mean))
+			stats.Set(statsFields.ByName("variance"), protoreflect.ValueOfFloat64(squaredDeviation/float64(values.Len())))
+			analysis.Set(analysisFields.ByName("statistics"), protoreflect.ValueOfMessage(stats.ProtoReflect()))
+			analyses.Append(protoreflect.ValueOfMessage(analysis.ProtoReflect()))
+			totalWeight += weight
+			weightedMeanSum += mean * weight
+		}
+		portfolio := dynamicpb.NewMessage(s.portfolioSummary)
+		portfolioFields := s.portfolioSummary.Fields()
+		portfolio.Set(portfolioFields.ByName("series_count"), protoreflect.ValueOfInt32(int32(series.Len())))
+		portfolio.Set(portfolioFields.ByName("total_weight"), protoreflect.ValueOfFloat64(totalWeight))
+		portfolio.Set(portfolioFields.ByName("weighted_mean"), protoreflect.ValueOfFloat64(weightedMeanSum/totalWeight))
+		res.Set(s.analysisResponse.Fields().ByName("portfolio"), protoreflect.ValueOfMessage(portfolio.ProtoReflect()))
+		return res, nil
+	}
+	if interceptor == nil {
+		return handle(ctx, req)
+	}
+	return interceptor(ctx, req, &grpc.UnaryServerInfo{FullMethod: "/sample.library.v1.LibraryService/AnalyzeSeries"}, handle)
 }
