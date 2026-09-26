@@ -28,7 +28,7 @@ grpc-test/
 
 - Go 1.24 以降（初回ビルド時は Go モジュールを取得できる環境）
 - [runnora](https://github.com/ramsesyok/runnora) のソース（既定: `../../runnora/` からビルド、既存バイナリを使う場合は `RUNNORA_EXE`）
-- [json-diff-with-epsilon](https://github.com/ramsesyok/json-diff-with-epsilon) のソース（`../../json-diff-with-epsilon/` から `jsondiff-eps.exe` をビルド）
+- [runnora-diff](https://github.com/ramsesyok/runnora-diff) のソース（既定: `../../runnora-diff/`、別の場所にある場合は `RUNNORA_DIFF_SOURCE_DIR` にソースディレクトリを指定）
 - [runnora-docgen](https://github.com/ramsesyok/runnora-docgen)（既定: `../../runnora-docgen/runnora-docgen.exe`、変更時は `RUNNORA_DOCGEN_EXE`）
 - 手順書を HTML 発行する場合は Quarto と ddq 2.4.0
 
