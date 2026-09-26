@@ -2,7 +2,7 @@
   "generator": "runnora-docgen",
   "scenario": "LIB-004 貸出上限3冊に達した会員は借りられず、1冊返すと借りられる",
   "source": "runbooks/scenarios/lib-004-loan-limit.yml",
-  "sha256": "f74bf45a61db27af223a8cf46c00770dc10aa49b0399e53678b04976f3edfcb6",
+  "sha256": "60809d2f7185f8fb345dcef7075a17bf998259aa8e3bf2d70b7cd78dc21aa85e",
   "files": [
     "after.qmd",
     "before.qmd",
@@ -15,7 +15,7 @@
     {
       "kind": "runbook",
       "path": "runbooks/scenarios/lib-004-loan-limit.yml",
-      "sha256": "f74bf45a61db27af223a8cf46c00770dc10aa49b0399e53678b04976f3edfcb6"
+      "sha256": "60809d2f7185f8fb345dcef7075a17bf998259aa8e3bf2d70b7cd78dc21aa85e"
     },
     {
       "kind": "config",

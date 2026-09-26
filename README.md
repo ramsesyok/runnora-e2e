@@ -117,7 +117,7 @@ runnora を直接呼ぶ例（シナリオ LIB-005）:
 | LIB-001 | 貸出〜返却・二重返却 | - | SELECT INTO + 例外で事後条件検証 |
 | LIB-002 | 在庫切れ（1 冊の取り合い） | - | - |
 | LIB-003 | 延滞者の貸出拒否 | %ROWTYPE で延滞貸出を作成 | - |
-| LIB-004 | 貸出上限 | 明示カーソル + WHILE LOOP | - |
+| LIB-004 | 貸出上限（応答の貸出 ID を返却・照会に引き継ぐ） | 明示カーソル + WHILE LOOP | - |
 | LIB-005 | SAVEPOINT による部分確定 | SAVEPOINT / ROLLBACK TO / EXCEPTION_INIT | 取消結果と自律型ログを検証 |
 | LIB-006 | 異常系 400/404/409 | - | DB 不変（件数・採番）を検証 |
 | LIB-007 | 大量履歴 | BULK COLLECT LIMIT + FORALL | - |

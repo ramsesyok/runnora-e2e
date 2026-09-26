@@ -2,7 +2,10 @@
 
 - 目的：上限（3 冊）まで借りている会員は 4 冊目を借りられず（409 `LOAN_LIMIT_EXCEEDED`）、1 冊返すと借りられることを確認する。
 - 前提：前処理 `lib004_fill_loans_before.sql` が、パラメータ付き明示カーソルと WHILE LOOP で
-  貸出可能な TECH の本を book_id 順に上限まで貸し出す（貸出 1〜3 = B0003, B0006, B0008）。
+  貸出可能な TECH の本を book_id 順に上限まで貸し出す（B0003, B0006, B0008）。
+- 引き継ぎ：貸出 ID は固定値で書かない。貸出中一覧の応答から 2 件目の貸出 ID・蔵書 ID と 3 件の貸出 ID を
+  `bind` で保存し、返却 URL（`/loans/{{ return_loan_id }}/return`）、蔵書照会 URL、DB 照会の条件、
+  新しい貸出 ID が既存と重複しないことの検証に使う。
 - 合格条件：全手順の検証式が真であり、共通後処理が正常終了すること。
 - 実行：`runnora run --config config.yaml --before-sql sql/cases/lib004_fill_loans_before.sql runbooks/scenarios/lib-004-loan-limit.yml`
 
