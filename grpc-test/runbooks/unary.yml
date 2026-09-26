@@ -1,0 +1,25 @@
+desc: Unary RPC で蔵書を1冊取得する
+labels:
+  - grpc
+  - unary
+runners:
+  greq:
+    addr: 127.0.0.1:19090
+    tls: false
+    importPaths:
+      - ../proto
+    protos:
+      - ../proto/library.proto
+steps:
+  get_book:
+    desc: B0003のタイトル、ジャンル、在庫数を確認する
+    greq:
+      sample.library.v1.LibraryService/GetBook:
+        message:
+          book_id: B0003
+    test: |
+      current.res.status == 0 &&
+      current.res.message.book.book_id == "B0003" &&
+      current.res.message.book.title == "Go言語によるWebアプリ開発" &&
+      current.res.message.book.genre == "TECH" &&
+      current.res.message.book.available_copies == 2

@@ -1,0 +1,29 @@
+{
+  "generator": "runnora-docgen",
+  "scenario": "Unary RPC で蔵書を1冊取得する",
+  "source": "runbooks/unary.yml",
+  "sha256": "b92c9877748d9be38c61ebe5d8fc5e944a643179112cb2720c475956b00624a7",
+  "files": [
+    "expectations.qmd",
+    "grpc-request.qmd",
+    "grpc.qmd",
+    "scenario.qmd"
+  ],
+  "inputs": [
+    {
+      "kind": "runbook",
+      "path": "runbooks/unary.yml",
+      "sha256": "b92c9877748d9be38c61ebe5d8fc5e944a643179112cb2720c475956b00624a7"
+    },
+    {
+      "kind": "proto",
+      "path": "proto/library.proto",
+      "sha256": "5bb59b2e8df6357ea19e81387e1038434932e2538f67fd8709c1d34fdf6a78fa"
+    },
+    {
+      "kind": "config",
+      "path": "config.yaml",
+      "sha256": "99827be06c34f7974bdc60844f887138ad0a4cf32eb0820bf457adcd45b633b6"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+# Server streaming RPC {.landscape-chapter}
+
+Unary `GetBook` の応答からジャンルを `bind` で保存し、`ListBooks` の入力に使う。
+受信したメッセージ配列の件数、順序、内容を検証する。
+
+{{< include generated/server-streaming/scenario.qmd >}}
+
+{{< include generated/server-streaming/grpc.qmd >}}
+
+{{< include generated/server-streaming/grpc-request.qmd >}}
+
+{{< include generated/server-streaming/expectations.qmd >}}

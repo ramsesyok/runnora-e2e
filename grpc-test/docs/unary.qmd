@@ -1,0 +1,11 @@
+# Unary RPC {.landscape-chapter}
+
+`GetBook` で B0003 を照会し、gRPC ステータスと蔵書の内容を確認する。
+
+{{< include generated/unary/scenario.qmd >}}
+
+{{< include generated/unary/grpc.qmd >}}
+
+{{< include generated/unary/grpc-request.qmd >}}
+
+{{< include generated/unary/expectations.qmd >}}

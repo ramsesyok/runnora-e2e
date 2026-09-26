@@ -1,0 +1,29 @@
+{
+  "generator": "runnora-docgen",
+  "scenario": "Unaryの応答を使ってServer streaming RPCの蔵書一覧を検証する",
+  "source": "runbooks/server-streaming.yml",
+  "sha256": "6297d6f88520184519e4396fe0a4eb1de885b0e9aecc956a0fc372fc94cb4b07",
+  "files": [
+    "expectations.qmd",
+    "grpc-request.qmd",
+    "grpc.qmd",
+    "scenario.qmd"
+  ],
+  "inputs": [
+    {
+      "kind": "runbook",
+      "path": "runbooks/server-streaming.yml",
+      "sha256": "6297d6f88520184519e4396fe0a4eb1de885b0e9aecc956a0fc372fc94cb4b07"
+    },
+    {
+      "kind": "proto",
+      "path": "proto/library.proto",
+      "sha256": "5bb59b2e8df6357ea19e81387e1038434932e2538f67fd8709c1d34fdf6a78fa"
+    },
+    {
+      "kind": "config",
+      "path": "config.yaml",
+      "sha256": "99827be06c34f7974bdc60844f887138ad0a4cf32eb0820bf457adcd45b633b6"
+    }
+  ]
+}

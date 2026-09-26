@@ -1,0 +1,39 @@
+desc: Unaryの応答を使ってServer streaming RPCの蔵書一覧を検証する
+labels:
+  - grpc
+  - server-streaming
+runners:
+  greq:
+    addr: 127.0.0.1:19090
+    tls: false
+    importPaths:
+      - ../proto
+    protos:
+      - ../proto/library.proto
+steps:
+  get_book:
+    desc: 検索条件に使う蔵書のジャンルをUnary RPCで取得する
+    greq:
+      sample.library.v1.LibraryService/GetBook:
+        message:
+          book_id: B0003
+    test: |
+      current.res.status == 0 &&
+      current.res.message.book.genre == "TECH"
+  save_genre:
+    desc: 応答のジャンルを後続のstreaming RPCへ渡す
+    bind:
+      genre: steps.get_book.res.message.book.genre
+  list_books:
+    desc: TECHの蔵書がID順に2件流れることを確認する
+    greq:
+      sample.library.v1.LibraryService/ListBooks:
+        message:
+          genre: "{{ genre }}"
+    test: |
+      current.res.status == 0 &&
+      len(current.res.messages) == 2 &&
+      current.res.messages[0].book_id == "B0003" &&
+      current.res.messages[0].genre == genre &&
+      current.res.messages[1].book_id == "B0004" &&
+      current.res.messages[1].genre == genre
