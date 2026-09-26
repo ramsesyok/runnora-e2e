@@ -16,10 +16,13 @@ if (-not (Test-Path -LiteralPath (Join-Path $jsondiffProject 'go.mod'))) {
 
 Push-Location $root
 $proc = $null
+$previousEvidenceDir = [Environment]::GetEnvironmentVariable('RUNNORA_EVIDENCE_DIR')
 try {
     New-Item -ItemType Directory -Force bin | Out-Null
     $reportDir = Join-Path $root ('reports\' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
     New-Item -ItemType Directory -Force $reportDir | Out-Null
+    $env:RUNNORA_EVIDENCE_DIR = Join-Path $reportDir 'evidence'
+    New-Item -ItemType Directory -Force $env:RUNNORA_EVIDENCE_DIR | Out-Null
     go build -buildvcs=false -o bin/libraryd.exe ./cmd/libraryd
     if ($LASTEXITCODE -ne 0) { throw 'gRPC サーバのビルドに失敗しました' }
     go -C $jsondiffProject build -buildvcs=false -o (Join-Path $root 'bin/jsondiff-eps.exe') ./cmd/jsondiff-eps
@@ -63,6 +66,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'カバレッジの確認に失敗しました' }
     Write-Host "レポート: $reportDir"
 } finally {
+    [Environment]::SetEnvironmentVariable('RUNNORA_EVIDENCE_DIR', $previousEvidenceDir)
     if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
     Pop-Location
 }

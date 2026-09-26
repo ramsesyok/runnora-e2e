@@ -11,10 +11,10 @@ sha256: 3cb5149a9249844295644cd433ce660e8d14b7fcd009fa77bfa37fab710637d6
 | 1      | GET      | ${RUNNORA_BASE_URL}/books                              | {"X-Test-Case":"listBooks/novel"}          | genre=NOVEL\                     |
 |        |          |                                                        |                                            | availableOnly=                   |
 +--------+----------+--------------------------------------------------------+--------------------------------------------+----------------------------------+
-| 2      | GET      | ${RUNNORA_BASE_URL}/books                              | {"X-Test-Case":"listBooks/tech_available"} | genre=TECH\                      |
+| 4      | GET      | ${RUNNORA_BASE_URL}/books                              | {"X-Test-Case":"listBooks/tech_available"} | genre=TECH\                      |
 |        |          |                                                        |                                            | availableOnly=true               |
 +--------+----------+--------------------------------------------------------+--------------------------------------------+----------------------------------+
-| 3      | GET      | ${RUNNORA_BASE_URL}/books                              | {"X-Test-Case":"listBooks/invalid_genre"}  | genre=COMIC\                     |
+| 7      | GET      | ${RUNNORA_BASE_URL}/books                              | {"X-Test-Case":"listBooks/invalid_genre"}  | genre=COMIC\                     |
 |        |          |                                                        |                                            | availableOnly=                   |
 +--------+----------+--------------------------------------------------------+--------------------------------------------+----------------------------------+
 :::

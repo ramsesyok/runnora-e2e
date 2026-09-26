@@ -27,6 +27,11 @@ steps:
       /members/{{ vars.case.pathParams.memberId }}/loans?status={{ vars.case.queryParams.status }}:
         get:
           headers: "{{ vars.case.headers }}"
+  dump_call_api:
+    dump:
+      expr: steps.call_api.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/get_listMemberLoans-{{ vars.case.name }}.json'
+  check_call_api:
     test: |
-      current.res.status == vars.case.expect.status &&
-      compare(current.res.body, vars.expected, vars.case.expect.ignorePaths)
+      steps.call_api.res.status == vars.case.expect.status &&
+      compare(steps.call_api.res.body, vars.expected, vars.case.expect.ignorePaths)

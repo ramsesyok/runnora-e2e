@@ -18,7 +18,13 @@ steps:
     greq:
       sample.library.v1.LibraryService/AnalyzeSeries:
         message: "{{ vars.request }}"
-    test: current.res.status == 0
+  dump_analyze_series:
+    dump:
+      expr: steps.analyze_series.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/series-analysis-analyze_series.json'
+  check_analyze_series:
+    test: steps.analyze_series.res.status == 0
+
   compare_without_epsilon:
     exec:
       command: ./bin/jsondiff-eps.exe --format json cases/series-analysis/expected.json -

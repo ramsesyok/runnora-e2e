@@ -19,7 +19,7 @@
     {
       "kind": "runbook",
       "path": "runbooks/contract/get_listMemberLoans.template.yml",
-      "sha256": "c4032dcf6f1d633804e68587b3dfe323130afb80cae0c15fdfe3258b07f343fa"
+      "sha256": "f8989936442eb31da95709276ac96a73a32e46484a5f262d5655eea48fbdeab9"
     },
     {
       "kind": "json",

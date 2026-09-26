@@ -19,6 +19,11 @@ steps:
     greq:
       sample.library.v1.LibraryService/GetBook:
         message: "{{ vars.request }}"
+  dump_get_book:
+    dump:
+      expr: steps.get_book.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/unary-get_book.json'
+  check_get_book:
     test: |
-      current.res.status == vars.expected.status &&
-      compare(current.res.message, vars.expected.message)
+      steps.get_book.res.status == vars.expected.status &&
+      compare(steps.get_book.res.message, vars.expected.message)

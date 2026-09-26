@@ -22,10 +22,16 @@ steps:
           headers:
             X-Test-Scenario: LIB-004
           body: null
+  dump_member_full:
+    dump:
+      expr: steps.member_full.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/member_full.json'
+  check_member_full:
     test: |
-      current.res.status == 200 &&
-      current.res.body.activeLoanCount == 3 &&
-      current.res.body.maxLoans == 3
+      steps.member_full.res.status == 200 &&
+      steps.member_full.res.body.activeLoanCount == 3 &&
+      steps.member_full.res.body.maxLoans == 3
+
   active_loans:
     desc: 貸出中一覧を取得し、明示カーソルがbook_id順に貸し出した3冊であることを確認する
     req:
@@ -34,10 +40,16 @@ steps:
           headers:
             X-Test-Scenario: LIB-004
           body: null
+  dump_active_loans:
+    dump:
+      expr: steps.active_loans.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/active_loans.json'
+  check_active_loans:
     test: |
-      current.res.status == 200 &&
-      current.res.body.total == 3 &&
-      map(current.res.body.items, .bookId) == ["B0003", "B0006", "B0008"]
+      steps.active_loans.res.status == 200 &&
+      steps.active_loans.res.body.total == 3 &&
+      map(steps.active_loans.res.body.items, .bookId) == ["B0003", "B0006", "B0008"]
+
   save_loans:
     desc: 一覧の2件目を返却対象として、貸出IDと蔵書IDを保存する。3件の貸出IDも保存する
     bind:
@@ -55,9 +67,15 @@ steps:
             application/json:
               memberId: M0001
               bookId: B0001
+  dump_loan_rejected:
+    dump:
+      expr: steps.loan_rejected.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/loan_rejected.json'
+  check_loan_rejected:
     test: |
-      current.res.status == 409 &&
-      current.res.body.code == "LOAN_LIMIT_EXCEEDED"
+      steps.loan_rejected.res.status == 409 &&
+      steps.loan_rejected.res.body.code == "LOAN_LIMIT_EXCEEDED"
+
   return_one:
     desc: 保存した貸出IDで返却し、応答の貸出・蔵書が保存した値と一致することを確認する
     req:
@@ -67,11 +85,17 @@ steps:
             X-Test-Scenario: LIB-004
           body:
             application/json: {}
+  dump_return_one:
+    dump:
+      expr: steps.return_one.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/return_one.json'
+  check_return_one:
     test: |
-      current.res.status == 200 &&
-      current.res.body.loanId == return_loan_id &&
-      current.res.body.bookId == return_book_id &&
-      current.res.body.status == "RETURNED"
+      steps.return_one.res.status == 200 &&
+      steps.return_one.res.body.loanId == return_loan_id &&
+      steps.return_one.res.body.bookId == return_book_id &&
+      steps.return_one.res.body.status == "RETURNED"
+
   book_returned:
     desc: 保存した蔵書IDで蔵書を照会し、返却で貸出可能冊数が1冊に戻ったことを確認する
     req:
@@ -80,9 +104,15 @@ steps:
           headers:
             X-Test-Scenario: LIB-004
           body: null
+  dump_book_returned:
+    dump:
+      expr: steps.book_returned.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/book_returned.json'
+  check_book_returned:
     test: |
-      current.res.status == 200 &&
-      current.res.body.availableCopies == 1
+      steps.book_returned.res.status == 200 &&
+      steps.book_returned.res.body.availableCopies == 1
+
   loan_ok:
     desc: 上限に空きができたのでB0001を借りられる。新しい貸出IDは既存の3件と重複しない
     req:
@@ -94,10 +124,16 @@ steps:
             application/json:
               memberId: M0001
               bookId: B0001
+  dump_loan_ok:
+    dump:
+      expr: steps.loan_ok.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/loan_ok.json'
+  check_loan_ok:
     test: |
-      current.res.status == 201 &&
-      current.res.body.bookId == "B0001" &&
-      !(current.res.body.loanId in loan_ids_before)
+      steps.loan_ok.res.status == 201 &&
+      steps.loan_ok.res.body.bookId == "B0001" &&
+      !(steps.loan_ok.res.body.loanId in loan_ids_before)
+
   save_new_loan:
     desc: 新しい貸出IDを保存する
     bind:
@@ -110,11 +146,17 @@ steps:
           headers:
             X-Test-Scenario: LIB-004
           body: null
+  dump_active_loans_after:
+    dump:
+      expr: steps.active_loans_after.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/active_loans_after.json'
+  check_active_loans_after:
     test: |
-      current.res.status == 200 &&
-      current.res.body.total == 3 &&
-      new_loan_id in map(current.res.body.items, .loanId) &&
-      !(return_loan_id in map(current.res.body.items, .loanId))
+      steps.active_loans_after.res.status == 200 &&
+      steps.active_loans_after.res.body.total == 3 &&
+      new_loan_id in map(steps.active_loans_after.res.body.items, .loanId) &&
+      !(return_loan_id in map(steps.active_loans_after.res.body.items, .loanId))
+
   db_returned_row:
     desc: DB上でも保存した貸出IDの行が返却済みになっていることを確認する
     db:

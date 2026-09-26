@@ -46,7 +46,7 @@ api-test/
 ├─ config.mock.yaml              runnora 設定（モック用。DB なし）
 ├─ sql/common/                   共通 前処理（リセット・シード）/ 後処理（不変条件検証）
 ├─ sql/cases/                    ケース固有の前処理・後処理
-├─ runbooks/generated/           runnora generate の出力（再生成前提）
+├─ runbooks/generated/           runnora generate の出力（再生成後に応答保存を追加）
 ├─ runbooks/contract/            契約テスト suite + template（モック・実 API 両方で実行）
 ├─ runbooks/scenarios/           シナリオ試験 LIB-001〜007（実 API のみ）
 ├─ runbooks/demo/                事後検証が不整合を検知することの確認（exit 4 が期待値）
@@ -88,7 +88,7 @@ Oracle イメージ `container-registry.oracle.com/database/free:latest` を使�
 ```powershell
 ./scripts/db-up.ps1         # Oracle 起動 + LIBAPP スキーマ (再) 作成
 ./scripts/mock-build.ps1    # oapi2wire validate + build
-./scripts/generate.ps1      # runnora generate (runbooks/generated を作り直す)
+./scripts/generate.ps1      # runnora generate + 応答保存ステップの追加
 ./scripts/api-start.ps1     # ターミナル A: API
 ./scripts/mock-start.ps1    # ターミナル B: WireMock
 ./scripts/test-mock.ps1     # モックに対して 生成 + 契約
@@ -100,11 +100,21 @@ Oracle イメージ `container-registry.oracle.com/database/free:latest` を使�
 runnora を直接呼ぶ例（シナリオ LIB-005）:
 
 ```powershell
+$env:RUNNORA_EVIDENCE_DIR = (New-Item -ItemType Directory -Force reports/manual).FullName
 ..\..\runnora\runnora.exe run --config config.yaml `
   --before-sql sql/cases/lib005_savepoint_before.sql `
   --after-sql  sql/cases/lib005_assert_after.sql `
   runbooks/scenarios/lib-005-savepoint.yml
 ```
+
+### レスポンス証跡
+
+テストスクリプトは `reports/<日時>-<種類>/evidence/<実行名>/` に、HTTP ステータス・ヘッダ・本文を含む応答を JSON で保存します。
+各 runbook は「リクエスト → dump → 判定」の順で実行するため、判定が失敗したケースの応答も残ります。
+生成テストへの `dump` と判定の追加は `scripts/generate.ps1` が再生成時に行います。
+LIB-001 の再照会は試行回数別、LIB-007 の蔵書照会は対象別にファイルを保存します。
+直接 runnora を実行する場合は、上の例のように保存先ディレクトリを作り、`RUNNORA_EVIDENCE_DIR` に絶対パスを指定してください。
+通信や OpenAPI 応答スキーマ検証でリクエストステップ自体が失敗した場合は、dump まで進まないため証跡ファイルは作られません。
 
 ## テストの内容
 
@@ -115,14 +125,14 @@ runnora を直接呼ぶ例（シナリオ LIB-005）:
 
 | やりたいこと | 最初に見る場所 | 注目する記述 |
 |---|---|---|
-| HTTP を呼び、ステータスと応答を検証する | [get_getHealth.template.yml](runbooks/contract/get_getHealth.template.yml) | `req` と `test`。入力と期待値は [suite](runbooks/contract/get_getHealth.suite.yml) から渡す |
-| JSON 全体を期待ファイルと比較する | [get_getBook.template.yml](runbooks/contract/get_getBook.template.yml)、[B0001 ケース](cases/contract/books/get_getBook/01_B0001.json) | `compare(current.res.body, vars.expected, ...)` と `ignorePaths: []` |
+| HTTP を呼び、ステータスと応答を検証する | [get_getHealth.template.yml](runbooks/contract/get_getHealth.template.yml) | `req` → `dump` → `test`。入力と期待値は [suite](runbooks/contract/get_getHealth.suite.yml) から渡す |
+| JSON 全体を期待ファイルと比較する | [get_getBook.template.yml](runbooks/contract/get_getBook.template.yml)、[B0001 ケース](cases/contract/books/get_getBook/01_B0001.json) | `compare(steps.call_api.res.body, vars.expected, ...)` と `ignorePaths: []` |
 | 変動する項目だけ比較から除外する | [post_createLoan.template.yml](runbooks/contract/post_createLoan.template.yml)、[created ケース](cases/contract/loans/post_createLoan/01_created.json) | `ignorePaths` で貸出 ID と日時を除外し、残りの JSON 全体を比較する |
 | 複数ケースで同じ手順を使う | [post_createBook.suite.yml](runbooks/contract/post_createBook.suite.yml) | ケースごとの `include` と `vars.case` / `vars.expected` |
 | 応答の ID を次のリクエストに渡す | [LIB-001](runbooks/scenarios/lib-001-loan-lifecycle.yml) | `bind` で貸出 ID を保存し、返却 URL の `{{ loan_id }}` に使う |
 | 一覧から必要なデータを選ぶ | [LIB-003](runbooks/scenarios/lib-003-overdue.yml) | `filter(...)` で延滞中の貸出を選び、`bind` で ID を保存する |
 | 条件成立まで再試行する | [LIB-001](runbooks/scenarios/lib-001-loan-lifecycle.yml) | `member_loans` の `loop.until`。最大回数内に条件を満たさなければ失敗する |
-| 決まった回数だけ繰り返す | [LIB-007](runbooks/scenarios/lib-007-bulk-history.yml) | `inspect_history_books` の `loop.count` と 0 始まりの添字 `i` |
+| 複数件を個別に照会する | [LIB-007](runbooks/scenarios/lib-007-bulk-history.yml) | `inspect_history_book_0`〜`_2` が各応答を保存してから判定する |
 | API と DB の状態を両方確かめる | [LIB-004](runbooks/scenarios/lib-004-loan-limit.yml) | HTTP の `req`、SQL の `db.query`、`current.rows` の検証 |
 
 `compare` は JSON の値を比較するため、オブジェクトのキー順や空白・改行は問いません。配列の要素順は比較対象です。
@@ -133,7 +143,7 @@ runnora を直接呼ぶ例（シナリオ LIB-005）:
 |---|---|---|---|
 | 生成テスト | モック / 実 API | 8 suite | OpenAPI example で呼び出しステータスを確認 |
 | 契約テスト | モック / 実 API | 8 suite・21 ケース | ステータス + **本文の全体一致（モックと共有する期待ファイル）** + **OpenAPI 応答スキーマ検証**（`openapi3` ランナー） |
-| シナリオ試験 | 実 API | 7 runbook・59 手順 | 状態変化・ID 引き継ぎ・**DB 直接照会（runn DB ランナー）**・前後処理での DB 検証 |
+| シナリオ試験 | 実 API | 7 runbook | 状態変化・ID 引き継ぎ・**DB 直接照会（runn DB ランナー）**・前後処理での DB 検証 |
 | 検知確認 | 実 API | 1 | 事後検証が DB 不整合を検知して exit 4 |
 
 | ID | シナリオ | 前処理 (PL/SQL) | 後処理 (PL/SQL) |
@@ -144,9 +154,9 @@ runnora を直接呼ぶ例（シナリオ LIB-005）:
 | LIB-004 | 貸出上限（応答の貸出 ID を返却・照会に引き継ぐ） | 明示カーソル + WHILE LOOP | - |
 | LIB-005 | SAVEPOINT による部分確定 | SAVEPOINT / ROLLBACK TO / EXCEPTION_INIT | 取消結果と自律型ログを検証 |
 | LIB-006 | 異常系 400/404/409 | - | DB 不変（件数・採番）を検証 |
-| LIB-007 | 大量履歴・runbook の繰り返し | BULK COLLECT LIMIT + FORALL | - |
+| LIB-007 | 大量履歴・3 件の個別照会 | BULK COLLECT LIMIT + FORALL | - |
 
-LIB-007 の `inspect_history_books` は `loop.count: 3` と `i` によって履歴の先頭 3 冊を順に照会する、runbook の繰り返しの例です。runn の `loop` は途中の回の検証失敗を最終結果に残さないため、16 件の履歴そのものは直前の `returned_history` ステップで一括検証します。
+LIB-007 は履歴の先頭 3 冊を個別の include ステップで照会し、それぞれの応答を保存・検証します。16 件の履歴全体は `returned_history` で一括検証します。
 
 すべての runbook の前後で、共通フック（`00_reset` → `10_seed_master` / `90_verify_integrity`）が走ります。
 `90_verify_integrity` は「貸出可能冊数 = 所蔵 − 貸出中」などの不変条件をカーソル FOR LOOP で検証し、

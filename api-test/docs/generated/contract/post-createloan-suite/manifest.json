@@ -20,7 +20,7 @@
     {
       "kind": "runbook",
       "path": "runbooks/contract/post_createLoan.template.yml",
-      "sha256": "a549b91962deeb7d267bd7aed564b38023d7c8ff365a9cb28f0a14d885cf4fda"
+      "sha256": "582777391b3354d7d1873c7097ed5a29145f86f4a7bc1db6476384b399fe4a83"
     },
     {
       "kind": "json",

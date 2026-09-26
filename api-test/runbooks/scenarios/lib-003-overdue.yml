@@ -21,10 +21,16 @@ steps:
           headers:
             X-Test-Scenario: LIB-003
           body: null
+  dump_member_overdue:
+    dump:
+      expr: steps.member_overdue.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/member_overdue.json'
+  check_member_overdue:
     test: |
-      current.res.status == 200 &&
-      current.res.body.activeLoanCount == 1 &&
-      current.res.body.overdue == true
+      steps.member_overdue.res.status == 200 &&
+      steps.member_overdue.res.body.activeLoanCount == 1 &&
+      steps.member_overdue.res.body.overdue == true
+
   active_loans:
     desc: 貸出中一覧に、返却期限が本日より前の貸出がちょうど1件あることを確認する
     req:
@@ -33,9 +39,15 @@ steps:
           headers:
             X-Test-Scenario: LIB-003
           body: null
+  dump_active_loans:
+    dump:
+      expr: steps.active_loans.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/active_loans.json'
+  check_active_loans:
     test: |
-      current.res.status == 200 &&
-      len(filter(current.res.body.items, date(.dueDate) < now())) == 1
+      steps.active_loans.res.status == 200 &&
+      len(filter(steps.active_loans.res.body.items, date(.dueDate) < now())) == 1
+
   save_overdue_loan:
     desc: 延滞している貸出の貸出IDと蔵書IDを保存する
     bind:
@@ -49,10 +61,16 @@ steps:
           headers:
             X-Test-Scenario: LIB-003
           body: null
+  dump_book_lent:
+    dump:
+      expr: steps.book_lent.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/book_lent.json'
+  check_book_lent:
     test: |
-      current.res.status == 200 &&
-      current.res.body.bookId == overdue_book_id &&
-      current.res.body.availableCopies == 0
+      steps.book_lent.res.status == 200 &&
+      steps.book_lent.res.body.bookId == overdue_book_id &&
+      steps.book_lent.res.body.availableCopies == 0
+
   loan_rejected:
     desc: 延滞中のM0002が別の本B0001を借りようとすると409 OVERDUE_LOANになる
     req:
@@ -64,9 +82,15 @@ steps:
             application/json:
               memberId: M0002
               bookId: B0001
+  dump_loan_rejected:
+    dump:
+      expr: steps.loan_rejected.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/loan_rejected.json'
+  check_loan_rejected:
     test: |
-      current.res.status == 409 &&
-      current.res.body.code == "OVERDUE_LOAN"
+      steps.loan_rejected.res.status == 409 &&
+      steps.loan_rejected.res.body.code == "OVERDUE_LOAN"
+
   return_overdue:
     desc: 保存した貸出IDで延滞している貸出を返却し、応答の貸出・蔵書が保存した値と一致することを確認する
     req:
@@ -76,12 +100,18 @@ steps:
             X-Test-Scenario: LIB-003
           body:
             application/json: {}
+  dump_return_overdue:
+    dump:
+      expr: steps.return_overdue.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/return_overdue.json'
+  check_return_overdue:
     test: |
-      current.res.status == 200 &&
-      current.res.body.loanId == overdue_loan_id &&
-      current.res.body.bookId == overdue_book_id &&
-      current.res.body.status == "RETURNED" &&
-      current.res.body.returnedAt != nil
+      steps.return_overdue.res.status == 200 &&
+      steps.return_overdue.res.body.loanId == overdue_loan_id &&
+      steps.return_overdue.res.body.bookId == overdue_book_id &&
+      steps.return_overdue.res.body.status == "RETURNED" &&
+      steps.return_overdue.res.body.returnedAt != nil
+
   book_returned:
     desc: 保存した蔵書IDで照会し、返却で貸出可能冊数が1冊に戻ったことを確認する
     req:
@@ -90,9 +120,15 @@ steps:
           headers:
             X-Test-Scenario: LIB-003
           body: null
+  dump_book_returned:
+    dump:
+      expr: steps.book_returned.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/book_returned.json'
+  check_book_returned:
     test: |
-      current.res.status == 200 &&
-      current.res.body.availableCopies == 1
+      steps.book_returned.res.status == 200 &&
+      steps.book_returned.res.body.availableCopies == 1
+
   member_cleared:
     desc: 返却後は延滞なし・貸出0件になることを確認する
     req:
@@ -101,10 +137,16 @@ steps:
           headers:
             X-Test-Scenario: LIB-003
           body: null
+  dump_member_cleared:
+    dump:
+      expr: steps.member_cleared.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/member_cleared.json'
+  check_member_cleared:
     test: |
-      current.res.status == 200 &&
-      current.res.body.activeLoanCount == 0 &&
-      current.res.body.overdue == false
+      steps.member_cleared.res.status == 200 &&
+      steps.member_cleared.res.body.activeLoanCount == 0 &&
+      steps.member_cleared.res.body.overdue == false
+
   loan_ok:
     desc: 延滞が解消したのでB0001を借りられる。新しい貸出IDは返却した貸出と異なる
     req:
@@ -116,10 +158,16 @@ steps:
             application/json:
               memberId: M0002
               bookId: B0001
+  dump_loan_ok:
+    dump:
+      expr: steps.loan_ok.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/loan_ok.json'
+  check_loan_ok:
     test: |
-      current.res.status == 201 &&
-      current.res.body.bookId == "B0001" &&
-      current.res.body.loanId != overdue_loan_id
+      steps.loan_ok.res.status == 201 &&
+      steps.loan_ok.res.body.bookId == "B0001" &&
+      steps.loan_ok.res.body.loanId != overdue_loan_id
+
   save_new_loan:
     desc: 新しい貸出IDを保存する
     bind:
@@ -132,8 +180,13 @@ steps:
           headers:
             X-Test-Scenario: LIB-003
           body: null
+  dump_loan_history:
+    dump:
+      expr: steps.loan_history.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/loan_history.json'
+  check_loan_history:
     test: |
-      current.res.status == 200 &&
-      current.res.body.total == 2 &&
-      filter(current.res.body.items, .loanId == overdue_loan_id)[0].status == "RETURNED" &&
-      filter(current.res.body.items, .loanId == new_loan_id)[0].status == "ACTIVE"
+      steps.loan_history.res.status == 200 &&
+      steps.loan_history.res.body.total == 2 &&
+      filter(steps.loan_history.res.body.items, .loanId == overdue_loan_id)[0].status == "RETURNED" &&
+      filter(steps.loan_history.res.body.items, .loanId == new_loan_id)[0].status == "ACTIVE"

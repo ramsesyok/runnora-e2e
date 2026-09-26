@@ -4,14 +4,14 @@ sha256: fd4732d68d8d9502d989bc4060a356789103b15888cec6a45768679317ec2e28
 -->
 
 ::: {.landscape}
-::: {.tbl caption="期待値・検証条件（契約 listMemberLoans 会員の貸出履歴を取得する（モック・実APIの両方で実行する）／手順 1）" label="tbl-exp-133dd03b" widths="18,20,62" merge-cols="all" breakable-rows="true"}
+::: {.tbl caption="期待値・検証条件（契約 listMemberLoans 会員の貸出履歴を取得する（モック・実APIの両方で実行する）／手順 3）" label="tbl-exp-07796b62" widths="18,20,62" merge-cols="all" breakable-rows="true"}
 +--------------------+----------------------------+--------------------------------------------------------------------------+
 | 区分               | 出典                       | 内容                                                                     |
 +====================+============================+==========================================================================+
-| 検証式             | get_\                      | current.res.status == vars.case.expect.status &&                         |
-|                    | listMember\                | compare(current.res.body, vars.expected, vars.case.expect.ignorePaths)   |
-|                    | Loans\                     |                                                                          |
-|                    | .template.yml:26           |                                                                          |
+| 検証式             | get_\                      | steps.call_api.res.status == vars.case.expect.status &&                  |
+|                    | listMember\                | compare(steps.call_api.res.body, vars.expected,                          |
+|                    | Loans\                     | vars.case.expect.ignorePaths)                                            |
+|                    | .template.yml:35           |                                                                          |
 +--------------------+----------------------------+--------------------------------------------------------------------------+
 | ステータス         | 検証式から抽出             | HTTP 200                                                                 |
 +--------------------+----------------------------+--------------------------------------------------------------------------+
@@ -57,14 +57,14 @@ sha256: fd4732d68d8d9502d989bc4060a356789103b15888cec6a45768679317ec2e28
 :::
 
 ::: {.landscape}
-::: {.tbl caption="期待値・検証条件（契約 listMemberLoans 会員の貸出履歴を取得する（モック・実APIの両方で実行する）／手順 2）" label="tbl-exp-7948c0ea" widths="18,20,62" merge-cols="all" breakable-rows="true"}
+::: {.tbl caption="期待値・検証条件（契約 listMemberLoans 会員の貸出履歴を取得する（モック・実APIの両方で実行する）／手順 6）" label="tbl-exp-4b6fcf1b" widths="18,20,62" merge-cols="all" breakable-rows="true"}
 +--------------------+--------------------------------+--------------------------------------------------------------------------+
 | 区分               | 出典                           | 内容                                                                     |
 +====================+================================+==========================================================================+
-| 検証式             | get_\                          | current.res.status == vars.case.expect.status &&                         |
-|                    | listMember\                    | compare(current.res.body, vars.expected, vars.case.expect.ignorePaths)   |
-|                    | Loans\                         |                                                                          |
-|                    | .template.yml:26               |                                                                          |
+| 検証式             | get_\                          | steps.call_api.res.status == vars.case.expect.status &&                  |
+|                    | listMember\                    | compare(steps.call_api.res.body, vars.expected,                          |
+|                    | Loans\                         | vars.case.expect.ignorePaths)                                            |
+|                    | .template.yml:35               |                                                                          |
 +--------------------+--------------------------------+--------------------------------------------------------------------------+
 | ステータス         | 検証式から抽出                 | HTTP 404                                                                 |
 +--------------------+--------------------------------+--------------------------------------------------------------------------+

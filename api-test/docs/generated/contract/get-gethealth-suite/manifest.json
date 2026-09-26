@@ -19,7 +19,7 @@
     {
       "kind": "runbook",
       "path": "runbooks/contract/get_getHealth.template.yml",
-      "sha256": "a9ef788db2976e2e66e930f3dbbf624d7dc84926c502111e9d16381b18260abe"
+      "sha256": "4904d8d7039088e454c200d34a33f51f796cec9064319ed8096e95ea338d876d"
     },
     {
       "kind": "json",

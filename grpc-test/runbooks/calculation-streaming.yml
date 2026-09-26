@@ -20,9 +20,14 @@ steps:
     greq:
       sample.library.v1.LibraryService/Calculate:
         message: "{{ vars.request }}"
+  dump_calculate:
+    dump:
+      expr: steps.calculate.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/calculation-streaming-calculate.json'
+  check_calculate:
     test: |
-      current.res.status == vars.expected.status &&
-      current.res.messages[0].completion == nil &&
-      current.res.messages[1].completion == nil &&
-      current.res.messages[2].completion != nil &&
-      compare(current.res.messages, vars.expected.messages)
+      steps.calculate.res.status == vars.expected.status &&
+      steps.calculate.res.messages[0].completion == nil &&
+      steps.calculate.res.messages[1].completion == nil &&
+      steps.calculate.res.messages[2].completion != nil &&
+      compare(steps.calculate.res.messages, vars.expected.messages)

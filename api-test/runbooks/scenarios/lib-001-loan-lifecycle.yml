@@ -19,11 +19,17 @@ steps:
           headers:
             X-Test-Scenario: LIB-001
           body: null
+  dump_member_before:
+    dump:
+      expr: steps.member_before.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/member_before.json'
+  check_member_before:
     test: |
-      current.res.status == 200 &&
-      current.res.body.status == "ACTIVE" &&
-      current.res.body.activeLoanCount == 0 &&
-      current.res.body.overdue == false
+      steps.member_before.res.status == 200 &&
+      steps.member_before.res.body.status == "ACTIVE" &&
+      steps.member_before.res.body.activeLoanCount == 0 &&
+      steps.member_before.res.body.overdue == false
+
   book_before:
     desc: 蔵書B0001の貸出可能冊数が所蔵冊数3と同じであることを確認する
     req:
@@ -32,10 +38,16 @@ steps:
           headers:
             X-Test-Scenario: LIB-001
           body: null
+  dump_book_before:
+    dump:
+      expr: steps.book_before.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/book_before.json'
+  check_book_before:
     test: |
-      current.res.status == 200 &&
-      current.res.body.totalCopies == 3 &&
-      current.res.body.availableCopies == 3
+      steps.book_before.res.status == 200 &&
+      steps.book_before.res.body.totalCopies == 3 &&
+      steps.book_before.res.body.availableCopies == 3
+
   create_loan:
     desc: M0001がB0001を借りる。採番リセット済みなので貸出IDは1になる
     req:
@@ -47,14 +59,20 @@ steps:
             application/json:
               memberId: M0001
               bookId: B0001
+  dump_create_loan:
+    dump:
+      expr: steps.create_loan.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/create_loan.json'
+  check_create_loan:
     test: |
-      current.res.status == 201 &&
-      current.res.body.loanId == 1 &&
-      current.res.body.memberId == "M0001" &&
-      current.res.body.bookId == "B0001" &&
-      current.res.body.status == "ACTIVE" &&
-      current.res.body.returnedAt == nil &&
-      current.res.body.dueDate > current.res.body.loanedAt
+      steps.create_loan.res.status == 201 &&
+      steps.create_loan.res.body.loanId == 1 &&
+      steps.create_loan.res.body.memberId == "M0001" &&
+      steps.create_loan.res.body.bookId == "B0001" &&
+      steps.create_loan.res.body.status == "ACTIVE" &&
+      steps.create_loan.res.body.returnedAt == nil &&
+      steps.create_loan.res.body.dueDate > steps.create_loan.res.body.loanedAt
+
   save_loan_id:
     desc: 応答の貸出IDをloan_idに保存し、後続の返却URLへ引き継ぐ
     bind:
@@ -78,23 +96,27 @@ steps:
           headers:
             X-Test-Scenario: LIB-001
           body: null
+  dump_book_lent:
+    dump:
+      expr: steps.book_lent.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/book_lent.json'
+  check_book_lent:
     test: |
-      current.res.status == 200 &&
-      current.res.body.availableCopies == steps.book_before.res.body.availableCopies - 1
+      steps.book_lent.res.status == 200 &&
+      steps.book_lent.res.body.availableCopies == steps.book_before.res.body.availableCopies - 1
+
   member_loans:
     desc: 貸出中一覧に今回の貸出が反映されるまで最大5回照会する
     # until が成立した時点で終了し、5回とも成立しなければ失敗する。
-    # 同じステップに test を置くと反映前の応答で失敗するため、条件は until にまとめる。
+    # 各照会の応答は include 内で保存し、その後に until で判定する。
     loop:
       count: 5
-      until: current.res.status == 200 && current.res.body.total == 1 && current.res.body.items[0].loanId == loan_id
+      until: current.steps.fetch.res.status == 200 && current.steps.fetch.res.body.total == 1 && current.steps.fetch.res.body.items[0].loanId == loan_id
       interval: 0.2
-    req:
-      /members/M0001/loans?status=ACTIVE:
-        get:
-          headers:
-            X-Test-Scenario: LIB-001
-          body: null
+    include:
+      path: ./lib-001-member-loans-poll.yml
+      vars:
+        attempt: '{{ i }}'
   return_loan:
     desc: 保存した貸出IDで返却し、状態がRETURNEDになり返却日が入ることを確認する
     req:
@@ -104,11 +126,17 @@ steps:
             X-Test-Scenario: LIB-001
           body:
             application/json: {}
+  dump_return_loan:
+    dump:
+      expr: steps.return_loan.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/return_loan.json'
+  check_return_loan:
     test: |
-      current.res.status == 200 &&
-      current.res.body.loanId == loan_id &&
-      current.res.body.status == "RETURNED" &&
-      current.res.body.returnedAt != nil
+      steps.return_loan.res.status == 200 &&
+      steps.return_loan.res.body.loanId == loan_id &&
+      steps.return_loan.res.body.status == "RETURNED" &&
+      steps.return_loan.res.body.returnedAt != nil
+
   return_again:
     desc: 同じ貸出を再度返却すると409 ALREADY_RETURNEDになることを確認する
     req:
@@ -118,9 +146,15 @@ steps:
             X-Test-Scenario: LIB-001
           body:
             application/json: {}
+  dump_return_again:
+    dump:
+      expr: steps.return_again.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/return_again.json'
+  check_return_again:
     test: |
-      current.res.status == 409 &&
-      current.res.body.code == "ALREADY_RETURNED"
+      steps.return_again.res.status == 409 &&
+      steps.return_again.res.body.code == "ALREADY_RETURNED"
+
   book_restored:
     desc: 返却によりB0001の貸出可能冊数が初期値に戻り、二重返却で増えていないことを確認する
     req:
@@ -129,9 +163,15 @@ steps:
           headers:
             X-Test-Scenario: LIB-001
           body: null
+  dump_book_restored:
+    dump:
+      expr: steps.book_restored.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/book_restored.json'
+  check_book_restored:
     test: |
-      current.res.status == 200 &&
-      current.res.body.availableCopies == steps.book_before.res.body.availableCopies
+      steps.book_restored.res.status == 200 &&
+      steps.book_restored.res.body.availableCopies == steps.book_before.res.body.availableCopies
+
   member_after:
     desc: 会員の貸出中件数が0に戻ったことを確認する
     req:
@@ -140,6 +180,11 @@ steps:
           headers:
             X-Test-Scenario: LIB-001
           body: null
+  dump_member_after:
+    dump:
+      expr: steps.member_after.res
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/member_after.json'
+  check_member_after:
     test: |
-      current.res.status == 200 &&
-      current.res.body.activeLoanCount == 0
+      steps.member_after.res.status == 200 &&
+      steps.member_after.res.body.activeLoanCount == 0
