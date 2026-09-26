@@ -35,7 +35,7 @@ function Invoke-Runnora {
         [string]$Name, [string]$Config, [string[]]$Runbooks, [string]$ReportDir,
         [string[]]$BeforeSql = @(), [string[]]$AfterSql = @(), [int]$Expect = 0
     )
-    # runnora 0.x は --report-format json/junit が未実装 (text で出力される) ため text で保存する
+    # 人が読むレポートとして text で保存する (json/junit は runnora#15 で実装済み。サマリー HTML 化の際に切り替える)
     $runArgs = @('run', '--config', $Config, '--report-format', 'text', '--report-out', (Join-Path $ReportDir "$Name.txt"))
     foreach ($f in $BeforeSql) { $runArgs += @('--before-sql', $f) }
     foreach ($f in $AfterSql) { $runArgs += @('--after-sql', $f) }

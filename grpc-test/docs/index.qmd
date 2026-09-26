@@ -1,6 +1,6 @@
 # gRPC E2E テスト手順書
 
-Go 製の図書照会・計算配信サービスに対して、runnora で Unary RPC と Server streaming RPC を実行する。系列分析の応答は `jsondiff-eps` で許容誤差付き比較を行う。
+Go 製の図書照会・計算配信サービスに対して、runnora で Unary RPC と Server streaming RPC を実行する。系列分析の応答は `runnora-diff` で許容誤差付き比較を行う。
 API 定義は `proto/library.proto`、runbook は `runbooks/` に置く。
 
 `grpc-test/` で `./scripts/run.ps1` を実行してテストし、`./scripts/build-docs.ps1` でこの手順書を生成する。

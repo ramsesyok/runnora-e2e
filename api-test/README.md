@@ -204,7 +204,7 @@ runbooks/contract/get_getMember.suite.yml
 
 | # | ツール | 内容 | 本サンプルでの対処 |
 |---|---|---|---|
-| 1 | runnora | `--report-format json` / `junit` が未実装で、指定してもテキストが出力される | text で保存 |
+| 1 | runnora | 作成時は `--report-format json` / `junit` が未実装で、指定してもテキストが出力された（[ramsesyok/runnora#15](https://github.com/ramsesyok/runnora/pull/15) で実装済み） | text で保存 |
 | 2 | runnora | フック SQL はファイル全体を 1 文で実行。SQL*Plus の `/` 終端は `PLS-00103` | 1 ファイル 1 無名ブロックで記述（[sql/README.md](sql/README.md)） |
 | 3 | runnora | エラー終了時に cobra の Usage が毎回出力され、エラーが読みにくい | - |
 | 4 | runnora (runn) | suite の `json://` 相対パスは include 先 template の位置で解決される | template を suite と同じディレクトリに配置 |

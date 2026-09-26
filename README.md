@@ -17,7 +17,7 @@ HTTP と gRPC の各応答は runbook の判定前に JSON ファイルへ保存
 Projects/
 ├─ runnora/            runnora.exe（テスト実行）
 ├─ oapi2wire/          oapi2wire.exe（WireMock モック生成）
-├─ runnora-diff/       jsondiff-eps.exe のビルド元
+├─ runnora-diff/       runnora-diff.exe のビルド元（数値の許容誤差比較）
 ├─ runnora-docgen/     runnora-docgen.exe（手順書の表生成）
 └─ runnora-e2e/        このリポジトリ
    ├─ api-test/
