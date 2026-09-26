@@ -29,6 +29,21 @@ steps:
       current.res.body.items[15].loanId == 16 &&
       current.res.body.items[15].bookId == "B0020" &&
       all(current.res.body.items, .returnedAt != nil)
+  inspect_history_books:
+    desc: 履歴の先頭3件をloopで順に蔵書照会する（iは0から始まる）
+    # loopのtestは最終回だけが報告されるため、各回の正否が重要な検証には使わない。
+    # 16件すべての内容はreturned_historyでまとめて検証している。
+    loop:
+      count: 3
+    req:
+      /books/{{ steps.returned_history.res.body.items[i].bookId }}:
+        get:
+          headers:
+            X-Test-Scenario: LIB-007
+          body: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.bookId == steps.returned_history.res.body.items[i].bookId
   no_active:
     desc: 貸出中の履歴は0件である
     req:

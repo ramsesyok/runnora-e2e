@@ -82,17 +82,19 @@ steps:
       current.res.status == 200 &&
       current.res.body.availableCopies == steps.book_before.res.body.availableCopies - 1
   member_loans:
-    desc: 会員の貸出中一覧に今回の貸出だけが表示されることを確認する
+    desc: 貸出中一覧に今回の貸出が反映されるまで最大5回照会する
+    # until が成立した時点で終了し、5回とも成立しなければ失敗する。
+    # 同じステップに test を置くと反映前の応答で失敗するため、条件は until にまとめる。
+    loop:
+      count: 5
+      until: current.res.status == 200 && current.res.body.total == 1 && current.res.body.items[0].loanId == loan_id
+      interval: 0.2
     req:
       /members/M0001/loans?status=ACTIVE:
         get:
           headers:
             X-Test-Scenario: LIB-001
           body: null
-    test: |
-      current.res.status == 200 &&
-      current.res.body.total == 1 &&
-      current.res.body.items[0].loanId == loan_id
   return_loan:
     desc: 保存した貸出IDで返却し、状態がRETURNEDになり返却日が入ることを確認する
     req:

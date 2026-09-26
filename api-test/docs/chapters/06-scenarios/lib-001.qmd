@@ -2,6 +2,7 @@
 
 - 目的：貸出と返却で在庫・会員の貸出件数が正しく増減し、貸出 ID を後続手順へ引き継げることを確認する。
 - 前提：共通前処理のみ（B0001 は 3 冊、M0001 は貸出 0 件）。
+- `member_loans` は `loop.until` の例。貸出 ID が一覧に現れるまで最大 5 回、0.2 秒間隔で照会し、条件を満たした時点で終了する。
 - 合格条件：全手順の検証式が真であり、後処理 `lib001_assert_after.sql` が DB 上で
   「貸出 1 件・返却済・返却日が本日・B0001 の貸出可能冊数 3」を確認して正常終了すること。
 - 実行：`runnora run --config config.yaml --after-sql sql/cases/lib001_assert_after.sql runbooks/scenarios/lib-001-loan-lifecycle.yml`

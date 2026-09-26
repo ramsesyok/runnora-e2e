@@ -4,6 +4,7 @@
 - 前提：前処理 `lib007_history_before.sql` が BULK COLLECT … LIMIT 5 と FORALL で
   M0004 に B0005〜B0020 の返却済み貸出 16 件（貸出 1〜16）を 4 バッチで投入する。
 - 合格条件：全手順の検証式が真であり、共通後処理が正常終了すること。
+- `inspect_history_books` は runn の `loop.count` と添字 `i` の書き方を示す。履歴の先頭 3 件を順に照会する。runn の loop は途中の回の検証失敗が最終結果に残らないため、履歴 16 件の内容は直前の `returned_history` で一括検証する。
 - 実行：`runnora run --config config.yaml --before-sql sql/cases/lib007_history_before.sql runbooks/scenarios/lib-007-bulk-history.yml`
 
 {{< include ../../generated/scenarios/lib-007-bulk-history/_body.qmd >}}
