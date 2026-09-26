@@ -1,0 +1,63 @@
+# 実施手順 {#sec-execution}
+
+## 準備 {#sec-prepare}
+
+| No. | 作業 | コマンド（リポジトリ直下、PowerShell） | 確認 |
+|-----|------|----------------------------------------|------|
+| 1 | Docker Desktop を起動する | - | `docker info` が応答する |
+| 2 | Oracle を起動しスキーマを作る | `./scripts/db-up.ps1` | 「LIBAPP スキーマを作成しました」と表示 |
+| 3 | モック資産を生成する | `./scripts/mock-build.ps1` | `build complete` と表示 |
+| 4 | テスト雛形を再生成する（任意） | `./scripts/generate.ps1` | `Generated 8 operations` と表示 |
+
+: 準備 {#tbl-prepare}
+
+## 実行 {#sec-run}
+
+一括で実行する場合は `./scripts/run-all.ps1` を使う。API と WireMock をバックグラウンドで起動し、
+テスト・手順書生成の後に停止する。個別に実行する場合は次のとおり。
+
+| No. | 作業 | コマンド | 合格条件 |
+|-----|------|----------|----------|
+| 1 | API を起動する（ターミナル A） | `./scripts/api-start.ps1` | `library api listening` と表示 |
+| 2 | モックを起動する（ターミナル B） | `./scripts/mock-start.ps1` | 18080 で待ち受け |
+| 3 | モックに対してテストする | `./scripts/test-mock.ps1` | 「モック: 2/2 OK」 |
+| 4 | 実 API に対してテストする | `./scripts/test-api.ps1` | 「実 API: 10/10 OK」、カバレッジ 8/8 |
+| 5 | 手順書を生成する | `./scripts/build-docs.ps1` | `docs/_book/index.html` ができる |
+
+: 実行 {#tbl-run}
+
+`test-api.ps1` はシナリオごとに次の形で runnora を呼ぶ（`scripts/scenarios.psd1` の定義による）。
+
+```powershell
+runnora run --config config.yaml `
+  --before-sql sql/cases/lib005_savepoint_before.sql `
+  --after-sql  sql/cases/lib005_assert_after.sql `
+  runbooks/scenarios/lib-005-savepoint.yml
+```
+
+終了コードの意味は次のとおり。検知確認（DEMO）は 4 が合格である。
+
+| 終了コード | 意味 |
+|-----------|------|
+| 0 | 全成功 |
+| 1 | runbook の検証失敗 |
+| 2 | 設定・引数不正 |
+| 3 | DB 接続失敗 |
+| 4 | 前処理・後処理の失敗（事後検証の違反を含む） |
+
+: runnora の終了コード {#tbl-exit-codes}
+
+## 証跡 {#sec-evidence}
+
+`reports/<日時>-mock/`、`reports/<日時>-api/` に、実行ごとの結果（`*.txt`）、
+標準出力（`*.log`）、カバレッジ（`coverage.txt`）が残る。
+DB 側の証跡として、前後処理のログが `TEST_HOOK_LOG` 表に残る（1 日で自動削除）。
+
+## 終了 {#sec-finish}
+
+| No. | 作業 | コマンド |
+|-----|------|----------|
+| 1 | API・モックを止める | 各ターミナルで Ctrl+C |
+| 2 | Oracle を止めて削除する | `./scripts/db-down.ps1` |
+
+: 終了 {#tbl-finish}

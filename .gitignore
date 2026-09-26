@@ -1,0 +1,31 @@
+# ==== runnora-e2e ====
+# ビルド成果物・実行結果
+/bin/
+/reports/
+# oapi2wire build の出力 (mapping の id が毎回変わるため管理しない。scripts/mock-build.ps1 で再生成)
+/mock/wiremock-out/
+
+# ==== ddq / Quarto (docs/) ====
+# 管理対象: 本文 (_quarto.yml / index.qmd / chapters/ / diagrams/)、機構ファイル、design-doc.pdf、
+#           docs/generated/ (scripts/build-docs.ps1 が生成。レビューで差分を見るため残す)
+_book/
+index.typ
+lib.typ
+typst-template.typ
+typst-show.typ
+_quarto-publish.yml
+.quarto/
+# Quarto のレンダリング中間物 (PDF 用の mermaid 画像など)
+**/*_files/
+**/*.quarto_ipynb
+/*/.gitignore
+**/diagrams/mmd-*
+**/diagrams/puml-*
+chk-*.png
+page-*.png
+*.zip
+
+# ==== OS / エディタ ====
+.DS_Store
+Thumbs.db
+*~

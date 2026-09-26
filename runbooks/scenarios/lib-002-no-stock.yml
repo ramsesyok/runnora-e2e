@@ -1,0 +1,98 @@
+desc: LIB-002 在庫1冊の本の取り合い（在庫切れ409と返却後の再貸出）
+labels:
+  - scenario
+  - loans
+runners:
+  req:
+    endpoint: http://127.0.0.1:18081
+    # 応答を OpenAPI 定義で自動検証する。異常系の入力を送るためリクエスト側の検証は行わない
+    openapi3: ../../openapi/library-api.yaml
+    skipValidateRequest: true
+  db: oracle://libapp:libapp_pw@127.0.0.1:1522/FREEPDB1
+steps:
+  first_loan:
+    desc: 所蔵1冊のB0002をM0001が借りる
+    req:
+      /loans:
+        post:
+          body:
+            application/json:
+              memberId: M0001
+              bookId: B0002
+    test: |
+      current.res.status == 201 &&
+      current.res.body.loanId == 1 &&
+      current.res.body.bookId == "B0002"
+  save_first:
+    desc: 1件目の貸出IDをfirst_loan_idに保存する
+    bind:
+      first_loan_id: steps.first_loan.res.body.loanId
+  book_empty:
+    desc: B0002の貸出可能冊数が0になったことを確認する
+    req:
+      /books/B0002:
+        get:
+          body: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.availableCopies == 0
+  available_novels:
+    desc: 貸出可能な小説の検索結果からB0002が消えることを確認する
+    req:
+      /books?genre=NOVEL&availableOnly=true:
+        get:
+          body: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.total == 1 &&
+      current.res.body.items[0].bookId == "B0001"
+  second_loan_rejected:
+    desc: 別会員M0002が同じ本を借りようとすると409 NO_STOCKになる
+    req:
+      /loans:
+        post:
+          body:
+            application/json:
+              memberId: M0002
+              bookId: B0002
+    test: |
+      current.res.status == 409 &&
+      current.res.body.code == "NO_STOCK"
+  db_no_extra_loan:
+    desc: 拒否された貸出がDBに作られていないことを確認する
+    db:
+      query: |
+        SELECT COUNT(*) AS cnt FROM loans WHERE book_id = 'B0002'
+    test: current.rows[0].CNT == "1"
+  return_first:
+    desc: M0001が返却する
+    req:
+      /loans/{{ first_loan_id }}/return:
+        post:
+          body:
+            application/json: {}
+    test: |
+      current.res.status == 200 &&
+      current.res.body.status == "RETURNED"
+  second_loan_ok:
+    desc: 返却後はM0002が借りられ、新しい貸出IDが採番される
+    req:
+      /loans:
+        post:
+          body:
+            application/json:
+              memberId: M0002
+              bookId: B0002
+    test: |
+      current.res.status == 201 &&
+      current.res.body.loanId == first_loan_id + 1 &&
+      current.res.body.memberId == "M0002"
+  book_empty_again:
+    desc: 再び貸出可能冊数が0になったことを確認する
+    req:
+      /books/B0002:
+        get:
+          body: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.availableCopies == 0

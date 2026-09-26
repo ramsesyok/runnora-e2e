@@ -1,0 +1,66 @@
+{
+  "generator": "runnora-docgen",
+  "scenario": "契約 listBooks 蔵書を検索する（モック・実APIの両方で実行する）",
+  "source": "runbooks/contract/get_listBooks.suite.yml",
+  "sha256": "1a044eb164ae5c93a49f81c87bcf1c9fd9b4c9bcd307f23ff4864531fc51759d",
+  "files": [
+    "after.qmd",
+    "before.qmd",
+    "cases.qmd",
+    "expectations.qmd",
+    "http.qmd",
+    "scenario.qmd"
+  ],
+  "inputs": [
+    {
+      "kind": "runbook",
+      "path": "runbooks/contract/get_listBooks.suite.yml",
+      "sha256": "1a044eb164ae5c93a49f81c87bcf1c9fd9b4c9bcd307f23ff4864531fc51759d"
+    },
+    {
+      "kind": "runbook",
+      "path": "runbooks/contract/get_listBooks.template.yml",
+      "sha256": "04abbf14d2b8b120197b8309aecfb4bbdc9a11a75e2a6a41a635ef5b4cf5bf4e"
+    },
+    {
+      "kind": "case",
+      "path": "cases/contract/books/get_listBooks/01_novel.json",
+      "sha256": "e1e6c6ea21667f18fa02f13ab9795e86c700ad735d05d13e8bb4dd4fdaf41f67"
+    },
+    {
+      "kind": "case",
+      "path": "cases/contract/books/get_listBooks/02_tech_available.json",
+      "sha256": "123bcb6f03badade8ed44d39a87a26d87c7e49166b7d8db0a40aad0e374dfe31"
+    },
+    {
+      "kind": "case",
+      "path": "cases/contract/books/get_listBooks/03_invalid_genre.json",
+      "sha256": "3df3e5d1d7135596fcb99d8257b2c973f5f479b78bfb8a9197732c97e785deac"
+    },
+    {
+      "kind": "config",
+      "path": "config.yaml",
+      "sha256": "8e7c2385aa5e0e1c08cf3ffe134a55283731931a467a245b012c1e5ceb75cf8c"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/common/00_reset.sql",
+      "sha256": "d9eb8b4d88152cac1536b45ee7c61cbb081ae8e487b547eac919dfceee1cc77e"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/common/10_seed_master.sql",
+      "sha256": "e3cde2dac9a6191735242025960ccddd47b867ffe574d2062fc4f3c64c8ebfba"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/cases/contract_setup.sql",
+      "sha256": "3960624669819050af2d202f4fa9f6a170cf1e19d1c3c7a145788c49a6dea108"
+    },
+    {
+      "kind": "after-sql",
+      "path": "sql/common/90_verify_integrity.sql",
+      "sha256": "2b9b30c6c72c6ad4e78d3f0ccf8998dd9062dc8354111cdd3393e0bef9e4cdda"
+    }
+  ]
+}

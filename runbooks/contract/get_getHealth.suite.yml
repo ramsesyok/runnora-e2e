@@ -1,0 +1,19 @@
+desc: 契約 getHealth 稼働状態を確認する（モック・実APIの両方で実行する）
+labels:
+  - contract
+  - system
+  - operation:getHealth
+
+vars:
+  cases:
+    - json://../../cases/contract/system/get_getHealth/01_up.json
+
+steps:
+  run_case:
+    desc: ケースJSONを順に読み込み、templateで呼び出して期待ステータスと本文の一部を検証する
+    loop:
+      count: len(vars.cases)
+    include:
+      path: ./get_getHealth.template.yml
+      vars:
+        case: "{{ vars.cases[i] }}"

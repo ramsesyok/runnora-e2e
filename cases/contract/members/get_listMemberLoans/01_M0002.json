@@ -1,0 +1,20 @@
+{
+  "name": "M0002",
+  "description": "M0002 は貸出中 1 件・返却済 1 件 (contract_setup.sql)",
+  "pathParams": {
+    "memberId": "M0002"
+  },
+  "queryParams": {
+    "status": ""
+  },
+  "headers": {},
+  "requestBody": null,
+  "expect": {
+    "status": 200,
+    "bodyMode": "subset",
+    "body": {
+      "total": 2
+    },
+    "ignorePaths": []
+  }
+}

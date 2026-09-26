@@ -1,0 +1,26 @@
+<!-- scripts/build-docs.ps1 が生成する。手で編集しない。 -->
+
+### テストシナリオ
+
+{{< include ../../generated/scenarios/lib-002-no-stock/scenario.qmd >}}
+
+### 前処理
+
+{{< include ../../generated/scenarios/lib-002-no-stock/before.qmd >}}
+
+### 後処理
+
+{{< include ../../generated/scenarios/lib-002-no-stock/after.qmd >}}
+
+### HTTP 呼び出し
+
+{{< include ../../generated/scenarios/lib-002-no-stock/http.qmd >}}
+
+### リクエストボディ
+
+{{< include ../../generated/scenarios/lib-002-no-stock/request-json.qmd >}}
+
+### 期待値・検証条件
+
+{{< include ../../generated/scenarios/lib-002-no-stock/expectations.qmd >}}
+

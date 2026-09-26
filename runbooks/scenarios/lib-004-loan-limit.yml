@@ -1,0 +1,76 @@
+desc: LIB-004 貸出上限3冊に達した会員は借りられず、1冊返すと借りられる
+# 実行: runnora run --config config.yaml --before-sql sql/cases/lib004_fill_loans_before.sql <this>
+# 前処理で M0001 に TECH の本 B0003, B0006, B0008 を貸出 1〜3 として貸し出す
+labels:
+  - scenario
+  - loans
+  - plsql-setup
+runners:
+  req:
+    endpoint: http://127.0.0.1:18081
+    # 応答を OpenAPI 定義で自動検証する。異常系の入力を送るためリクエスト側の検証は行わない
+    openapi3: ../../openapi/library-api.yaml
+    skipValidateRequest: true
+  db: oracle://libapp:libapp_pw@127.0.0.1:1522/FREEPDB1
+steps:
+  member_full:
+    desc: 前処理によりM0001の貸出中件数が上限3に達していることを確認する
+    req:
+      /members/M0001:
+        get:
+          body: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.activeLoanCount == 3 &&
+      current.res.body.maxLoans == 3
+  loans_by_cursor:
+    desc: 明示カーソルがbook_id順に貸し出した3冊を確認する
+    req:
+      /members/M0001/loans?status=ACTIVE:
+        get:
+          body: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.total == 3 &&
+      map(current.res.body.items, .bookId) == ["B0003", "B0006", "B0008"] &&
+      map(current.res.body.items, .loanId) == [1, 2, 3]
+  loan_rejected:
+    desc: 4冊目を借りようとすると409 LOAN_LIMIT_EXCEEDEDになる
+    req:
+      /loans:
+        post:
+          body:
+            application/json:
+              memberId: M0001
+              bookId: B0001
+    test: |
+      current.res.status == 409 &&
+      current.res.body.code == "LOAN_LIMIT_EXCEEDED"
+  return_one:
+    desc: 貸出2（B0006）を返却する
+    req:
+      /loans/2/return:
+        post:
+          body:
+            application/json: {}
+    test: |
+      current.res.status == 200 &&
+      current.res.body.bookId == "B0006"
+  loan_ok:
+    desc: 上限に空きができたのでB0001を借りられる（貸出IDは4）
+    req:
+      /loans:
+        post:
+          body:
+            application/json:
+              memberId: M0001
+              bookId: B0001
+    test: |
+      current.res.status == 201 &&
+      current.res.body.loanId == 4
+  db_active_count:
+    desc: DB上でもM0001の貸出中が3件（上限ちょうど）であることを確認する
+    db:
+      query: |
+        SELECT COUNT(*) AS cnt FROM loans WHERE member_id = 'M0001' AND status = 'ACTIVE'
+    test: current.rows[0].CNT == "3"

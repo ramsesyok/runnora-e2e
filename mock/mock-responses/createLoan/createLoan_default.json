@@ -1,0 +1,9 @@
+{
+  "bookId": "B0001",
+  "dueDate": "2026-10-10",
+  "loanId": 1,
+  "loanedAt": "2026-09-26",
+  "memberId": "M0001",
+  "returnedAt": null,
+  "status": "ACTIVE"
+}

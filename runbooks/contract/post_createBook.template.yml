@@ -1,0 +1,32 @@
+# runbooks/generated/ から複製して拡張した契約テスト用 template (生成物は再生成で上書きされるため)
+# 変更点: ステータスに加え、expect.body のトップレベル項目が応答と一致すること (subset) を検証する
+desc: 蔵書を登録する contract template
+labels:
+  - openapi
+  - books
+  - method:post
+  - operation:createBook
+  - mode:template
+  - contract
+
+runners:
+  req:
+    endpoint: ${RUNNORA_BASE_URL}
+    # モック・実 API どちらの応答も OpenAPI 定義で検証する (モックの定義ずれも検出できる)
+    openapi3: ../../openapi/library-api.yaml
+    skipValidateRequest: true
+
+vars:
+  case: {}
+
+steps:
+  call_api:
+    req:
+      /books:
+        post:
+          headers: "{{ vars.case.headers }}"
+          body:
+            application/json: "{{ vars.case.requestBody }}"
+    test: |
+      current.res.status == vars.case.expect.status &&
+      all(keys(vars.case.expect.body), { current.res.body[#] == vars.case.expect.body[#] })

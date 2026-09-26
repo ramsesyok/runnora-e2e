@@ -1,0 +1,20 @@
+## LIB-005 SAVEPOINT による部分確定 {#sec-lib-005}
+
+- 目的：前処理で SAVEPOINT / ROLLBACK TO SAVEPOINT を使い、失敗した単位だけを取り消した初期データが
+  API から期待どおりに見えることを確認する。
+- 前提：前処理 `lib005_savepoint_before.sql` が「蔵書登録 + 初回貸出」を 1 単位として 5 件投入する。
+
+  | 単位 | 蔵書 | 内容 | 結果 |
+  |------|------|------|------|
+  | 1 | B0101 | 2 冊、M0004 に初回貸出 | 確定（貸出 1） |
+  | 2 | B0102 | 1 冊 | 確定 |
+  | 3 | B0103 | B0101 と同じ ISBN | `DUP_VAL_ON_INDEX` → ROLLBACK TO SAVEPOINT |
+  | 4 | B0104 | 存在しない会員 M9999 に初回貸出 | 蔵書は登録済みだが貸出で ORA-02291 → 蔵書ごと取消（貸出 2 は欠番） |
+  | 5 | B0105 | 3 冊、M0005 に初回貸出 | 確定（貸出 3） |
+
+  後半で M0006〜M0008 を一括停止し、件数超過として ROLLBACK TO SAVEPOINT で取り消したうえで M0008 だけを停止する。
+- 合格条件：全手順の検証式が真であり、後処理 `lib005_assert_after.sql` が
+  「TEST 蔵書 4 件（前処理 3 + API 登録 1）・B0104 なし・ROLLBACK のログ 2 件以上」を確認して正常終了すること。
+- 実行：`runnora run --config config.yaml --before-sql sql/cases/lib005_savepoint_before.sql --after-sql sql/cases/lib005_assert_after.sql runbooks/scenarios/lib-005-savepoint.yml`
+
+{{< include ../../generated/scenarios/lib-005-savepoint/_body.qmd >}}

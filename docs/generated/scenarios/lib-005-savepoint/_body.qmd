@@ -1,0 +1,26 @@
+<!-- scripts/build-docs.ps1 が生成する。手で編集しない。 -->
+
+### テストシナリオ
+
+{{< include ../../generated/scenarios/lib-005-savepoint/scenario.qmd >}}
+
+### 前処理
+
+{{< include ../../generated/scenarios/lib-005-savepoint/before.qmd >}}
+
+### 後処理
+
+{{< include ../../generated/scenarios/lib-005-savepoint/after.qmd >}}
+
+### HTTP 呼び出し
+
+{{< include ../../generated/scenarios/lib-005-savepoint/http.qmd >}}
+
+### リクエストボディ
+
+{{< include ../../generated/scenarios/lib-005-savepoint/request-json.qmd >}}
+
+### 期待値・検証条件
+
+{{< include ../../generated/scenarios/lib-005-savepoint/expectations.qmd >}}
+

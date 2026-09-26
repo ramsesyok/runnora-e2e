@@ -1,0 +1,8 @@
+## LIB-002 在庫切れ {#sec-lib-002}
+
+- 目的：所蔵 1 冊の本を 2 人が借りようとしたとき、後から借りる会員が 409 `NO_STOCK` になり、返却後は借りられることを確認する。
+- 前提：共通前処理のみ（B0002 は 1 冊）。
+- 合格条件：全手順の検証式が真であり、共通後処理（不変条件の検証）が正常終了すること。
+- 実行：`runnora run --config config.yaml runbooks/scenarios/lib-002-no-stock.yml`
+
+{{< include ../../generated/scenarios/lib-002-no-stock/_body.qmd >}}

@@ -1,0 +1,45 @@
+{
+  "generator": "runnora-docgen",
+  "scenario": "DEMO 事後処理の整合性検証がDB不整合を検知できることの確認（exit 4 が期待値）",
+  "source": "runbooks/demo/hook-failure-detection.yml",
+  "sha256": "ee81a080d2ed0ce12e6f252a42b6c1da38e6abdcfa0a6517b742d9366b2df07d",
+  "files": [
+    "after.qmd",
+    "before.qmd",
+    "expectations.qmd",
+    "http.qmd",
+    "scenario.qmd"
+  ],
+  "inputs": [
+    {
+      "kind": "runbook",
+      "path": "runbooks/demo/hook-failure-detection.yml",
+      "sha256": "ee81a080d2ed0ce12e6f252a42b6c1da38e6abdcfa0a6517b742d9366b2df07d"
+    },
+    {
+      "kind": "config",
+      "path": "config.yaml",
+      "sha256": "8e7c2385aa5e0e1c08cf3ffe134a55283731931a467a245b012c1e5ceb75cf8c"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/common/00_reset.sql",
+      "sha256": "d9eb8b4d88152cac1536b45ee7c61cbb081ae8e487b547eac919dfceee1cc77e"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/common/10_seed_master.sql",
+      "sha256": "e3cde2dac9a6191735242025960ccddd47b867ffe574d2062fc4f3c64c8ebfba"
+    },
+    {
+      "kind": "after-sql",
+      "path": "sql/cases/demo_break_invariant_after.sql",
+      "sha256": "82b4e802db00c1b6b2b87f2dc060c57f46c1a29da10ec4432abb966547496614"
+    },
+    {
+      "kind": "after-sql",
+      "path": "sql/common/90_verify_integrity.sql",
+      "sha256": "2b9b30c6c72c6ad4e78d3f0ccf8998dd9062dc8354111cdd3393e0bef9e4cdda"
+    }
+  ]
+}

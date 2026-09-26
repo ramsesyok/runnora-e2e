@@ -1,0 +1,1 @@
+{"total":2,"items":[{"loanId":1,"memberId":"M0002","bookId":"B0003","loanedAt":"2026-09-20","dueDate":"2026-10-04","returnedAt":null,"status":"ACTIVE"},{"loanId":2,"memberId":"M0002","bookId":"B0004","loanedAt":"2026-09-01","dueDate":"2026-09-15","returnedAt":"2026-09-10","status":"RETURNED"}]}

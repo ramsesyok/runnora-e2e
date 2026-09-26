@@ -1,0 +1,46 @@
+{
+  "generator": "runnora-docgen",
+  "scenario": "LIB-004 貸出上限3冊に達した会員は借りられず、1冊返すと借りられる",
+  "source": "runbooks/scenarios/lib-004-loan-limit.yml",
+  "sha256": "f74bf45a61db27af223a8cf46c00770dc10aa49b0399e53678b04976f3edfcb6",
+  "files": [
+    "after.qmd",
+    "before.qmd",
+    "expectations.qmd",
+    "http.qmd",
+    "request-json.qmd",
+    "scenario.qmd"
+  ],
+  "inputs": [
+    {
+      "kind": "runbook",
+      "path": "runbooks/scenarios/lib-004-loan-limit.yml",
+      "sha256": "f74bf45a61db27af223a8cf46c00770dc10aa49b0399e53678b04976f3edfcb6"
+    },
+    {
+      "kind": "config",
+      "path": "config.yaml",
+      "sha256": "8e7c2385aa5e0e1c08cf3ffe134a55283731931a467a245b012c1e5ceb75cf8c"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/common/00_reset.sql",
+      "sha256": "d9eb8b4d88152cac1536b45ee7c61cbb081ae8e487b547eac919dfceee1cc77e"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/common/10_seed_master.sql",
+      "sha256": "e3cde2dac9a6191735242025960ccddd47b867ffe574d2062fc4f3c64c8ebfba"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/cases/lib004_fill_loans_before.sql",
+      "sha256": "3c0dddbaa8147a3552a8f033e11dac34a2a84d265f2c9f565d5bb77dc70aafc5"
+    },
+    {
+      "kind": "after-sql",
+      "path": "sql/common/90_verify_integrity.sql",
+      "sha256": "2b9b30c6c72c6ad4e78d3f0ccf8998dd9062dc8354111cdd3393e0bef9e4cdda"
+    }
+  ]
+}

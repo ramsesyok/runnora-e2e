@@ -1,0 +1,81 @@
+# 試験の概要 {#sec-overview}
+
+## 目的 {#sec-purpose}
+
+図書貸出 API が OpenAPI 定義と業務ルールどおりに動作することを、モックと実装の両面から確認する。
+あわせて、runnora の PL/SQL 前後処理で API テストによく使う構文
+（FOR LOOP、SAVEPOINT、カーソル、BULK COLLECT/FORALL、例外処理など）が期待どおり動くことを確認する。
+
+## 試験対象 {#sec-target}
+
+| 対象 | 内容 | 所在 |
+|------|------|------|
+| API 仕様 | 図書貸出 API 1.0.0（8 operation） | `openapi/library-api.yaml`（第 2 章） |
+| サンプル実装 | Go + go-ora。データは Oracle Database Free (23ai) の LIBAPP スキーマ | `api/`, `db/` |
+| モック | oapi2wire が生成した WireMock 資産 | `mock/` |
+
+: 試験対象 {#tbl-target}
+
+業務ルールは次のとおり。シナリオ試験（第 6 章）はこれらを 1 つずつ確認する。
+
+| No. | 業務ルール | 違反時の応答 | 確認するシナリオ |
+|-----|-----------|--------------|------------------|
+| 1 | 貸出可能冊数が 0 の本は借りられない | 409 `NO_STOCK` | LIB-002 |
+| 2 | 返却期限を過ぎた未返却の貸出がある会員は借りられない | 409 `OVERDUE_LOAN` | LIB-003 |
+| 3 | 同時に借りられる冊数は会員ごとの上限 (既定 3) まで | 409 `LOAN_LIMIT_EXCEEDED` | LIB-004 |
+| 4 | 利用停止 (SUSPENDED) の会員は借りられない | 409 `MEMBER_SUSPENDED` | LIB-005, LIB-006 |
+| 5 | 返却済みの貸出は再返却できない | 409 `ALREADY_RETURNED` | LIB-001 |
+| 6 | ISBN は重複登録できない | 409 `DUPLICATE_BOOK` | LIB-005 |
+| 7 | 貸出期間は貸出日から 14 日 | - | LIB-001 |
+
+: 業務ルール {#tbl-rules}
+
+## 試験環境 {#sec-environment}
+
+```{mermaid}
+flowchart LR
+  subgraph spec[正本]
+    OAS[OpenAPI<br/>library-api.yaml]
+  end
+  subgraph mock[モック系]
+    O2W[oapi2wire] --> WM[WireMock<br/>:18080]
+  end
+  subgraph real[実装系]
+    API[library-api<br/>Go :18081] --> ORA[(Oracle Free 23ai<br/>:1522 LIBAPP)]
+  end
+  subgraph test[試験]
+    RN[runnora]
+    SQL[PL/SQL 前後処理<br/>sql/common, sql/cases]
+  end
+  OAS --> O2W
+  OAS -->|generate| RN
+  RN -->|契約テスト| WM
+  RN -->|契約・シナリオ試験| API
+  RN -->|前処理・後処理| SQL --> ORA
+  RN -->|DB 照会ステップ| ORA
+  RN -.->|runbook・SQL| DG[runnora-docgen] -.-> DOC[本書]
+  style spec fill:#f4f6fa,stroke:#8a94a6
+  style mock fill:#f4f6fa,stroke:#8a94a6
+  style real fill:#f4f6fa,stroke:#8a94a6
+  style test fill:#f4f6fa,stroke:#8a94a6
+```
+
+| 構成要素 | 版・設定 | 備考 |
+|----------|----------|------|
+| Oracle Database | Free 23ai（Docker `container-registry.oracle.com/database/free`） | ホスト 1522 → コンテナ 1521、PDB `FREEPDB1` |
+| サンプル API | Go 1.24 以上、go-ora v2.9.0 | `127.0.0.1:18081` |
+| WireMock | 3.13.2 standalone（Java 17） | `127.0.0.1:18080` |
+| runnora | runn v1.9.2 組込み | 前後処理は go-ora で実行（Oracle Client 不要） |
+
+: 試験環境 {#tbl-environment}
+
+## 試験の種類 {#sec-test-kinds}
+
+| 種類 | 実行先 | 資産 | 検証の深さ |
+|------|--------|------|-----------|
+| 生成テスト | モック・実装 | `runbooks/generated/`（runnora generate の出力そのまま） | OpenAPI の example で呼び、ステータスのみ |
+| 契約テスト | モック・実装 | `runbooks/contract/`, `cases/contract/` | ステータス + 本文の一部 + OpenAPI 応答スキーマ |
+| シナリオ試験 | 実装のみ | `runbooks/scenarios/`, `sql/cases/` | 状態変化・ID 引き継ぎ・DB 直接照会・前後処理での DB 検証 |
+| 検知確認 | 実装のみ | `runbooks/demo/` | 事後検証が DB 不整合を検知して終了コード 4 になること |
+
+: 試験の種類 {#tbl-test-kinds}

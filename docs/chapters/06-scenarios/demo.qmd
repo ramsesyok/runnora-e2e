@@ -1,0 +1,9 @@
+## DEMO 事後検証による不整合の検知 {#sec-demo}
+
+- 目的：共通後処理 `90_verify_integrity.sql` が DB の不整合を実際に検知できることを確認する（検証の検証）。
+- 前提：runbook 自体は稼働確認だけを行い成功する。ケース後処理 `demo_break_invariant_after.sql` が
+  B0001 の貸出可能冊数をわざと 1 減らす。ケース後処理は共通後処理より先に実行される。
+- 合格条件：runnora が**終了コード 4** で終了し、エラーに `ORA-20100: integrity check failed (1): B0001 available=2 expected=3` が含まれること。
+- 実行：`runnora run --config config.yaml --after-sql sql/cases/demo_break_invariant_after.sql runbooks/demo/hook-failure-detection.yml`
+
+{{< include ../../generated/scenarios/hook-failure-detection/_body.qmd >}}

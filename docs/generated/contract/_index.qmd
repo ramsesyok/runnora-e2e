@@ -1,0 +1,56 @@
+<!-- scripts/build-docs.ps1 が生成する。手で編集しない。 -->
+
+## 前処理・後処理（全 suite 共通）
+
+{{< include ../../generated/contract/get-getbook-suite/before.qmd >}}
+
+{{< include ../../generated/contract/get-getbook-suite/after.qmd >}}
+
+## 契約 getBook 蔵書を 1 件取得する（モック・実APIの両方で実行する）
+
+出典：`runbooks/contract/get_getBook.suite.yml`
+
+{{< include ../../generated/contract/get-getbook-suite/_body.qmd >}}
+
+## 契約 getHealth 稼働状態を確認する（モック・実APIの両方で実行する）
+
+出典：`runbooks/contract/get_getHealth.suite.yml`
+
+{{< include ../../generated/contract/get-gethealth-suite/_body.qmd >}}
+
+## 契約 getMember 会員と貸出状況を取得する（モック・実APIの両方で実行する）
+
+出典：`runbooks/contract/get_getMember.suite.yml`
+
+{{< include ../../generated/contract/get-getmember-suite/_body.qmd >}}
+
+## 契約 listBooks 蔵書を検索する（モック・実APIの両方で実行する）
+
+出典：`runbooks/contract/get_listBooks.suite.yml`
+
+{{< include ../../generated/contract/get-listbooks-suite/_body.qmd >}}
+
+## 契約 listMemberLoans 会員の貸出履歴を取得する（モック・実APIの両方で実行する）
+
+出典：`runbooks/contract/get_listMemberLoans.suite.yml`
+
+{{< include ../../generated/contract/get-listmemberloans-suite/_body.qmd >}}
+
+## 契約 createBook 蔵書を登録する（モック・実APIの両方で実行する）
+
+出典：`runbooks/contract/post_createBook.suite.yml`
+
+{{< include ../../generated/contract/post-createbook-suite/_body.qmd >}}
+
+## 契約 createLoan 本を貸し出す（モック・実APIの両方で実行する）
+
+出典：`runbooks/contract/post_createLoan.suite.yml`
+
+{{< include ../../generated/contract/post-createloan-suite/_body.qmd >}}
+
+## 契約 returnLoan 本を返却する（モック・実APIの両方で実行する）
+
+出典：`runbooks/contract/post_returnLoan.suite.yml`
+
+{{< include ../../generated/contract/post-returnloan-suite/_body.qmd >}}
+

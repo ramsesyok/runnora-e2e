@@ -1,0 +1,465 @@
+openapi: 3.0.3
+info:
+  title: 図書貸出 API (runnora-e2e サンプル)
+  version: 1.0.0
+  description: |
+    runnora / oapi2wire / runnora-docgen のフルセット検証用サンプル API。
+    蔵書・会員・貸出を Oracle Database で管理する。
+
+    業務ルール:
+    - 会員が同時に借りられる冊数は会員ごとの上限 (maxLoans, 既定 3) まで
+    - 返却期限を過ぎた貸出 (延滞) がある会員は新たに借りられない
+    - 利用停止 (SUSPENDED) の会員は借りられない
+    - 貸出可能冊数 (availableCopies) が 0 の本は借りられない
+    - 貸出期間は貸出日から 14 日
+servers:
+  - url: http://127.0.0.1:18081
+    description: サンプル実装 (Go + Oracle)
+  - url: http://127.0.0.1:18080
+    description: WireMock (oapi2wire 生成モック)
+tags:
+  - name: system
+    description: 稼働確認
+  - name: books
+    description: 蔵書
+  - name: members
+    description: 会員
+  - name: loans
+    description: 貸出・返却
+paths:
+  /health:
+    get:
+      tags: [system]
+      operationId: getHealth
+      summary: 稼働状態を確認する
+      responses:
+        '200':
+          description: 稼働中
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+              example:
+                status: UP
+                database: UP
+  /books:
+    get:
+      tags: [books]
+      operationId: listBooks
+      summary: 蔵書を検索する
+      parameters:
+        - in: query
+          name: genre
+          required: false
+          description: ジャンルで絞り込む
+          schema:
+            type: string
+            enum: [NOVEL, TECH, HISTORY, TEST]
+        - in: query
+          name: availableOnly
+          required: false
+          description: true の場合、貸出可能な本だけを返す
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: 検索結果 (book_id 昇順)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookList'
+              example:
+                total: 2
+                items:
+                  - bookId: B0001
+                    isbn: '9784000000001'
+                    title: 吾輩は猫である
+                    author: 夏目漱石
+                    genre: NOVEL
+                    totalCopies: 3
+                    availableCopies: 3
+                  - bookId: B0002
+                    isbn: '9784000000002'
+                    title: 羅生門
+                    author: 芥川龍之介
+                    genre: NOVEL
+                    totalCopies: 1
+                    availableCopies: 1
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    post:
+      tags: [books]
+      operationId: createBook
+      summary: 蔵書を登録する
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookCreate'
+            example:
+              bookId: B0900
+              isbn: '9784000000900'
+              title: API テスト入門
+              author: 試験 花子
+              genre: TECH
+              totalCopies: 2
+      responses:
+        '201':
+          description: 登録した蔵書
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+              example:
+                bookId: B0900
+                isbn: '9784000000900'
+                title: API テスト入門
+                author: 試験 花子
+                genre: TECH
+                totalCopies: 2
+                availableCopies: 2
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: bookId または ISBN が登録済み
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: DUPLICATE_BOOK
+                message: book already exists
+  /books/{bookId}:
+    get:
+      tags: [books]
+      operationId: getBook
+      summary: 蔵書を 1 件取得する
+      parameters:
+        - $ref: '#/components/parameters/BookId'
+      responses:
+        '200':
+          description: 蔵書
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+              example:
+                bookId: B0001
+                isbn: '9784000000001'
+                title: 吾輩は猫である
+                author: 夏目漱石
+                genre: NOVEL
+                totalCopies: 3
+                availableCopies: 3
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /members/{memberId}:
+    get:
+      tags: [members]
+      operationId: getMember
+      summary: 会員と貸出状況を取得する
+      parameters:
+        - $ref: '#/components/parameters/MemberId'
+      responses:
+        '200':
+          description: 会員
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+              example:
+                memberId: M0001
+                name: 山田 太郎
+                status: ACTIVE
+                maxLoans: 3
+                activeLoanCount: 0
+                overdue: false
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /members/{memberId}/loans:
+    get:
+      tags: [members]
+      operationId: listMemberLoans
+      summary: 会員の貸出履歴を取得する
+      parameters:
+        - $ref: '#/components/parameters/MemberId'
+        - in: query
+          name: status
+          required: false
+          description: 貸出状態で絞り込む
+          schema:
+            type: string
+            enum: [ACTIVE, RETURNED]
+      responses:
+        '200':
+          description: 貸出一覧 (loan_id 昇順)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoanList'
+              example:
+                total: 1
+                items:
+                  - loanId: 1
+                    memberId: M0001
+                    bookId: B0001
+                    loanedAt: '2026-09-26'
+                    dueDate: '2026-10-10'
+                    returnedAt: null
+                    status: ACTIVE
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /loans:
+    post:
+      tags: [loans]
+      operationId: createLoan
+      summary: 本を貸し出す
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoanCreate'
+            example:
+              memberId: M0001
+              bookId: B0001
+      responses:
+        '201':
+          description: 作成した貸出
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Loan'
+              example:
+                loanId: 1
+                memberId: M0001
+                bookId: B0001
+                loanedAt: '2026-09-26'
+                dueDate: '2026-10-10'
+                returnedAt: null
+                status: ACTIVE
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: |
+            業務ルール違反。code で理由を示す。
+            NO_STOCK / LOAN_LIMIT_EXCEEDED / OVERDUE_LOAN / MEMBER_SUSPENDED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: NO_STOCK
+                message: no available copies
+  /loans/{loanId}/return:
+    post:
+      tags: [loans]
+      operationId: returnLoan
+      summary: 本を返却する
+      parameters:
+        - in: path
+          name: loanId
+          required: true
+          schema:
+            type: integer
+            format: int64
+          example: 1
+      responses:
+        '200':
+          description: 返却済みの貸出
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Loan'
+              example:
+                loanId: 1
+                memberId: M0001
+                bookId: B0001
+                loanedAt: '2026-09-26'
+                dueDate: '2026-10-10'
+                returnedAt: '2026-09-26'
+                status: RETURNED
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 返却済み
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: ALREADY_RETURNED
+                message: loan already returned
+components:
+  parameters:
+    BookId:
+      in: path
+      name: bookId
+      required: true
+      schema:
+        type: string
+        pattern: '^B[0-9]{4}$'
+      example: B0001
+    MemberId:
+      in: path
+      name: memberId
+      required: true
+      schema:
+        type: string
+        pattern: '^M[0-9]{4}$'
+      example: M0001
+  responses:
+    BadRequest:
+      description: 入力不正
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: VALIDATION_ERROR
+            message: memberId is required
+    NotFound:
+      description: 対象が存在しない
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: NOT_FOUND
+            message: resource not found
+  schemas:
+    Health:
+      type: object
+      required: [status, database]
+      properties:
+        status:
+          type: string
+          enum: [UP, DOWN]
+        database:
+          type: string
+          enum: [UP, DOWN]
+    Book:
+      type: object
+      required: [bookId, isbn, title, author, genre, totalCopies, availableCopies]
+      properties:
+        bookId:
+          type: string
+        isbn:
+          type: string
+        title:
+          type: string
+        author:
+          type: string
+        genre:
+          type: string
+          enum: [NOVEL, TECH, HISTORY, TEST]
+        totalCopies:
+          type: integer
+        availableCopies:
+          type: integer
+    BookCreate:
+      type: object
+      required: [bookId, isbn, title, author, genre, totalCopies]
+      properties:
+        bookId:
+          type: string
+          pattern: '^B[0-9]{4}$'
+        isbn:
+          type: string
+          pattern: '^[0-9]{13}$'
+        title:
+          type: string
+          maxLength: 200
+        author:
+          type: string
+          maxLength: 100
+        genre:
+          type: string
+          enum: [NOVEL, TECH, HISTORY, TEST]
+        totalCopies:
+          type: integer
+          minimum: 1
+          maximum: 99
+    BookList:
+      type: object
+      required: [total, items]
+      properties:
+        total:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Book'
+    Member:
+      type: object
+      required: [memberId, name, status, maxLoans, activeLoanCount, overdue]
+      properties:
+        memberId:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+          enum: [ACTIVE, SUSPENDED]
+        maxLoans:
+          type: integer
+        activeLoanCount:
+          type: integer
+        overdue:
+          type: boolean
+          description: 返却期限を過ぎた未返却の貸出があるか
+    LoanCreate:
+      type: object
+      required: [memberId, bookId]
+      properties:
+        memberId:
+          type: string
+        bookId:
+          type: string
+    Loan:
+      type: object
+      required: [loanId, memberId, bookId, loanedAt, dueDate, returnedAt, status]
+      properties:
+        loanId:
+          type: integer
+          format: int64
+        memberId:
+          type: string
+        bookId:
+          type: string
+        loanedAt:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        returnedAt:
+          type: string
+          format: date
+          nullable: true
+        status:
+          type: string
+          enum: [ACTIVE, RETURNED]
+    LoanList:
+      type: object
+      required: [total, items]
+      properties:
+        total:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Loan'
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string

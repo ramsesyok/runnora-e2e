@@ -1,0 +1,26 @@
+<!-- scripts/build-docs.ps1 が生成する。手で編集しない。 -->
+
+### テストシナリオ
+
+{{< include ../../generated/scenarios/lib-004-loan-limit/scenario.qmd >}}
+
+### 前処理
+
+{{< include ../../generated/scenarios/lib-004-loan-limit/before.qmd >}}
+
+### 後処理
+
+{{< include ../../generated/scenarios/lib-004-loan-limit/after.qmd >}}
+
+### HTTP 呼び出し
+
+{{< include ../../generated/scenarios/lib-004-loan-limit/http.qmd >}}
+
+### リクエストボディ
+
+{{< include ../../generated/scenarios/lib-004-loan-limit/request-json.qmd >}}
+
+### 期待値・検証条件
+
+{{< include ../../generated/scenarios/lib-004-loan-limit/expectations.qmd >}}
+

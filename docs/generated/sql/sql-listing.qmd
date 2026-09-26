@@ -1,0 +1,638 @@
+<!-- scripts/build-docs.ps1 が生成する。手で編集しない。 -->
+
+## sql/common/
+
+### 00_reset.sql {#sec-sql-common-00-reset}
+
+```sql
+-- =============================================================
+-- common/00_reset.sql  (config.yaml hooks.common.before 1/2)
+-- 全テーブルのデータを削除し、貸出 ID の採番を 1 に戻す。
+-- 毎回同じ初期状態から runbook を始めるための「リセット」フック。
+--
+-- 使用構文: VARRAY / 数値 FOR LOOP / EXECUTE IMMEDIATE (DML・DDL)
+--           SQL%ROWCOUNT / DBMS_ASSERT / 局所プロシージャ
+--           PRAGMA AUTONOMOUS_TRANSACTION
+-- 注意: runnora はファイル全体を 1 文で実行するため、末尾に "/" を書かない。
+-- =============================================================
+DECLARE
+  TYPE t_table_names IS VARRAY(10) OF VARCHAR2(30);
+  -- 外部キーがあるため 子 → 親 の順に削除する
+  c_tables  CONSTANT t_table_names := t_table_names('LOANS', 'BOOKS', 'MEMBERS');
+  v_summary VARCHAR2(4000);
+
+  -- 本体のトランザクションとは独立にログを確定させる (ROLLBACK されても残る)
+  PROCEDURE log_hook(p_message IN VARCHAR2) IS
+    PRAGMA AUTONOMOUS_TRANSACTION;
+  BEGIN
+    INSERT INTO test_hook_log (hook_name, message) VALUES ('common/00_reset', p_message);
+    COMMIT;
+  END log_hook;
+BEGIN
+  FOR i IN 1 .. c_tables.COUNT LOOP
+    -- 表名を動的 SQL に連結するので DBMS_ASSERT で識別子として検証する
+    EXECUTE IMMEDIATE 'DELETE FROM ' || DBMS_ASSERT.SIMPLE_SQL_NAME(c_tables(i));
+    v_summary := v_summary || c_tables(i) || '=' || SQL%ROWCOUNT || ' ';
+  END LOOP;
+
+  -- 1 日より古いフックログを掃除する
+  DELETE FROM test_hook_log WHERE logged_at < SYSTIMESTAMP - INTERVAL '1' DAY;
+  COMMIT;
+
+  -- DDL は暗黙コミットされるため、DML を確定させた後に実行する
+  EXECUTE IMMEDIATE 'ALTER SEQUENCE loan_seq RESTART START WITH 1';
+
+  log_hook('deleted rows: ' || RTRIM(v_summary) || ', loan_seq restarted');
+END;
+```
+
+### 10_seed_master.sql {#sec-sql-common-10-seed-master}
+
+```sql
+-- =============================================================
+-- common/10_seed_master.sql  (config.yaml hooks.common.before 2/2)
+-- 会員・蔵書のマスタデータを投入する。
+-- OpenAPI の example (B0001, M0001 など) と同じ値にしてあるため、
+-- 生成テスト (runnora generate) とモック (oapi2wire) の期待値が実 API でも成り立つ。
+--
+-- 使用構文: MERGE / レコード型 + 連想配列 (INDEX BY) / 修飾式 (18c+)
+--           数値 FOR LOOP / CASE 式 / 局所ファンクション
+-- =============================================================
+DECLARE
+  TYPE t_book IS RECORD (
+    book_id books.book_id%TYPE,
+    title   books.title%TYPE,
+    author  books.author%TYPE,
+    genre   books.genre%TYPE,
+    copies  books.total_copies%TYPE
+  );
+  TYPE t_book_tab IS TABLE OF t_book INDEX BY PLS_INTEGER;
+  v_books  t_book_tab;
+  v_genre  books.genre%TYPE;
+  v_copies books.total_copies%TYPE;
+  v_isbn   books.isbn%TYPE;
+
+  -- ISBN は 978400000 + 4 桁連番 (B0001 → 9784000000001)
+  -- 局所ファンクションは SQL 文の中から呼べない (PLS-00231) ので、変数に代入してから使う
+  FUNCTION isbn_of(p_no IN PLS_INTEGER) RETURN VARCHAR2 IS
+  BEGIN
+    RETURN '978400000' || TO_CHAR(p_no, 'FM0000');
+  END isbn_of;
+BEGIN
+  -- 1) 名前付きの会員 : MERGE で「あれば更新・なければ登録」
+  MERGE INTO members m
+  USING (
+    SELECT 'M0001' AS member_id, '山田 太郎' AS name, 'ACTIVE' AS status FROM dual UNION ALL
+    SELECT 'M0002', '佐藤 花子', 'ACTIVE'    FROM dual UNION ALL
+    SELECT 'M0003', '鈴木 一郎', 'SUSPENDED' FROM dual
+  ) s
+  ON (m.member_id = s.member_id)
+  WHEN MATCHED THEN
+    UPDATE SET m.name = s.name, m.status = s.status, m.max_loans = 3
+  WHEN NOT MATCHED THEN
+    INSERT (member_id, name, status, max_loans) VALUES (s.member_id, s.name, s.status, 3);
+
+  -- 2) 汎用テスト会員 M0004 〜 M0010 : 数値 FOR LOOP
+  FOR i IN 4 .. 10 LOOP
+    INSERT INTO members (member_id, name, status, max_loans)
+    VALUES ('M' || TO_CHAR(i, 'FM0000'), 'テスト会員 ' || TO_CHAR(i, 'FM00'), 'ACTIVE', 3);
+  END LOOP;
+
+  -- 3) 名前付きの蔵書 : レコードの連想配列を修飾式で組み立てて FOR LOOP で登録
+  v_books(1) := t_book('B0001', '吾輩は猫である',            '夏目漱石',   'NOVEL',   3);
+  v_books(2) := t_book('B0002', '羅生門',                    '芥川龍之介', 'NOVEL',   1);
+  v_books(3) := t_book('B0003', 'Go言語によるWebアプリ開発', '技術 一郎',  'TECH',    2);
+  v_books(4) := t_book('B0004', '日本の城郭史',              '歴史 次郎',  'HISTORY', 1);
+
+  FOR i IN 1 .. v_books.COUNT LOOP
+    v_isbn := isbn_of(i);
+    INSERT INTO books (book_id, isbn, title, author, genre, total_copies, available_copies)
+    VALUES (v_books(i).book_id, v_isbn, v_books(i).title, v_books(i).author,
+            v_books(i).genre, v_books(i).copies, v_books(i).copies);
+  END LOOP;
+
+  -- 4) 汎用テスト図書 B0005 〜 B0020 : ジャンルと冊数を CASE 式で振り分ける
+  --    (NOVEL は B0001/B0002 の 2 冊だけにして、OpenAPI example の件数と一致させる)
+  FOR i IN 5 .. 20 LOOP
+    v_genre  := CASE MOD(i, 2) WHEN 0 THEN 'TECH' ELSE 'HISTORY' END;
+    v_copies := CASE WHEN i <= 10 THEN 1 ELSE 2 END;
+    v_isbn   := isbn_of(i);
+    INSERT INTO books (book_id, isbn, title, author, genre, total_copies, available_copies)
+    VALUES ('B' || TO_CHAR(i, 'FM0000'), v_isbn, 'テスト図書 ' || TO_CHAR(i, 'FM00'),
+            'テスト 著者', v_genre, v_copies, v_copies);
+  END LOOP;
+
+  COMMIT;
+END;
+```
+
+### 90_verify_integrity.sql {#sec-sql-common-90-verify-integrity}
+
+```sql
+-- =============================================================
+-- common/90_verify_integrity.sql  (config.yaml hooks.common.after)
+-- runbook 実行後に DB の不変条件を検証する。違反があれば
+-- RAISE_APPLICATION_ERROR で失敗させ、runnora を exit 4 で終了させる。
+--
+-- 不変条件:
+--   (1) 蔵書ごとに 貸出可能冊数 = 所蔵冊数 - 貸出中件数
+--   (2) ACTIVE の貸出は返却日なし / RETURNED の貸出は返却日あり
+--   (3) 会員の貸出中件数 <= 貸出上限
+--
+-- 使用構文: カーソル FOR LOOP / CASE 文 / 局所プロシージャ
+--           PRAGMA AUTONOMOUS_TRANSACTION / RAISE_APPLICATION_ERROR
+-- =============================================================
+DECLARE
+  v_errors  PLS_INTEGER := 0;
+  v_checked PLS_INTEGER := 0;
+  v_detail  VARCHAR2(4000);
+
+  PROCEDURE add_error(p_message IN VARCHAR2) IS
+  BEGIN
+    v_errors := v_errors + 1;
+    IF NVL(LENGTH(v_detail), 0) < 3000 THEN
+      v_detail := v_detail || p_message || '; ';
+    END IF;
+  END add_error;
+
+  PROCEDURE log_hook(p_message IN VARCHAR2) IS
+    PRAGMA AUTONOMOUS_TRANSACTION;
+  BEGIN
+    INSERT INTO test_hook_log (hook_name, message) VALUES ('common/90_verify_integrity', p_message);
+    COMMIT;
+  END log_hook;
+BEGIN
+  -- (1) 在庫数の整合 : カーソル FOR LOOP
+  FOR r IN (
+    SELECT b.book_id, b.total_copies, b.available_copies, COUNT(l.loan_id) AS active_loans
+      FROM books b
+      LEFT JOIN loans l ON l.book_id = b.book_id AND l.status = 'ACTIVE'
+     GROUP BY b.book_id, b.total_copies, b.available_copies
+     ORDER BY b.book_id
+  ) LOOP
+    v_checked := v_checked + 1;
+    IF r.available_copies <> r.total_copies - r.active_loans THEN
+      add_error(r.book_id || ' available=' || r.available_copies
+                || ' expected=' || (r.total_copies - r.active_loans));
+    END IF;
+  END LOOP;
+
+  -- (2) 貸出状態と返却日の整合 : CASE 文
+  FOR r IN (SELECT loan_id, status, returned_at FROM loans ORDER BY loan_id) LOOP
+    CASE r.status
+      WHEN 'ACTIVE' THEN
+        IF r.returned_at IS NOT NULL THEN
+          add_error('loan ' || r.loan_id || ' is ACTIVE but has returned_at');
+        END IF;
+      WHEN 'RETURNED' THEN
+        IF r.returned_at IS NULL THEN
+          add_error('loan ' || r.loan_id || ' is RETURNED but returned_at is null');
+        END IF;
+    END CASE;
+  END LOOP;
+
+  -- (3) 貸出上限
+  FOR r IN (
+    SELECT m.member_id, m.max_loans, COUNT(l.loan_id) AS active_loans
+      FROM members m
+      JOIN loans l ON l.member_id = m.member_id AND l.status = 'ACTIVE'
+     GROUP BY m.member_id, m.max_loans
+    HAVING COUNT(l.loan_id) > m.max_loans
+  ) LOOP
+    add_error(r.member_id || ' has ' || r.active_loans || ' loans (max ' || r.max_loans || ')');
+  END LOOP;
+
+  log_hook('books checked=' || v_checked || ', errors=' || v_errors);
+
+  IF v_errors > 0 THEN
+    RAISE_APPLICATION_ERROR(-20100, 'integrity check failed (' || v_errors || '): ' || v_detail);
+  END IF;
+END;
+```
+
+## sql/cases/
+
+### contract_setup.sql {#sec-sql-cases-contract-setup}
+
+```sql
+-- =============================================================
+-- cases/contract_setup.sql  (--before-sql : 契約テスト・生成テスト用)
+-- モック (oapi2wire) と同じ前提データを実 DB に作る。
+--   loan 1 : M0002 が B0003 を貸出中 (ACTIVE)   → POST /loans/1/return は 200
+--   loan 2 : M0002 が B0004 を返却済 (RETURNED) → POST /loans/2/return は 409
+--
+-- 使用構文: 行ロック (SELECT ... FOR UPDATE) / RETURNING INTO / 局所プロシージャ
+-- =============================================================
+DECLARE
+  v_loan_id loans.loan_id%TYPE;
+  v_avail   books.available_copies%TYPE;
+
+  PROCEDURE lend(p_member IN VARCHAR2, p_book IN VARCHAR2, p_days_ago IN PLS_INTEGER,
+                 p_returned IN BOOLEAN, p_loan_id OUT NUMBER) IS
+  BEGIN
+    -- API と同じく蔵書行をロックしてから在庫を動かす
+    SELECT available_copies INTO v_avail FROM books WHERE book_id = p_book FOR UPDATE;
+
+    INSERT INTO loans (loan_id, member_id, book_id, loaned_at, due_date, returned_at, status)
+    VALUES (loan_seq.NEXTVAL, p_member, p_book,
+            TRUNC(SYSDATE) - p_days_ago, TRUNC(SYSDATE) - p_days_ago + 14,
+            CASE WHEN p_returned THEN TRUNC(SYSDATE) - p_days_ago + 9 END,
+            CASE WHEN p_returned THEN 'RETURNED' ELSE 'ACTIVE' END)
+    RETURNING loan_id INTO p_loan_id;
+
+    IF NOT p_returned THEN
+      UPDATE books SET available_copies = v_avail - 1 WHERE book_id = p_book;
+    END IF;
+  END lend;
+BEGIN
+  lend('M0002', 'B0003', 6,  FALSE, v_loan_id);   -- loan 1 (ACTIVE)
+  lend('M0002', 'B0004', 25, TRUE,  v_loan_id);   -- loan 2 (RETURNED)
+  COMMIT;
+END;
+```
+
+### demo_break_invariant_after.sql {#sec-sql-cases-demo-break-invariant-after}
+
+```sql
+-- =============================================================
+-- cases/demo_break_invariant_after.sql  (--after-sql : 検知デモ専用)
+-- わざと在庫数を 1 減らして不変条件を壊す。
+-- --after-sql は common.after より先に実行されるので、
+-- 直後の common/90_verify_integrity.sql が不整合を検知して exit 4 になることを確認できる。
+-- 通常のテストでは使わない (scripts/test-api.ps1 の「検知確認」でのみ使用)。
+-- =============================================================
+BEGIN
+  UPDATE books SET available_copies = available_copies - 1 WHERE book_id = 'B0001';
+  COMMIT;
+END;
+```
+
+### lib001_assert_after.sql {#sec-sql-cases-lib001-assert-after}
+
+```sql
+-- =============================================================
+-- cases/lib001_assert_after.sql  (--after-sql : LIB-001 貸出〜返却)
+-- API 経由では見えない DB 上の事後条件を検証する。
+--   - 貸出は 1 件だけ作られ、RETURNED・返却日 = 本日 になっている
+--   - B0001 の貸出可能冊数が初期値 3 に戻っている
+--
+-- 使用構文: SELECT INTO / 例外 NO_DATA_FOUND・TOO_MANY_ROWS
+--           ユーザー定義例外 (EXCEPTION + RAISE) / RAISE_APPLICATION_ERROR
+-- =============================================================
+DECLARE
+  e_assert   EXCEPTION;
+  v_message  VARCHAR2(400);
+  v_loan     loans%ROWTYPE;
+  v_avail    books.available_copies%TYPE;
+BEGIN
+  -- 1 件だけであることを SELECT INTO の例外で確かめる
+  SELECT * INTO v_loan FROM loans WHERE member_id = 'M0001';
+
+  IF v_loan.loan_id <> 1 OR v_loan.book_id <> 'B0001' THEN
+    v_message := 'unexpected loan: id=' || v_loan.loan_id || ' book=' || v_loan.book_id;
+    RAISE e_assert;
+  ELSIF v_loan.status <> 'RETURNED' OR v_loan.returned_at <> TRUNC(SYSDATE) THEN
+    v_message := 'loan 1 is not returned today: status=' || v_loan.status
+                 || ' returned_at=' || TO_CHAR(v_loan.returned_at, 'YYYY-MM-DD');
+    RAISE e_assert;
+  END IF;
+
+  SELECT available_copies INTO v_avail FROM books WHERE book_id = 'B0001';
+  IF v_avail <> 3 THEN
+    v_message := 'B0001 available_copies=' || v_avail || ' (expected 3)';
+    RAISE e_assert;
+  END IF;
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    RAISE_APPLICATION_ERROR(-20001, 'LIB-001: no loan found for M0001');
+  WHEN TOO_MANY_ROWS THEN
+    RAISE_APPLICATION_ERROR(-20001, 'LIB-001: more than one loan found for M0001');
+  WHEN e_assert THEN
+    RAISE_APPLICATION_ERROR(-20001, 'LIB-001: ' || v_message);
+END;
+```
+
+### lib003_overdue_before.sql {#sec-sql-cases-lib003-overdue-before}
+
+```sql
+-- =============================================================
+-- cases/lib003_overdue_before.sql  (--before-sql : LIB-003 延滞者の貸出拒否)
+-- API では作れない「返却期限を 7 日過ぎた貸出」を直接作る。
+--   loan 1 : M0002 が B0004 を 21 日前に借りて未返却 (期限は 7 日前)
+--
+-- 使用構文: %ROWTYPE レコード / レコード単位の INSERT (VALUES rec)
+--           PL/SQL 式でのシーケンス参照 / 日付演算 / RETURNING INTO
+-- =============================================================
+DECLARE
+  v_loan  loans%ROWTYPE;
+  v_title books.title%TYPE;
+BEGIN
+  v_loan.loan_id     := loan_seq.NEXTVAL;
+  v_loan.member_id   := 'M0002';
+  v_loan.book_id     := 'B0004';
+  v_loan.loaned_at   := TRUNC(SYSDATE) - 21;
+  v_loan.due_date    := v_loan.loaned_at + 14;    -- = 7 日前
+  v_loan.returned_at := NULL;
+  v_loan.status      := 'ACTIVE';
+
+  INSERT INTO loans VALUES v_loan;
+
+  -- 不変条件 (貸出可能冊数 = 所蔵 - 貸出中) を保つため在庫も減らす
+  UPDATE books
+     SET available_copies = available_copies - 1
+   WHERE book_id = v_loan.book_id
+  RETURNING title INTO v_title;
+
+  IF SQL%ROWCOUNT <> 1 THEN
+    RAISE_APPLICATION_ERROR(-20003, 'LIB-003: book ' || v_loan.book_id || ' not found');
+  END IF;
+  COMMIT;
+END;
+```
+
+### lib004_fill_loans_before.sql {#sec-sql-cases-lib004-fill-loans-before}
+
+```sql
+-- =============================================================
+-- cases/lib004_fill_loans_before.sql  (--before-sql : LIB-004 貸出上限)
+-- M0001 に上限 (max_loans = 3) まで TECH の本を貸し出した状態を作る。
+-- 貸出可能な本を book_id 順に探すので loan 1..3 = B0003, B0006, B0008 になる。
+--
+-- 使用構文: パラメータ付き明示カーソル (OPEN / FETCH / CLOSE)
+--           %NOTFOUND / %ISOPEN / WHILE LOOP / EXIT WHEN
+-- =============================================================
+DECLARE
+  CURSOR c_available (p_genre VARCHAR2) IS
+    SELECT book_id
+      FROM books
+     WHERE genre = p_genre
+       AND available_copies > 0
+     ORDER BY book_id
+       FOR UPDATE;
+
+  v_member   CONSTANT members.member_id%TYPE := 'M0001';
+  v_max      members.max_loans%TYPE;
+  v_count    PLS_INTEGER := 0;
+  v_book_id  books.book_id%TYPE;
+BEGIN
+  SELECT max_loans INTO v_max FROM members WHERE member_id = v_member;
+
+  OPEN c_available('TECH');
+  WHILE v_count < v_max LOOP
+    FETCH c_available INTO v_book_id;
+    EXIT WHEN c_available%NOTFOUND;   -- 貸出可能な本が尽きたら終了
+
+    INSERT INTO loans (loan_id, member_id, book_id, loaned_at, due_date, status)
+    VALUES (loan_seq.NEXTVAL, v_member, v_book_id, TRUNC(SYSDATE) - 1, TRUNC(SYSDATE) + 13, 'ACTIVE');
+
+    UPDATE books SET available_copies = available_copies - 1
+     WHERE CURRENT OF c_available;
+
+    v_count := v_count + 1;
+  END LOOP;
+  IF c_available%ISOPEN THEN
+    CLOSE c_available;
+  END IF;
+
+  IF v_count < v_max THEN
+    RAISE_APPLICATION_ERROR(-20004, 'LIB-004: only ' || v_count || ' books could be lent');
+  END IF;
+  COMMIT;
+END;
+```
+
+### lib005_assert_after.sql {#sec-sql-cases-lib005-assert-after}
+
+```sql
+-- =============================================================
+-- cases/lib005_assert_after.sql  (--after-sql : LIB-005 SAVEPOINT)
+-- SAVEPOINT で取り消した単位が残っていないこと、API で再登録した B0103 が
+-- 追加されていることを DB で確認する。
+--
+-- 使用構文: 集計の SELECT INTO / 条件付き COUNT / RAISE_APPLICATION_ERROR
+-- =============================================================
+DECLARE
+  v_test_books PLS_INTEGER;
+  v_b0104      PLS_INTEGER;
+  v_rollbacks  PLS_INTEGER;
+BEGIN
+  SELECT COUNT(*), COUNT(CASE WHEN book_id = 'B0104' THEN 1 END)
+    INTO v_test_books, v_b0104
+    FROM books
+   WHERE genre = 'TEST';
+
+  -- 前処理で 3 件 (B0101, B0102, B0105) + シナリオ内の API 登録 1 件 (B0103)
+  IF v_test_books <> 4 THEN
+    RAISE_APPLICATION_ERROR(-20005, 'LIB-005: TEST books=' || v_test_books || ' (expected 4)');
+  END IF;
+  IF v_b0104 <> 0 THEN
+    RAISE_APPLICATION_ERROR(-20005, 'LIB-005: B0104 should have been rolled back');
+  END IF;
+
+  -- 自律型トランザクションのログは ROLLBACK TO の影響を受けずに残っている
+  SELECT COUNT(*) INTO v_rollbacks
+    FROM test_hook_log
+   WHERE hook_name = 'cases/lib005_savepoint'
+     AND message LIKE 'rollback B%'
+     AND logged_at > SYSTIMESTAMP - INTERVAL '10' MINUTE;
+  IF v_rollbacks < 2 THEN
+    RAISE_APPLICATION_ERROR(-20005, 'LIB-005: rollback log count=' || v_rollbacks || ' (expected >= 2)');
+  END IF;
+END;
+```
+
+### lib005_savepoint_before.sql {#sec-sql-cases-lib005-savepoint-before}
+
+```sql
+-- =============================================================
+-- cases/lib005_savepoint_before.sql  (--before-sql : LIB-005 SAVEPOINT)
+-- 「蔵書登録 + 初回貸出」を 1 単位として 5 件投入し、失敗した単位だけを
+-- ROLLBACK TO SAVEPOINT で取り消して、成功した単位は最後にまとめて COMMIT する。
+--
+--   単位 | 蔵書  | ISBN            | 冊数 | 初回貸出 | 結果
+--   -----+-------+-----------------+------+----------+-----------------------------
+--    1   | B0101 | 9784000000101   | 2    | M0004    | 登録 (loan 1)
+--    2   | B0102 | 9784000000102   | 1    | -        | 登録
+--    3   | B0103 | 9784000000101   | 1    | -        | ISBN 重複 → 取消
+--    4   | B0104 | 9784000000104   | 1    | M9999    | 蔵書は入るが貸出で FK 違反 → 蔵書ごと取消
+--                                                       (loan 2 の採番は消費されたまま)
+--    5   | B0105 | 9784000000105   | 3    | M0005    | 登録 (loan 3)
+--
+-- 後半は「一括の利用停止が想定件数を超えたら取り消し、個別停止に切り替える」例。
+--
+-- 使用構文: SAVEPOINT / ROLLBACK TO SAVEPOINT / ネストしたブロックの例外処理
+--           DUP_VAL_ON_INDEX / PRAGMA EXCEPTION_INIT / 修飾式 / SQL%ROWCOUNT
+--           PRAGMA AUTONOMOUS_TRANSACTION (ROLLBACK されないログ)
+-- =============================================================
+DECLARE
+  TYPE t_unit IS RECORD (
+    book_id books.book_id%TYPE,
+    isbn    books.isbn%TYPE,
+    copies  books.total_copies%TYPE,
+    lend_to members.member_id%TYPE
+  );
+  TYPE t_units IS TABLE OF t_unit INDEX BY PLS_INTEGER;
+
+  e_parent_missing EXCEPTION;
+  PRAGMA EXCEPTION_INIT(e_parent_missing, -2291);   -- ORA-02291: 親キーがありません
+
+  v_units     t_units;
+  v_loan_id   loans.loan_id%TYPE;
+  v_ok        PLS_INTEGER := 0;
+  v_rolled    PLS_INTEGER := 0;
+  v_suspended PLS_INTEGER;
+
+  PROCEDURE log_hook(p_message IN VARCHAR2) IS
+    PRAGMA AUTONOMOUS_TRANSACTION;
+  BEGIN
+    INSERT INTO test_hook_log (hook_name, message) VALUES ('cases/lib005_savepoint', p_message);
+    COMMIT;
+  END log_hook;
+BEGIN
+  v_units(1) := t_unit('B0101', '9784000000101', 2, 'M0004');
+  v_units(2) := t_unit('B0102', '9784000000102', 1, NULL);
+  v_units(3) := t_unit('B0103', '9784000000101', 1, NULL);      -- ISBN 重複
+  v_units(4) := t_unit('B0104', '9784000000104', 1, 'M9999');   -- 存在しない会員
+  v_units(5) := t_unit('B0105', '9784000000105', 3, 'M0005');
+
+  FOR i IN 1 .. v_units.COUNT LOOP
+    SAVEPOINT sp_unit;   -- 同名 SAVEPOINT は再設定すると位置が上書きされる
+    BEGIN
+      INSERT INTO books (book_id, isbn, title, author, genre, total_copies, available_copies)
+      VALUES (v_units(i).book_id, v_units(i).isbn, 'SAVEPOINT 検証 ' || v_units(i).book_id,
+              '試験 花子', 'TEST', v_units(i).copies, v_units(i).copies);
+
+      IF v_units(i).lend_to IS NOT NULL THEN
+        INSERT INTO loans (loan_id, member_id, book_id, loaned_at, due_date, status)
+        VALUES (loan_seq.NEXTVAL, v_units(i).lend_to, v_units(i).book_id,
+                TRUNC(SYSDATE), TRUNC(SYSDATE) + 14, 'ACTIVE')
+        RETURNING loan_id INTO v_loan_id;
+
+        UPDATE books SET available_copies = available_copies - 1
+         WHERE book_id = v_units(i).book_id;
+      END IF;
+      v_ok := v_ok + 1;
+    EXCEPTION
+      WHEN DUP_VAL_ON_INDEX THEN
+        ROLLBACK TO SAVEPOINT sp_unit;
+        v_rolled := v_rolled + 1;
+        log_hook('rollback ' || v_units(i).book_id || ': duplicate isbn ' || v_units(i).isbn);
+      WHEN e_parent_missing THEN
+        -- 蔵書 INSERT は成功済み。SAVEPOINT まで戻すことで蔵書も一緒に取り消される
+        ROLLBACK TO SAVEPOINT sp_unit;
+        v_rolled := v_rolled + 1;
+        log_hook('rollback ' || v_units(i).book_id || ': member ' || v_units(i).lend_to || ' not found');
+    END;
+  END LOOP;
+
+  -- 後半: 一括停止 → 件数超過なら取り消して個別停止
+  SAVEPOINT sp_before_suspend;
+  UPDATE members SET status = 'SUSPENDED' WHERE member_id IN ('M0006', 'M0007', 'M0008');
+  v_suspended := SQL%ROWCOUNT;   -- ROLLBACK 後は参照できないので先に退避する
+  IF v_suspended > 1 THEN
+    ROLLBACK TO SAVEPOINT sp_before_suspend;
+    log_hook('rollback bulk suspend (' || v_suspended || ' rows); suspend M0008 only');
+    UPDATE members SET status = 'SUSPENDED' WHERE member_id = 'M0008';
+  END IF;
+
+  COMMIT;
+  log_hook('units ok=' || v_ok || ', rolled back=' || v_rolled);
+END;
+```
+
+### lib006_assert_no_loans_after.sql {#sec-sql-cases-lib006-assert-no-loans-after}
+
+```sql
+-- =============================================================
+-- cases/lib006_assert_no_loans_after.sql  (--after-sql : LIB-006 異常系)
+-- エラー応答を返したリクエストが DB を変更していないことを確認する。
+--   - 貸出は 0 件 / 蔵書は初期の 20 件 / 採番は一度も進んでいない
+--
+-- 使用構文: SELECT INTO / USER_SEQUENCES の参照 / IF ... ELSIF
+-- =============================================================
+DECLARE
+  v_loans  PLS_INTEGER;
+  v_books  PLS_INTEGER;
+  v_nextno NUMBER;
+BEGIN
+  SELECT COUNT(*) INTO v_loans FROM loans;
+  SELECT COUNT(*) INTO v_books FROM books;
+  -- NOCACHE なので LAST_NUMBER = 次に払い出される値
+  SELECT last_number INTO v_nextno FROM user_sequences WHERE sequence_name = 'LOAN_SEQ';
+
+  IF v_loans <> 0 THEN
+    RAISE_APPLICATION_ERROR(-20006, 'LIB-006: loans=' || v_loans || ' (expected 0)');
+  ELSIF v_books <> 20 THEN
+    RAISE_APPLICATION_ERROR(-20006, 'LIB-006: books=' || v_books || ' (expected 20)');
+  ELSIF v_nextno <> 1 THEN
+    RAISE_APPLICATION_ERROR(-20006, 'LIB-006: loan_seq advanced to ' || v_nextno);
+  END IF;
+END;
+```
+
+### lib007_history_before.sql {#sec-sql-cases-lib007-history-before}
+
+```sql
+-- =============================================================
+-- cases/lib007_history_before.sql  (--before-sql : LIB-007 大量の貸出履歴)
+-- M0004 に、B0005〜B0020 の 16 冊分の返却済み貸出履歴を一括投入する。
+-- 5 件ずつ BULK COLLECT で読み、FORALL でまとめて INSERT する「バッチ処理」の定型。
+--   loan 1..16 : 全て RETURNED (loaned_at は 1 週間ずつずらす)
+--
+-- 使用構文: BULK COLLECT ... LIMIT / FORALL / SQL%BULK_ROWCOUNT
+--           入れ子表 (TABLE OF) / 基本 LOOP + EXIT WHEN
+-- =============================================================
+DECLARE
+  CURSOR c_books IS
+    SELECT book_id
+      FROM books
+     WHERE book_id BETWEEN 'B0005' AND 'B0020'
+     ORDER BY book_id;
+
+  TYPE t_ids   IS TABLE OF books.book_id%TYPE;
+  TYPE t_dates IS TABLE OF DATE;
+  v_ids     t_ids;
+  v_loaned  t_dates := t_dates();
+  v_offset  PLS_INTEGER := 0;
+  v_batches PLS_INTEGER := 0;
+  v_rows    PLS_INTEGER := 0;
+
+  PROCEDURE log_hook(p_message IN VARCHAR2) IS
+    PRAGMA AUTONOMOUS_TRANSACTION;
+  BEGIN
+    INSERT INTO test_hook_log (hook_name, message) VALUES ('cases/lib007_history', p_message);
+    COMMIT;
+  END log_hook;
+BEGIN
+  OPEN c_books;
+  LOOP
+    FETCH c_books BULK COLLECT INTO v_ids LIMIT 5;
+    EXIT WHEN v_ids.COUNT = 0;
+    v_batches := v_batches + 1;
+
+    -- 貸出日を事前に計算 (FORALL の中では式に添字しか使えないため)
+    v_loaned.DELETE;
+    v_loaned.EXTEND(v_ids.COUNT);
+    FOR i IN 1 .. v_ids.COUNT LOOP
+      v_loaned(i) := TRUNC(SYSDATE) - 200 + (v_offset + i) * 7;
+    END LOOP;
+
+    FORALL i IN 1 .. v_ids.COUNT
+      INSERT INTO loans (loan_id, member_id, book_id, loaned_at, due_date, returned_at, status)
+      VALUES (loan_seq.NEXTVAL, 'M0004', v_ids(i), v_loaned(i), v_loaned(i) + 14, v_loaned(i) + 10, 'RETURNED');
+
+    FOR i IN 1 .. v_ids.COUNT LOOP
+      v_rows := v_rows + SQL%BULK_ROWCOUNT(i);
+    END LOOP;
+    v_offset := v_offset + v_ids.COUNT;
+  END LOOP;
+  CLOSE c_books;
+
+  IF v_rows <> 16 THEN
+    RAISE_APPLICATION_ERROR(-20007, 'LIB-007: inserted ' || v_rows || ' rows (expected 16)');
+  END IF;
+  COMMIT;
+  log_hook('batches=' || v_batches || ', rows=' || v_rows);
+END;
+```
+

@@ -1,0 +1,21 @@
+{
+  "name": "returned",
+  "description": "貸出中の貸出 1 を返却する (contract_setup.sql)",
+  "pathParams": {
+    "loanId": 1
+  },
+  "queryParams": {},
+  "headers": {},
+  "requestBody": {},
+  "expect": {
+    "status": 200,
+    "bodyMode": "subset",
+    "body": {
+      "loanId": 1,
+      "memberId": "M0002",
+      "bookId": "B0003",
+      "status": "RETURNED"
+    },
+    "ignorePaths": []
+  }
+}

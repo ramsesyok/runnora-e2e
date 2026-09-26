@@ -1,0 +1,23 @@
+{
+  "name": "invalid_isbn",
+  "description": "13 桁でない ISBN は 400",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {},
+  "requestBody": {
+    "bookId": "B0902",
+    "isbn": "978400",
+    "title": "不正 ISBN",
+    "author": "試験 花子",
+    "genre": "TECH",
+    "totalCopies": 1
+  },
+  "expect": {
+    "status": 400,
+    "bodyMode": "subset",
+    "body": {
+      "code": "VALIDATION_ERROR"
+    },
+    "ignorePaths": []
+  }
+}

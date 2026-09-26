@@ -1,0 +1,19 @@
+{
+  "name": "M0003_suspended",
+  "description": "利用停止中の会員 M0003",
+  "pathParams": {
+    "memberId": "M0003"
+  },
+  "queryParams": {},
+  "headers": {},
+  "requestBody": null,
+  "expect": {
+    "status": 200,
+    "bodyMode": "subset",
+    "body": {
+      "memberId": "M0003",
+      "status": "SUSPENDED"
+    },
+    "ignorePaths": []
+  }
+}

@@ -1,0 +1,131 @@
+desc: LIB-006 異常系（入力不正400・存在しない404・利用停止409）でDBが変わらない
+# 実行: runnora run --config config.yaml --after-sql sql/cases/lib006_assert_no_loans_after.sql <this>
+labels:
+  - scenario
+  - negative
+runners:
+  req:
+    endpoint: http://127.0.0.1:18081
+    # 応答を OpenAPI 定義で自動検証する。異常系の入力を送るためリクエスト側の検証は行わない
+    openapi3: ../../openapi/library-api.yaml
+    skipValidateRequest: true
+steps:
+  suspended_member:
+    desc: 利用停止中の会員M0003は借りられない
+    req:
+      /loans:
+        post:
+          body:
+            application/json:
+              memberId: M0003
+              bookId: B0001
+    test: |
+      current.res.status == 409 &&
+      current.res.body.code == "MEMBER_SUSPENDED"
+  unknown_member:
+    desc: 存在しない会員M9999は404
+    req:
+      /loans:
+        post:
+          body:
+            application/json:
+              memberId: M9999
+              bookId: B0001
+    test: |
+      current.res.status == 404 &&
+      current.res.body.code == "NOT_FOUND"
+  unknown_book:
+    desc: 存在しない蔵書B9999は404
+    req:
+      /loans:
+        post:
+          body:
+            application/json:
+              memberId: M0001
+              bookId: B9999
+    test: |
+      current.res.status == 404 &&
+      current.res.body.code == "NOT_FOUND"
+  missing_book_id:
+    desc: bookIdが無いリクエストは400
+    req:
+      /loans:
+        post:
+          body:
+            application/json:
+              memberId: M0001
+    test: |
+      current.res.status == 400 &&
+      current.res.body.code == "VALIDATION_ERROR" &&
+      current.res.body.message == "bookId is required"
+  unknown_field:
+    desc: 定義に無い項目を含むリクエストは400
+    req:
+      /loans:
+        post:
+          body:
+            application/json:
+              memberId: M0001
+              bookId: B0001
+              days: 30
+    test: |
+      current.res.status == 400 &&
+      current.res.body.code == "VALIDATION_ERROR"
+  invalid_isbn:
+    desc: 13桁でないISBNでは蔵書を登録できない
+    req:
+      /books:
+        post:
+          body:
+            application/json:
+              bookId: B0901
+              isbn: "978400"
+              title: 不正ISBN
+              author: 試験 花子
+              genre: TECH
+              totalCopies: 1
+    test: |
+      current.res.status == 400 &&
+      current.res.body.message == "isbn must be 13 digits"
+  invalid_copies:
+    desc: 所蔵冊数0では蔵書を登録できない
+    req:
+      /books:
+        post:
+          body:
+            application/json:
+              bookId: B0902
+              isbn: "9784000000902"
+              title: 冊数不正
+              author: 試験 花子
+              genre: TECH
+              totalCopies: 0
+    test: |
+      current.res.status == 400 &&
+      current.res.body.message == "totalCopies must be between 1 and 99"
+  invalid_genre:
+    desc: 定義外のジャンルでの検索は400
+    req:
+      /books?genre=COMIC:
+        get:
+          body: null
+    test: |
+      current.res.status == 400 &&
+      current.res.body.code == "VALIDATION_ERROR"
+  invalid_status_filter:
+    desc: 定義外の貸出状態での絞り込みは400
+    req:
+      /members/M0001/loans?status=LOST:
+        get:
+          body: null
+    test: current.res.status == 400
+  unknown_loan:
+    desc: 存在しない貸出の返却は404
+    req:
+      /loans/9999/return:
+        post:
+          body:
+            application/json: {}
+    test: |
+      current.res.status == 404 &&
+      current.res.body.code == "NOT_FOUND"

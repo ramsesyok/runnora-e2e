@@ -1,0 +1,18 @@
+{
+  "name": "not_found",
+  "description": "存在しない蔵書は 404",
+  "pathParams": {
+    "bookId": "B9999"
+  },
+  "queryParams": {},
+  "headers": {},
+  "requestBody": null,
+  "expect": {
+    "status": 404,
+    "bodyMode": "subset",
+    "body": {
+      "code": "NOT_FOUND"
+    },
+    "ignorePaths": []
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "name": "already_returned",
+  "description": "返却済みの貸出 2 は 409",
+  "pathParams": {
+    "loanId": 2
+  },
+  "queryParams": {},
+  "headers": {},
+  "requestBody": {},
+  "expect": {
+    "status": 409,
+    "bodyMode": "subset",
+    "body": {
+      "code": "ALREADY_RETURNED"
+    },
+    "ignorePaths": []
+  }
+}

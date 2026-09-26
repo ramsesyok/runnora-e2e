@@ -1,0 +1,118 @@
+# 試験の設計 {#sec-design}
+
+## 資産の流れ {#sec-asset-flow}
+
+OpenAPI を唯一の正本とし、そこから次の順で資産を作る。人が書くのは太字の部分だけである。
+
+| 順 | 作業 | ツール | 入力 | 出力 |
+|----|------|--------|------|------|
+| 1 | API 仕様を書く | - | - | **`openapi/library-api.yaml`** |
+| 2 | モックの雛形を作る | `oapi2wire init` | OpenAPI | `mock/mock-cases.yaml`, `mock/mock-responses/` |
+| 3 | 返し分けを書く | - | 雛形 | **`mock/mock-cases.yaml`, `mock/mock-responses/`** |
+| 4 | モックを生成する | `oapi2wire validate` / `build` | OpenAPI + case YAML | `mock/wiremock-out/` |
+| 5 | テストの雛形を生成する | `runnora generate` | OpenAPI | `runbooks/generated/`, `cases/generated/` |
+| 6 | 契約テストを書く | - | 生成 template を複製 | **`runbooks/contract/`, `cases/contract/`** |
+| 7 | シナリオと前後処理を書く | - | - | **`runbooks/scenarios/`, `sql/`** |
+| 8 | 手順書を生成する | `runnora-docgen`, `tools/openapi-doc`, `ddq` | 上記すべて | `docs/generated/`, 本書 |
+
+: 資産の流れ {#tbl-asset-flow}
+
+モックと実装が同じ契約テストに合格するよう、次の値を 3 か所でそろえている。
+
+- OpenAPI の `example`（生成テストの入力・期待値になる）
+- モックの返し分け条件と応答 JSON（`mock/`）
+- 実 DB の初期データ（`sql/common/10_seed_master.sql`）
+
+## 初期データ {#sec-seed}
+
+runbook を実行するたびに、共通前処理がデータを全削除して次の状態に戻す（@sec-hooks）。
+貸出 ID の採番も 1 に戻すため、シナリオは貸出 ID を固定値で検証できる。
+
+| 区分 | ID | 内容 |
+|------|----|------|
+| 会員 | M0001 山田 太郎 | ACTIVE、上限 3 |
+| 会員 | M0002 佐藤 花子 | ACTIVE、上限 3 |
+| 会員 | M0003 鈴木 一郎 | **SUSPENDED**（利用停止） |
+| 会員 | M0004〜M0010 | テスト会員、ACTIVE、上限 3 |
+| 蔵書 | B0001 吾輩は猫である | NOVEL、3 冊 |
+| 蔵書 | B0002 羅生門 | NOVEL、**1 冊**（在庫切れの確認用） |
+| 蔵書 | B0003 Go言語によるWebアプリ開発 | TECH、2 冊 |
+| 蔵書 | B0004 日本の城郭史 | HISTORY、1 冊 |
+| 蔵書 | B0005〜B0020 | テスト図書。偶数は TECH・奇数は HISTORY、B0010 までは 1 冊・以降 2 冊 |
+
+: 初期データ {#tbl-seed}
+
+## PL/SQL 前後処理 {#sec-hooks}
+
+### 実行順序
+
+runnora は runbook 1 本ごとに次の順で処理する。後処理は runbook が失敗しても実行される。
+suite が `include` + `loop` で template を繰り返しても、前後処理は suite 1 本につき 1 回である。
+
+| 順 | 区分 | ファイル | 役割 |
+|----|------|----------|------|
+| 1 | 共通前処理 | `sql/common/00_reset.sql` | 全データ削除、貸出 ID 採番のリセット |
+| 2 | 共通前処理 | `sql/common/10_seed_master.sql` | 会員・蔵書マスタの投入 |
+| 3 | ケース前処理 | `--before-sql`（`sql/cases/*_before.sql` 等） | API では作れない状態（延滞など）を作る |
+| 4 | runbook | `runbooks/**` | API 呼び出しと検証 |
+| 5 | ケース後処理 | `--after-sql`（`sql/cases/*_after.sql`） | ケース固有の事後条件を DB で検証 |
+| 6 | 共通後処理 | `sql/common/90_verify_integrity.sql` | DB 不変条件を検証。違反は `RAISE_APPLICATION_ERROR` |
+
+: 前後処理の実行順序 {#tbl-hook-order}
+
+後処理の SQL が `RAISE_APPLICATION_ERROR` で失敗すると、runnora は終了コード **4**（フック失敗）で終わる。
+これにより「API の応答は正しいが DB が壊れている」不具合を検出できる（検知確認 DEMO で確認）。
+
+### 記述上の制約
+
+runnora はフックファイルの内容全体を 1 つの文として実行する。作成時に次を実機で確認した。
+
+| 書き方 | 可否 | 確認結果 |
+|--------|------|----------|
+| 1 ファイル = 1 つの無名ブロック（`DECLARE … BEGIN … END;`） | ○ | 複数の DML/DDL はブロック内に書く |
+| 先頭・行末の `--` コメント、日本語コメント | ○ | そのまま実行できる |
+| SQL*Plus の `/` 終端 | × | `PLS-00103: Encountered the symbol "/"` で終了コード 4 |
+| DDL（`ALTER SEQUENCE` など） | ○ | `EXECUTE IMMEDIATE` で実行する。暗黙コミットに注意 |
+| ブロック内の局所ファンクションを SQL 文から呼ぶ | × | `PLS-00231`。一度変数に代入してから使う |
+| `TIMESTAMP`（TZ なし）列と `SYSTIMESTAMP` の比較 | △ | 比較は TZ なし側をセッション TZで解釈するため（go-ora 接続で 9 時間ずれて失敗した）結果が環境依存。`TIMESTAMP WITH TIME ZONE` を使う |
+| ファイルをまたぐ SAVEPOINT・トランザクション | × | ファイルごとに接続プールから実行されるため、各ファイル内で完結させる |
+
+: フック SQL の記述上の制約 {#tbl-hook-rules}
+
+### 使用している PL/SQL 構文
+
+| 構文 | 使用ファイル | 目的 |
+|------|--------------|------|
+| 数値 FOR LOOP | 00_reset, 10_seed_master | 表ごとの削除、テスト会員・図書の連番生成 |
+| カーソル FOR LOOP | 90_verify_integrity | 蔵書ごと・貸出ごとの不変条件検証 |
+| 明示カーソル（パラメータ付き、`FOR UPDATE`、`WHERE CURRENT OF`）+ WHILE LOOP | lib004_fill_loans_before | 上限に達するまで貸出を作る |
+| BULK COLLECT … LIMIT + FORALL + `SQL%BULK_ROWCOUNT` | lib007_history_before | 貸出履歴 16 件を 5 件ずつ一括投入 |
+| SAVEPOINT / ROLLBACK TO SAVEPOINT | lib005_savepoint_before | 失敗した単位だけを取り消し、他は確定 |
+| 例外処理（`DUP_VAL_ON_INDEX`、`NO_DATA_FOUND`、`TOO_MANY_ROWS`、ユーザー定義例外） | lib005, lib001_assert_after | 想定内の失敗の分岐、事後条件の判定 |
+| `PRAGMA EXCEPTION_INIT` | lib005_savepoint_before | ORA-02291（親キーなし）に名前を付ける |
+| `PRAGMA AUTONOMOUS_TRANSACTION` | 00_reset, 90_verify, lib005, lib007 | ROLLBACK されないフック実行ログ |
+| `EXECUTE IMMEDIATE`（DML・DDL）、`DBMS_ASSERT` | 00_reset | 動的な表名の削除、シーケンスのリセット |
+| MERGE | 10_seed_master | 会員マスタの登録・更新 |
+| レコード型・連想配列・VARRAY・入れ子表・修飾式 | 00_reset, 10_seed, lib005, lib007 | テストデータの表形式定義 |
+| `%ROWTYPE` とレコード単位の INSERT | lib003_overdue_before, lib001_assert_after | 貸出行の組み立て・取得 |
+| RETURNING INTO | contract_setup, lib003, lib005 | 採番結果の取得 |
+| `RAISE_APPLICATION_ERROR` | 90_verify_integrity, lib00x_assert_after | 事後条件違反を runnora に伝える（終了コード 4） |
+
+: 使用している PL/SQL 構文 {#tbl-plsql-syntax}
+
+## モックの返し分け {#sec-mock-design}
+
+WireMock は状態を持たないため、返し分けは「入力 → 固定応答」の対応で定義する。
+各 operation に fallback を置き、想定外の入力には 404 / 400 を返す（未定義の組合せを 501 にしない）。
+
+| operation | 条件 | 応答 |
+|-----------|------|------|
+| listBooks | genre=NOVEL / genre=TECH & availableOnly=true / 定義外 genre / その他 | 200 / 200 / 400 / 200（全件） |
+| getBook | B0001・B0002 / その他 | 200 / 404 |
+| createBook | B0900 の登録 / ISBN 9784000000001 / その他 | 201 / 409 / 400 |
+| getMember | M0001・M0003 / その他 | 200 / 404 |
+| listMemberLoans | M0001・M0002 / その他 | 200 / 404 |
+| createLoan | M0001+B0001 / memberId=M0003 / bookId=B9999 / その他 | 201 / 409 / 404 / 400 |
+| returnLoan | loanId=1 / loanId=2 / その他 | 200 / 409 / 404 |
+
+: モックの返し分け（`mock/mock-cases.yaml`） {#tbl-mock-cases}

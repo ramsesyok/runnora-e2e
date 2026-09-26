@@ -1,0 +1,19 @@
+{
+  "name": "member_suspended",
+  "description": "利用停止中の M0003 は 409",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {},
+  "requestBody": {
+    "memberId": "M0003",
+    "bookId": "B0001"
+  },
+  "expect": {
+    "status": 409,
+    "bodyMode": "subset",
+    "body": {
+      "code": "MEMBER_SUSPENDED"
+    },
+    "ignorePaths": []
+  }
+}

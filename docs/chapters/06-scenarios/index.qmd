@@ -1,0 +1,37 @@
+# シナリオ試験 {#sec-scenarios .landscape-chapter}
+
+実装（実 API + Oracle）に対し、業務の流れに沿って状態の変化を追う。
+各シナリオは runbook 1 本と、必要に応じてケース固有の前処理・後処理 SQL で構成する。
+
+| ID | シナリオ | ケース前処理 | ケース後処理 | 主な確認点 |
+|----|----------|--------------|--------------|-----------|
+| LIB-001 | 貸出〜返却 | - | lib001_assert_after | ID 引き継ぎ、在庫増減、二重返却、DB 直接照会 |
+| LIB-002 | 在庫切れ | - | - | 1 冊の本の取り合い、返却後の再貸出 |
+| LIB-003 | 延滞 | lib003_overdue_before | - | API では作れない延滞状態を PL/SQL で作る |
+| LIB-004 | 貸出上限 | lib004_fill_loans_before | - | 明示カーソル + WHILE で上限まで貸し出す |
+| LIB-005 | SAVEPOINT | lib005_savepoint_before | lib005_assert_after | 一部だけ確定した初期データ、採番の欠番 |
+| LIB-006 | 異常系 | - | lib006_assert_no_loans_after | 400/404/409 の後に DB が変わっていない |
+| LIB-007 | 大量履歴 | lib007_history_before | - | BULK COLLECT/FORALL で投入した履歴の照会 |
+| DEMO | 検知確認 | - | demo_break_invariant_after | 事後検証が不整合を検知して終了コード 4 |
+
+: シナリオ一覧 {#tbl-scenarios}
+
+すべてのシナリオで、共通前処理（データ初期化）と共通後処理（不変条件の検証）が前後に実行される。
+以下、各節の表は runnora-docgen が runbook と前後処理 SQL から生成した（生成）。
+DB 照会ステップは検証式だけが表示される（SQL 本文は runbook を参照）。
+
+{{< include lib-001.qmd >}}
+
+{{< include lib-002.qmd >}}
+
+{{< include lib-003.qmd >}}
+
+{{< include lib-004.qmd >}}
+
+{{< include lib-005.qmd >}}
+
+{{< include lib-006.qmd >}}
+
+{{< include lib-007.qmd >}}
+
+{{< include demo.qmd >}}

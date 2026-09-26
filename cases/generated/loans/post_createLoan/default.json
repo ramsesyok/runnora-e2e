@@ -1,0 +1,25 @@
+{
+  "name": "default",
+  "description": "本を貸し出す",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {},
+  "requestBody": {
+    "bookId": "B0001",
+    "memberId": "M0001"
+  },
+  "expect": {
+    "status": 201,
+    "bodyMode": "subset",
+    "body": {
+      "bookId": "B0001",
+      "dueDate": "2026-10-10",
+      "loanId": 1,
+      "loanedAt": "2026-09-26",
+      "memberId": "M0001",
+      "returnedAt": null,
+      "status": "ACTIVE"
+    },
+    "ignorePaths": []
+  }
+}

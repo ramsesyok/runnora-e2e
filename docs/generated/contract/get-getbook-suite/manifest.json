@@ -1,0 +1,61 @@
+{
+  "generator": "runnora-docgen",
+  "scenario": "契約 getBook 蔵書を 1 件取得する（モック・実APIの両方で実行する）",
+  "source": "runbooks/contract/get_getBook.suite.yml",
+  "sha256": "0b62460b8c48dc198991df17e960d697f273428586442ac3dae564f950a2e684",
+  "files": [
+    "after.qmd",
+    "before.qmd",
+    "cases.qmd",
+    "expectations.qmd",
+    "http.qmd",
+    "scenario.qmd"
+  ],
+  "inputs": [
+    {
+      "kind": "runbook",
+      "path": "runbooks/contract/get_getBook.suite.yml",
+      "sha256": "0b62460b8c48dc198991df17e960d697f273428586442ac3dae564f950a2e684"
+    },
+    {
+      "kind": "runbook",
+      "path": "runbooks/contract/get_getBook.template.yml",
+      "sha256": "492704736155421d0056ff82141b45c9a321dd49dae1fc67765035e3ff6cf15e"
+    },
+    {
+      "kind": "case",
+      "path": "cases/contract/books/get_getBook/01_B0001.json",
+      "sha256": "311c27afb3c1a19f38595e9022f27ab597f753d9b7cb31a80e385905e56415a1"
+    },
+    {
+      "kind": "case",
+      "path": "cases/contract/books/get_getBook/02_not_found.json",
+      "sha256": "7e57285ab0520c623f6e100f617987fc604d3eb2af09d440f06825a9dcd84b18"
+    },
+    {
+      "kind": "config",
+      "path": "config.yaml",
+      "sha256": "8e7c2385aa5e0e1c08cf3ffe134a55283731931a467a245b012c1e5ceb75cf8c"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/common/00_reset.sql",
+      "sha256": "d9eb8b4d88152cac1536b45ee7c61cbb081ae8e487b547eac919dfceee1cc77e"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/common/10_seed_master.sql",
+      "sha256": "e3cde2dac9a6191735242025960ccddd47b867ffe574d2062fc4f3c64c8ebfba"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/cases/contract_setup.sql",
+      "sha256": "3960624669819050af2d202f4fa9f6a170cf1e19d1c3c7a145788c49a6dea108"
+    },
+    {
+      "kind": "after-sql",
+      "path": "sql/common/90_verify_integrity.sql",
+      "sha256": "2b9b30c6c72c6ad4e78d3f0ccf8998dd9062dc8354111cdd3393e0bef9e4cdda"
+    }
+  ]
+}

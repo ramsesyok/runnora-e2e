@@ -1,0 +1,23 @@
+{
+  "name": "M0001",
+  "description": "貸出のない会員 M0001",
+  "pathParams": {
+    "memberId": "M0001"
+  },
+  "queryParams": {},
+  "headers": {},
+  "requestBody": null,
+  "expect": {
+    "status": 200,
+    "bodyMode": "subset",
+    "body": {
+      "memberId": "M0001",
+      "name": "山田 太郎",
+      "status": "ACTIVE",
+      "maxLoans": 3,
+      "activeLoanCount": 0,
+      "overdue": false
+    },
+    "ignorePaths": []
+  }
+}

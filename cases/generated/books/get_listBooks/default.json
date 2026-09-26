@@ -1,0 +1,39 @@
+{
+  "name": "default",
+  "description": "蔵書を検索する",
+  "pathParams": {},
+  "queryParams": {
+    "availableOnly": false,
+    "genre": "NOVEL"
+  },
+  "headers": {},
+  "requestBody": null,
+  "expect": {
+    "status": 200,
+    "bodyMode": "subset",
+    "body": {
+      "items": [
+        {
+          "author": "夏目漱石",
+          "availableCopies": 3,
+          "bookId": "B0001",
+          "genre": "NOVEL",
+          "isbn": "9784000000001",
+          "title": "吾輩は猫である",
+          "totalCopies": 3
+        },
+        {
+          "author": "芥川龍之介",
+          "availableCopies": 1,
+          "bookId": "B0002",
+          "genre": "NOVEL",
+          "isbn": "9784000000002",
+          "title": "羅生門",
+          "totalCopies": 1
+        }
+      ],
+      "total": 2
+    },
+    "ignorePaths": []
+  }
+}

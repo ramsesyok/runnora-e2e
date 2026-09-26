@@ -1,0 +1,41 @@
+{
+  "generator": "runnora-docgen",
+  "scenario": "LIB-002 在庫1冊の本の取り合い（在庫切れ409と返却後の再貸出）",
+  "source": "runbooks/scenarios/lib-002-no-stock.yml",
+  "sha256": "14b0e7c01dcfc0fe51fee643527124e15d099e2b0cc4d0b7112d29c7a58e603b",
+  "files": [
+    "after.qmd",
+    "before.qmd",
+    "expectations.qmd",
+    "http.qmd",
+    "request-json.qmd",
+    "scenario.qmd"
+  ],
+  "inputs": [
+    {
+      "kind": "runbook",
+      "path": "runbooks/scenarios/lib-002-no-stock.yml",
+      "sha256": "14b0e7c01dcfc0fe51fee643527124e15d099e2b0cc4d0b7112d29c7a58e603b"
+    },
+    {
+      "kind": "config",
+      "path": "config.yaml",
+      "sha256": "8e7c2385aa5e0e1c08cf3ffe134a55283731931a467a245b012c1e5ceb75cf8c"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/common/00_reset.sql",
+      "sha256": "d9eb8b4d88152cac1536b45ee7c61cbb081ae8e487b547eac919dfceee1cc77e"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/common/10_seed_master.sql",
+      "sha256": "e3cde2dac9a6191735242025960ccddd47b867ffe574d2062fc4f3c64c8ebfba"
+    },
+    {
+      "kind": "after-sql",
+      "path": "sql/common/90_verify_integrity.sql",
+      "sha256": "2b9b30c6c72c6ad4e78d3f0ccf8998dd9062dc8354111cdd3393e0bef9e4cdda"
+    }
+  ]
+}

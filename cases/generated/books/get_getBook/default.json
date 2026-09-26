@@ -1,0 +1,24 @@
+{
+  "name": "default",
+  "description": "蔵書を 1 件取得する",
+  "pathParams": {
+    "bookId": "B0001"
+  },
+  "queryParams": {},
+  "headers": {},
+  "requestBody": null,
+  "expect": {
+    "status": 200,
+    "bodyMode": "subset",
+    "body": {
+      "author": "夏目漱石",
+      "availableCopies": 3,
+      "bookId": "B0001",
+      "genre": "NOVEL",
+      "isbn": "9784000000001",
+      "title": "吾輩は猫である",
+      "totalCopies": 3
+    },
+    "ignorePaths": []
+  }
+}

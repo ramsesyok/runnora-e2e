@@ -1,0 +1,125 @@
+desc: LIB-001 本を借りて返すまでの正常系（在庫増減・ID引き継ぎ・二重返却）
+# 実行: runnora run --config config.yaml --after-sql sql/cases/lib001_assert_after.sql <this>
+labels:
+  - scenario
+  - loans
+runners:
+  req:
+    endpoint: http://127.0.0.1:18081
+    # 応答を OpenAPI 定義で自動検証する。異常系の入力を送るためリクエスト側の検証は行わない
+    openapi3: ../../openapi/library-api.yaml
+    skipValidateRequest: true
+  db: oracle://libapp:libapp_pw@127.0.0.1:1522/FREEPDB1
+steps:
+  member_before:
+    desc: 会員M0001が貸出0件・延滞なしであることを確認する
+    req:
+      /members/M0001:
+        get:
+          body: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.status == "ACTIVE" &&
+      current.res.body.activeLoanCount == 0 &&
+      current.res.body.overdue == false
+  book_before:
+    desc: 蔵書B0001の貸出可能冊数が所蔵冊数3と同じであることを確認する
+    req:
+      /books/B0001:
+        get:
+          body: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.totalCopies == 3 &&
+      current.res.body.availableCopies == 3
+  create_loan:
+    desc: M0001がB0001を借りる。採番リセット済みなので貸出IDは1になる
+    req:
+      /loans:
+        post:
+          body:
+            application/json:
+              memberId: M0001
+              bookId: B0001
+    test: |
+      current.res.status == 201 &&
+      current.res.body.loanId == 1 &&
+      current.res.body.memberId == "M0001" &&
+      current.res.body.bookId == "B0001" &&
+      current.res.body.status == "ACTIVE" &&
+      current.res.body.returnedAt == nil &&
+      current.res.body.dueDate > current.res.body.loanedAt
+  save_loan_id:
+    desc: 応答の貸出IDをloan_idに保存し、後続の返却URLへ引き継ぐ
+    bind:
+      loan_id: steps.create_loan.res.body.loanId
+  db_loan_row:
+    desc: DBのLOANS表に貸出中の行が1件あり、返却期限が貸出日+14日であることを直接確認する
+    db:
+      query: |
+        SELECT status, due_date - loaned_at AS days
+          FROM loans
+         WHERE loan_id = {{ loan_id }}
+    test: |
+      len(current.rows) == 1 &&
+      current.rows[0].STATUS == "ACTIVE" &&
+      current.rows[0].DAYS == "14"
+  book_lent:
+    desc: 貸出によりB0001の貸出可能冊数が1減ったことを確認する
+    req:
+      /books/B0001:
+        get:
+          body: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.availableCopies == steps.book_before.res.body.availableCopies - 1
+  member_loans:
+    desc: 会員の貸出中一覧に今回の貸出だけが表示されることを確認する
+    req:
+      /members/M0001/loans?status=ACTIVE:
+        get:
+          body: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.total == 1 &&
+      current.res.body.items[0].loanId == loan_id
+  return_loan:
+    desc: 保存した貸出IDで返却し、状態がRETURNEDになり返却日が入ることを確認する
+    req:
+      /loans/{{ loan_id }}/return:
+        post:
+          body:
+            application/json: {}
+    test: |
+      current.res.status == 200 &&
+      current.res.body.loanId == loan_id &&
+      current.res.body.status == "RETURNED" &&
+      current.res.body.returnedAt != nil
+  return_again:
+    desc: 同じ貸出を再度返却すると409 ALREADY_RETURNEDになることを確認する
+    req:
+      /loans/{{ loan_id }}/return:
+        post:
+          body:
+            application/json: {}
+    test: |
+      current.res.status == 409 &&
+      current.res.body.code == "ALREADY_RETURNED"
+  book_restored:
+    desc: 返却によりB0001の貸出可能冊数が初期値に戻り、二重返却で増えていないことを確認する
+    req:
+      /books/B0001:
+        get:
+          body: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.availableCopies == steps.book_before.res.body.availableCopies
+  member_after:
+    desc: 会員の貸出中件数が0に戻ったことを確認する
+    req:
+      /members/M0001:
+        get:
+          body: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.activeLoanCount == 0

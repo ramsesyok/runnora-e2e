@@ -1,0 +1,22 @@
+# 契約テスト {#sec-contract .landscape-chapter}
+
+契約テストは、同じケース JSON を**モック（WireMock）と実装（実 API）の両方**に流し、
+どちらも OpenAPI どおりに応答することを確認する。各 suite は `runnora generate` が作った
+template を `runbooks/contract/` に複製し、次の 2 点を追加したものである。
+
+- 検証式にケース JSON の `expect.body` のトップレベル項目との一致（部分一致）を追加
+- ランナーに `openapi3` を指定し、応答を OpenAPI の応答定義・スキーマで自動検証
+  （作成時、`GET /books` などの 400 応答が OpenAPI に未定義であることをこの検証で検出し、定義を補った）
+
+| 実行先 | 設定 | 前処理 | 実行コマンド |
+|--------|------|--------|--------------|
+| モック | `config.mock.yaml`（DB なし） | なし | `./scripts/test-mock.ps1` |
+| 実 API | `config.yaml` | 共通前処理 + `sql/cases/contract_setup.sql`（貸出 1: 貸出中、貸出 2: 返却済） | `./scripts/test-api.ps1` |
+
+: 契約テストの実行先 {#tbl-contract-targets}
+
+合格条件：両方の実行先で 8 suite すべてが成功すること。
+
+以下の表は runnora-docgen が生成した（生成）。前処理・後処理の表は実 API で実行する場合の内容である。
+
+{{< include ../../generated/contract/_index.qmd >}}

@@ -1,0 +1,20 @@
+desc: 契約 getBook 蔵書を 1 件取得する（モック・実APIの両方で実行する）
+labels:
+  - contract
+  - books
+  - operation:getBook
+
+vars:
+  cases:
+    - json://../../cases/contract/books/get_getBook/01_B0001.json
+    - json://../../cases/contract/books/get_getBook/02_not_found.json
+
+steps:
+  run_case:
+    desc: ケースJSONを順に読み込み、templateで呼び出して期待ステータスと本文の一部を検証する
+    loop:
+      count: len(vars.cases)
+    include:
+      path: ./get_getBook.template.yml
+      vars:
+        case: "{{ vars.cases[i] }}"

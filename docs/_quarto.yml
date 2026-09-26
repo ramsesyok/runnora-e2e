@@ -1,0 +1,62 @@
+# ============================================================
+#  図書貸出 API テスト手順書（ddq 2.4.0 の設計書 book 雛形を利用）
+#
+#  docs/generated/ は scripts/build-docs.ps1 が作る生成原稿（手で編集しない）:
+#    generated/api/        tools/openapi-doc が OpenAPI から作る API 仕様
+#    generated/contract/   runnora-docgen が契約テスト suite から作る表
+#    generated/scenarios/  runnora-docgen がシナリオ runbook + 前後処理 SQL から作る表
+#  章ファイルは生成原稿を include し、目的・前提・合格条件など人が書く部分だけを持つ。
+# ============================================================
+project:
+  type: book
+  output-dir: _book
+  post-render:
+    - postprocess-html.js
+
+book:
+  title: 図書貸出 API テスト手順書
+  subtitle: runnora・oapi2wire・runnora-docgen によるフルセット API テストのサンプル
+  author: runnora-e2e
+  output-file: runnora-e2e-library-api-test
+  chapters:
+    - index.qmd
+    - chapters/01-overview/index.qmd
+    - chapters/02-api-spec/index.qmd
+    - chapters/03-test-design/index.qmd
+    - chapters/04-execution/index.qmd
+    - chapters/05-contract/index.qmd
+    - chapters/06-scenarios/index.qmd
+    - chapters/07-records/index.qmd
+    - chapters/08-appendix-sql/index.qmd
+
+lang: ja
+# "--" (SQL コメント) がダッシュに置き換わらないよう smart 変換を無効にする
+from: markdown-smart
+plantuml-server: ""
+doc-number: RE2E-2026-001
+doc-revision: ""
+spec: false
+company-ja: ""
+company-en: ""
+page-start: 1
+pagebreak-level: 2
+
+toc: true
+toc-location: left
+toc-title: 目 次
+toc-depth: 3
+
+format:
+  html:
+    number-sections: true
+    css: design-doc.css
+    embed-resources: false
+    grid:
+      sidebar-width: 300px
+      body-width: 1560px
+      margin-width: 60px
+
+filters:
+  # {.landscape-chapter} の章を連続した横向きページにまとめる (生成表ごとの改ページを防ぐ)
+  - workflow-layout.lua
+  - design-doc.lua

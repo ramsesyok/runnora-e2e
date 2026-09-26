@@ -1,0 +1,22 @@
+desc: 契約 createLoan 本を貸し出す（モック・実APIの両方で実行する）
+labels:
+  - contract
+  - loans
+  - operation:createLoan
+
+vars:
+  cases:
+    - json://../../cases/contract/loans/post_createLoan/01_created.json
+    - json://../../cases/contract/loans/post_createLoan/02_member_suspended.json
+    - json://../../cases/contract/loans/post_createLoan/03_book_not_found.json
+    - json://../../cases/contract/loans/post_createLoan/04_missing_book_id.json
+
+steps:
+  run_case:
+    desc: ケースJSONを順に読み込み、templateで呼び出して期待ステータスと本文の一部を検証する
+    loop:
+      count: len(vars.cases)
+    include:
+      path: ./post_createLoan.template.yml
+      vars:
+        case: "{{ vars.cases[i] }}"

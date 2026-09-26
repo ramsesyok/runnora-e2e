@@ -1,0 +1,21 @@
+desc: 契約 listBooks 蔵書を検索する（モック・実APIの両方で実行する）
+labels:
+  - contract
+  - books
+  - operation:listBooks
+
+vars:
+  cases:
+    - json://../../cases/contract/books/get_listBooks/01_novel.json
+    - json://../../cases/contract/books/get_listBooks/02_tech_available.json
+    - json://../../cases/contract/books/get_listBooks/03_invalid_genre.json
+
+steps:
+  run_case:
+    desc: ケースJSONを順に読み込み、templateで呼び出して期待ステータスと本文の一部を検証する
+    loop:
+      count: len(vars.cases)
+    include:
+      path: ./get_listBooks.template.yml
+      vars:
+        case: "{{ vars.cases[i] }}"

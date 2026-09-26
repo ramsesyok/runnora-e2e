@@ -1,0 +1,21 @@
+desc: 契約 getMember 会員と貸出状況を取得する（モック・実APIの両方で実行する）
+labels:
+  - contract
+  - members
+  - operation:getMember
+
+vars:
+  cases:
+    - json://../../cases/contract/members/get_getMember/01_M0001.json
+    - json://../../cases/contract/members/get_getMember/02_M0003_suspended.json
+    - json://../../cases/contract/members/get_getMember/03_not_found.json
+
+steps:
+  run_case:
+    desc: ケースJSONを順に読み込み、templateで呼び出して期待ステータスと本文の一部を検証する
+    loop:
+      count: len(vars.cases)
+    include:
+      path: ./get_getMember.template.yml
+      vars:
+        case: "{{ vars.cases[i] }}"

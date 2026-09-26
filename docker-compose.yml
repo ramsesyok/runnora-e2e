@@ -1,0 +1,20 @@
+# runnora-e2e 用 Oracle Database Free (23ai)
+# 既存の oracle-free コンテナ (1521) と衝突しないよう、ホスト側は 1522 を使う。
+name: runnora-e2e
+services:
+  oracle:
+    image: container-registry.oracle.com/database/free:latest
+    container_name: runnora-e2e-oracle
+    ports:
+      - "1522:1521"
+    environment:
+      # ローカル検証専用の SYS/SYSTEM パスワード
+      ORACLE_PWD: RunnoraE2e_Sys1
+    volumes:
+      - ./db:/opt/runnora-e2e/db:ro
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/oracle/checkDBStatus.sh"]
+      interval: 15s
+      timeout: 10s
+      retries: 40
+      start_period: 60s

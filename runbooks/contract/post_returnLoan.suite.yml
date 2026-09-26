@@ -1,0 +1,21 @@
+desc: 契約 returnLoan 本を返却する（モック・実APIの両方で実行する）
+labels:
+  - contract
+  - loans
+  - operation:returnLoan
+
+vars:
+  cases:
+    - json://../../cases/contract/loans/post_returnLoan/01_returned.json
+    - json://../../cases/contract/loans/post_returnLoan/02_already_returned.json
+    - json://../../cases/contract/loans/post_returnLoan/03_not_found.json
+
+steps:
+  run_case:
+    desc: ケースJSONを順に読み込み、templateで呼び出して期待ステータスと本文の一部を検証する
+    loop:
+      count: len(vars.cases)
+    include:
+      path: ./post_returnLoan.template.yml
+      vars:
+        case: "{{ vars.cases[i] }}"

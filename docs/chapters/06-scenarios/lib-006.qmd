@@ -1,0 +1,9 @@
+## LIB-006 異常系 {#sec-lib-006}
+
+- 目的：入力不正（400）・対象なし（404）・利用停止（409）の各エラーが正しく返り、DB を変更しないことを確認する。
+- 前提：共通前処理のみ（M0003 は利用停止）。
+- 合格条件：全手順の検証式が真であり、後処理 `lib006_assert_no_loans_after.sql` が
+  「貸出 0 件・蔵書 20 件・貸出 ID の採番が進んでいない」を確認して正常終了すること。
+- 実行：`runnora run --config config.yaml --after-sql sql/cases/lib006_assert_no_loans_after.sql runbooks/scenarios/lib-006-validation-errors.yml`
+
+{{< include ../../generated/scenarios/lib-006-validation-errors/_body.qmd >}}

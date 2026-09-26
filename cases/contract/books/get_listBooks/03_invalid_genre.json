@@ -1,0 +1,19 @@
+{
+  "name": "invalid_genre",
+  "description": "定義外のジャンルは 400",
+  "pathParams": {},
+  "queryParams": {
+    "genre": "COMIC",
+    "availableOnly": ""
+  },
+  "headers": {},
+  "requestBody": null,
+  "expect": {
+    "status": 400,
+    "bodyMode": "subset",
+    "body": {
+      "code": "VALIDATION_ERROR"
+    },
+    "ignorePaths": []
+  }
+}

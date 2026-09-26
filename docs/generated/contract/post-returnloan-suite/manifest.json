@@ -1,0 +1,67 @@
+{
+  "generator": "runnora-docgen",
+  "scenario": "契約 returnLoan 本を返却する（モック・実APIの両方で実行する）",
+  "source": "runbooks/contract/post_returnLoan.suite.yml",
+  "sha256": "af01db4c32d06e8cc7caa0bcce2296c02df704a036823a9db595e1194ff229e2",
+  "files": [
+    "after.qmd",
+    "before.qmd",
+    "cases.qmd",
+    "expectations.qmd",
+    "http.qmd",
+    "request-json.qmd",
+    "scenario.qmd"
+  ],
+  "inputs": [
+    {
+      "kind": "runbook",
+      "path": "runbooks/contract/post_returnLoan.suite.yml",
+      "sha256": "af01db4c32d06e8cc7caa0bcce2296c02df704a036823a9db595e1194ff229e2"
+    },
+    {
+      "kind": "runbook",
+      "path": "runbooks/contract/post_returnLoan.template.yml",
+      "sha256": "fd382429d7319cb467f48242e5ad483de0707bb55a67c94510ce54b2f64a38e7"
+    },
+    {
+      "kind": "case",
+      "path": "cases/contract/loans/post_returnLoan/01_returned.json",
+      "sha256": "262a09a37b4487544ebaad6a4d96af5e342f79fa026491ffd99571d0dba057a7"
+    },
+    {
+      "kind": "case",
+      "path": "cases/contract/loans/post_returnLoan/02_already_returned.json",
+      "sha256": "14d0c5e7909f1bcaf67c8ac1f52c0d2caf215030ec266e999f732e9c39d9d630"
+    },
+    {
+      "kind": "case",
+      "path": "cases/contract/loans/post_returnLoan/03_not_found.json",
+      "sha256": "a5dce02aeb4f5b43c1050fe840e6fe1bd59ebb35c321835382ddc91957c5a7f9"
+    },
+    {
+      "kind": "config",
+      "path": "config.yaml",
+      "sha256": "8e7c2385aa5e0e1c08cf3ffe134a55283731931a467a245b012c1e5ceb75cf8c"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/common/00_reset.sql",
+      "sha256": "d9eb8b4d88152cac1536b45ee7c61cbb081ae8e487b547eac919dfceee1cc77e"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/common/10_seed_master.sql",
+      "sha256": "e3cde2dac9a6191735242025960ccddd47b867ffe574d2062fc4f3c64c8ebfba"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/cases/contract_setup.sql",
+      "sha256": "3960624669819050af2d202f4fa9f6a170cf1e19d1c3c7a145788c49a6dea108"
+    },
+    {
+      "kind": "after-sql",
+      "path": "sql/common/90_verify_integrity.sql",
+      "sha256": "2b9b30c6c72c6ad4e78d3f0ccf8998dd9062dc8354111cdd3393e0bef9e4cdda"
+    }
+  ]
+}

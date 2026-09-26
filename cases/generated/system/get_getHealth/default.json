@@ -1,0 +1,17 @@
+{
+  "name": "default",
+  "description": "稼働状態を確認する",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {},
+  "requestBody": null,
+  "expect": {
+    "status": 200,
+    "bodyMode": "subset",
+    "body": {
+      "database": "UP",
+      "status": "UP"
+    },
+    "ignorePaths": []
+  }
+}

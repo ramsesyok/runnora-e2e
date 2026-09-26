@@ -1,0 +1,264 @@
+# oapi2wire case YAML
+#   oapi2wire init で雛形を作り、返し分け条件を手で追記したもの。
+#   契約テスト (runbooks/contract/, cases/contract/) と同じ入力で同じステータス・code を返すように揃えている。
+#   モックは状態を持たないため、状態変化 (貸出で在庫が減る等) は実 API のシナリオテストで確認する。
+version: 1
+defaults:
+  response:
+    headers:
+      Content-Type: application/json
+
+cases:
+  # ---------------------------------------------------------------- system
+  - id: getHealth_default
+    operationId: getHealth
+    fallback: true
+    priority: 10000
+    response:
+      status: 200
+      bodyFile: getHealth/getHealth_default.json
+
+  # ---------------------------------------------------------------- books
+  - id: listBooks_novel
+    operationId: listBooks
+    priority: 10
+    request:
+      query:
+        genre:
+          equalTo: "NOVEL"
+    response:
+      status: 200
+      bodyFile: listBooks/listBooks_novel.json
+
+  - id: listBooks_tech_available
+    operationId: listBooks
+    priority: 11
+    request:
+      query:
+        genre:
+          equalTo: "TECH"
+        availableOnly:
+          equalTo: "true"
+    response:
+      status: 200
+      bodyFile: listBooks/listBooks_tech_available.json
+
+  - id: listBooks_invalid_genre
+    operationId: listBooks
+    priority: 20
+    request:
+      query:
+        genre:
+          matches: "^(?!(NOVEL|TECH|HISTORY|TEST)$).+$"
+    response:
+      status: 400
+      bodyFile: listBooks/listBooks_invalid_genre.json
+
+  - id: listBooks_fallback
+    operationId: listBooks
+    fallback: true
+    priority: 10000
+    response:
+      status: 200
+      bodyFile: listBooks/listBooks_fallback.json
+
+  - id: getBook_B0001
+    operationId: getBook
+    priority: 10
+    request:
+      pathParams:
+        bookId:
+          equalTo: "B0001"
+    response:
+      status: 200
+      bodyFile: getBook/getBook_B0001.json
+
+  - id: getBook_B0002
+    operationId: getBook
+    priority: 11
+    request:
+      pathParams:
+        bookId:
+          equalTo: "B0002"
+    response:
+      status: 200
+      bodyFile: getBook/getBook_B0002.json
+
+  - id: getBook_fallback
+    operationId: getBook
+    fallback: true
+    priority: 10000
+    response:
+      status: 404
+      bodyFile: common/not_found.json
+
+  - id: createBook_default
+    operationId: createBook
+    priority: 50
+    request:
+      body:
+        equalToJson:
+          bookId: "B0900"
+          isbn: "9784000000900"
+          title: "API テスト入門"
+          author: "試験 花子"
+          genre: "TECH"
+          totalCopies: 2
+    response:
+      status: 201
+      bodyFile: createBook/createBook_default.json
+
+  - id: createBook_duplicate_isbn
+    operationId: createBook
+    priority: 10
+    request:
+      body:
+        matchesJsonPath:
+          - "$[?(@.isbn == '9784000000001')]"
+    response:
+      status: 409
+      bodyFile: createBook/createBook_duplicate_isbn.json
+
+  - id: createBook_fallback
+    operationId: createBook
+    fallback: true
+    priority: 10000
+    response:
+      status: 400
+      bodyFile: common/validation_error.json
+
+  # ---------------------------------------------------------------- members
+  - id: getMember_M0001
+    operationId: getMember
+    priority: 10
+    request:
+      pathParams:
+        memberId:
+          equalTo: "M0001"
+    response:
+      status: 200
+      bodyFile: getMember/getMember_M0001.json
+
+  - id: getMember_M0003_suspended
+    operationId: getMember
+    priority: 11
+    request:
+      pathParams:
+        memberId:
+          equalTo: "M0003"
+    response:
+      status: 200
+      bodyFile: getMember/getMember_M0003_suspended.json
+
+  - id: getMember_fallback
+    operationId: getMember
+    fallback: true
+    priority: 10000
+    response:
+      status: 404
+      bodyFile: common/not_found.json
+
+  - id: listMemberLoans_M0001
+    operationId: listMemberLoans
+    priority: 10
+    request:
+      pathParams:
+        memberId:
+          equalTo: "M0001"
+    response:
+      status: 200
+      bodyFile: listMemberLoans/listMemberLoans_M0001.json
+
+  - id: listMemberLoans_M0002
+    operationId: listMemberLoans
+    priority: 11
+    request:
+      pathParams:
+        memberId:
+          equalTo: "M0002"
+    response:
+      status: 200
+      bodyFile: listMemberLoans/listMemberLoans_M0002.json
+
+  - id: listMemberLoans_fallback
+    operationId: listMemberLoans
+    fallback: true
+    priority: 10000
+    response:
+      status: 404
+      bodyFile: common/not_found.json
+
+  # ---------------------------------------------------------------- loans
+  - id: createLoan_default
+    operationId: createLoan
+    priority: 50
+    request:
+      body:
+        equalToJson:
+          memberId: "M0001"
+          bookId: "B0001"
+    response:
+      status: 201
+      bodyFile: createLoan/createLoan_default.json
+
+  - id: createLoan_member_suspended
+    operationId: createLoan
+    priority: 10
+    request:
+      body:
+        matchesJsonPath:
+          - "$[?(@.memberId == 'M0003')]"
+          - "$.bookId"
+    response:
+      status: 409
+      bodyFile: createLoan/createLoan_member_suspended.json
+
+  - id: createLoan_book_not_found
+    operationId: createLoan
+    priority: 20
+    request:
+      body:
+        matchesJsonPath:
+          - "$[?(@.bookId == 'B9999')]"
+          - "$.memberId"
+    response:
+      status: 404
+      bodyFile: common/not_found.json
+
+  - id: createLoan_fallback
+    operationId: createLoan
+    fallback: true
+    priority: 10000
+    response:
+      status: 400
+      bodyFile: common/validation_error.json
+
+  - id: returnLoan_1
+    operationId: returnLoan
+    priority: 10
+    request:
+      pathParams:
+        loanId:
+          equalTo: "1"
+    response:
+      status: 200
+      bodyFile: returnLoan/returnLoan_1.json
+
+  - id: returnLoan_2_already_returned
+    operationId: returnLoan
+    priority: 11
+    request:
+      pathParams:
+        loanId:
+          equalTo: "2"
+    response:
+      status: 409
+      bodyFile: returnLoan/returnLoan_2_already_returned.json
+
+  - id: returnLoan_fallback
+    operationId: returnLoan
+    fallback: true
+    priority: 10000
+    response:
+      status: 404
+      bodyFile: common/not_found.json

@@ -1,0 +1,29 @@
+# 実施記録 {#sec-records}
+
+実施者が記入する。証跡は `reports/<日時>-mock/`、`reports/<日時>-api/` に保存する。
+
+| 区分 | 対象 | 期待 | 結果 | 実施日 | 実施者 | 証跡 |
+|------|------|------|------|--------|--------|------|
+| 生成テスト | モック（8 suite） | 終了コード 0 | | | | mock-generated.txt |
+| 契約テスト | モック（8 suite） | 終了コード 0 | | | | mock-contract.txt |
+| 生成テスト | 実 API（8 suite） | 終了コード 0 | | | | api-generated.txt |
+| 契約テスト | 実 API（8 suite） | 終了コード 0 | | | | api-contract.txt |
+| シナリオ | LIB-001 | 終了コード 0 | | | | lib-001.txt |
+| シナリオ | LIB-002 | 終了コード 0 | | | | lib-002.txt |
+| シナリオ | LIB-003 | 終了コード 0 | | | | lib-003.txt |
+| シナリオ | LIB-004 | 終了コード 0 | | | | lib-004.txt |
+| シナリオ | LIB-005 | 終了コード 0 | | | | lib-005.txt |
+| シナリオ | LIB-006 | 終了コード 0 | | | | lib-006.txt |
+| シナリオ | LIB-007 | 終了コード 0 | | | | lib-007.txt |
+| 検知確認 | DEMO | 終了コード 4 | | | | demo-hook-failure.log |
+| カバレッジ | 契約 + シナリオ | 8 / 8 operation | | | | coverage.txt |
+
+: 実施記録 {#tbl-records}
+
+## 不具合・所見 {.unnumbered}
+
+| No. | 内容 | 対応 |
+|-----|------|------|
+| | | |
+
+: 不具合・所見 {#tbl-findings}

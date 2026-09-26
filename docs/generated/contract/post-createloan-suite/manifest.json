@@ -1,0 +1,72 @@
+{
+  "generator": "runnora-docgen",
+  "scenario": "契約 createLoan 本を貸し出す（モック・実APIの両方で実行する）",
+  "source": "runbooks/contract/post_createLoan.suite.yml",
+  "sha256": "c6704ddfe433c8e1f499c29e21edd1d9e35a2b886672c161a80b242ae0a8a35b",
+  "files": [
+    "after.qmd",
+    "before.qmd",
+    "cases.qmd",
+    "expectations.qmd",
+    "http.qmd",
+    "request-json.qmd",
+    "scenario.qmd"
+  ],
+  "inputs": [
+    {
+      "kind": "runbook",
+      "path": "runbooks/contract/post_createLoan.suite.yml",
+      "sha256": "c6704ddfe433c8e1f499c29e21edd1d9e35a2b886672c161a80b242ae0a8a35b"
+    },
+    {
+      "kind": "runbook",
+      "path": "runbooks/contract/post_createLoan.template.yml",
+      "sha256": "d0a8d2b528423a4419d1db9aa0e4258c8b51eb8b7ee2540e7f2cc52d853faae0"
+    },
+    {
+      "kind": "case",
+      "path": "cases/contract/loans/post_createLoan/01_created.json",
+      "sha256": "c6c1bea9df53a1e3c12cbc500c3d05b825faa8bdfd5981e38e290942a615441b"
+    },
+    {
+      "kind": "case",
+      "path": "cases/contract/loans/post_createLoan/02_member_suspended.json",
+      "sha256": "98476fd484e6679df0053193ff04e1afd9458501347aa1c9c6c1a965991ca15b"
+    },
+    {
+      "kind": "case",
+      "path": "cases/contract/loans/post_createLoan/03_book_not_found.json",
+      "sha256": "08638849763df433bc638eef8bc62d5f458f64ea904fdd2d847e4e9b77852c12"
+    },
+    {
+      "kind": "case",
+      "path": "cases/contract/loans/post_createLoan/04_missing_book_id.json",
+      "sha256": "9f436a157ed816a429badaecb591e2a3075781c9b9bdbf30774ea8dc657dfefa"
+    },
+    {
+      "kind": "config",
+      "path": "config.yaml",
+      "sha256": "8e7c2385aa5e0e1c08cf3ffe134a55283731931a467a245b012c1e5ceb75cf8c"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/common/00_reset.sql",
+      "sha256": "d9eb8b4d88152cac1536b45ee7c61cbb081ae8e487b547eac919dfceee1cc77e"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/common/10_seed_master.sql",
+      "sha256": "e3cde2dac9a6191735242025960ccddd47b867ffe574d2062fc4f3c64c8ebfba"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/cases/contract_setup.sql",
+      "sha256": "3960624669819050af2d202f4fa9f6a170cf1e19d1c3c7a145788c49a6dea108"
+    },
+    {
+      "kind": "after-sql",
+      "path": "sql/common/90_verify_integrity.sql",
+      "sha256": "2b9b30c6c72c6ad4e78d3f0ccf8998dd9062dc8354111cdd3393e0bef9e4cdda"
+    }
+  ]
+}

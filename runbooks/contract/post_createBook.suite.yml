@@ -1,0 +1,21 @@
+desc: 契約 createBook 蔵書を登録する（モック・実APIの両方で実行する）
+labels:
+  - contract
+  - books
+  - operation:createBook
+
+vars:
+  cases:
+    - json://../../cases/contract/books/post_createBook/01_created.json
+    - json://../../cases/contract/books/post_createBook/02_duplicate_isbn.json
+    - json://../../cases/contract/books/post_createBook/03_invalid_isbn.json
+
+steps:
+  run_case:
+    desc: ケースJSONを順に読み込み、templateで呼び出して期待ステータスと本文の一部を検証する
+    loop:
+      count: len(vars.cases)
+    include:
+      path: ./post_createBook.template.yml
+      vars:
+        case: "{{ vars.cases[i] }}"

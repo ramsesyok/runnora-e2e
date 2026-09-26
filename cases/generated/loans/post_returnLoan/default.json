@@ -1,0 +1,26 @@
+{
+  "name": "default",
+  "description": "本を返却する",
+  "pathParams": {
+    "loanId": 1
+  },
+  "queryParams": {},
+  "headers": {},
+  "requestBody": {
+    "TODO": "fill in request body"
+  },
+  "expect": {
+    "status": 200,
+    "bodyMode": "subset",
+    "body": {
+      "bookId": "B0001",
+      "dueDate": "2026-10-10",
+      "loanId": 1,
+      "loanedAt": "2026-09-26",
+      "memberId": "M0001",
+      "returnedAt": "2026-09-26",
+      "status": "RETURNED"
+    },
+    "ignorePaths": []
+  }
+}

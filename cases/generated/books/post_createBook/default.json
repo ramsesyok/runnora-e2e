@@ -1,0 +1,29 @@
+{
+  "name": "default",
+  "description": "蔵書を登録する",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {},
+  "requestBody": {
+    "author": "試験 花子",
+    "bookId": "B0900",
+    "genre": "TECH",
+    "isbn": "9784000000900",
+    "title": "API テスト入門",
+    "totalCopies": 2
+  },
+  "expect": {
+    "status": 201,
+    "bodyMode": "subset",
+    "body": {
+      "author": "試験 花子",
+      "availableCopies": 2,
+      "bookId": "B0900",
+      "genre": "TECH",
+      "isbn": "9784000000900",
+      "title": "API テスト入門",
+      "totalCopies": 2
+    },
+    "ignorePaths": []
+  }
+}

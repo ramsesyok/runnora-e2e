@@ -1,0 +1,22 @@
+<!-- scripts/build-docs.ps1 が生成する。手で編集しない。 -->
+
+### テストシナリオ
+
+{{< include ../../generated/scenarios/hook-failure-detection/scenario.qmd >}}
+
+### 前処理
+
+{{< include ../../generated/scenarios/hook-failure-detection/before.qmd >}}
+
+### 後処理
+
+{{< include ../../generated/scenarios/hook-failure-detection/after.qmd >}}
+
+### HTTP 呼び出し
+
+{{< include ../../generated/scenarios/hook-failure-detection/http.qmd >}}
+
+### 期待値・検証条件
+
+{{< include ../../generated/scenarios/hook-failure-detection/expectations.qmd >}}
+

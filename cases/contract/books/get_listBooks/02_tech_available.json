@@ -1,0 +1,17 @@
+{
+  "name": "tech_available",
+  "description": "貸出可能な技術書の検索は 200",
+  "pathParams": {},
+  "queryParams": {
+    "genre": "TECH",
+    "availableOnly": "true"
+  },
+  "headers": {},
+  "requestBody": null,
+  "expect": {
+    "status": 200,
+    "bodyMode": "subset",
+    "body": {},
+    "ignorePaths": []
+  }
+}

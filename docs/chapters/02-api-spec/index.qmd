@@ -1,0 +1,6 @@
+# API 仕様 {#sec-api}
+
+本章は `tools/openapi-doc` が `openapi/library-api.yaml` から生成した（生成）。
+仕様を変えるときは OpenAPI を直し、`scripts/build-docs.ps1` で再生成する。
+
+{{< include ../../generated/api/api-spec.qmd >}}

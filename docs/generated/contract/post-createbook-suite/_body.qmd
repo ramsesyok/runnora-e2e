@@ -1,0 +1,22 @@
+<!-- scripts/build-docs.ps1 が生成する。手で編集しない。 -->
+
+### テストシナリオ
+
+{{< include ../../generated/contract/post-createbook-suite/scenario.qmd >}}
+
+### ケースデータ
+
+{{< include ../../generated/contract/post-createbook-suite/cases.qmd >}}
+
+### HTTP 呼び出し
+
+{{< include ../../generated/contract/post-createbook-suite/http.qmd >}}
+
+### リクエストボディ
+
+{{< include ../../generated/contract/post-createbook-suite/request-json.qmd >}}
+
+### 期待値・検証条件
+
+{{< include ../../generated/contract/post-createbook-suite/expectations.qmd >}}
+

@@ -1,0 +1,31 @@
+{
+  "name": "default",
+  "description": "会員の貸出履歴を取得する",
+  "pathParams": {
+    "memberId": "M0001"
+  },
+  "queryParams": {
+    "status": "ACTIVE"
+  },
+  "headers": {},
+  "requestBody": null,
+  "expect": {
+    "status": 200,
+    "bodyMode": "subset",
+    "body": {
+      "items": [
+        {
+          "bookId": "B0001",
+          "dueDate": "2026-10-10",
+          "loanId": 1,
+          "loanedAt": "2026-09-26",
+          "memberId": "M0001",
+          "returnedAt": null,
+          "status": "ACTIVE"
+        }
+      ],
+      "total": 1
+    },
+    "ignorePaths": []
+  }
+}

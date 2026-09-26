@@ -1,0 +1,24 @@
+desc: 蔵書を検索する template
+labels:
+  - generated
+  - openapi
+  - books
+  - method:get
+  - operation:listBooks
+  - mode:template
+
+runners:
+  req:
+    endpoint: ${RUNNORA_BASE_URL}
+
+vars:
+  case: {}
+
+steps:
+  call_api:
+    req:
+      /books?genre={{ vars.case.queryParams.genre }}&availableOnly={{ vars.case.queryParams.availableOnly }}:
+        get:
+          headers: "{{ vars.case.headers }}"
+    test: |
+      current.res.status == vars.case.expect.status

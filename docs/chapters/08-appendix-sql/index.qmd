@@ -1,0 +1,7 @@
+# 付録 前後処理 SQL 全文 {#sec-appendix-sql}
+
+第 5・6 章の前処理・後処理の表（runnora-docgen 生成）は実行順とファイル名だけを示す。
+表の「出典」に挙げた SQL/PL/SQL ファイルの全文をここに掲載する（生成）。
+構文と用途の対応は @tbl-plsql-syntax を参照。
+
+{{< include ../../generated/sql/sql-listing.qmd >}}

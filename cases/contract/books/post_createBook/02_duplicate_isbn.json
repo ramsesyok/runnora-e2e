@@ -1,0 +1,23 @@
+{
+  "name": "duplicate_isbn",
+  "description": "B0001 と同じ ISBN は 409",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {},
+  "requestBody": {
+    "bookId": "B0901",
+    "isbn": "9784000000001",
+    "title": "重複 ISBN",
+    "author": "試験 花子",
+    "genre": "TECH",
+    "totalCopies": 1
+  },
+  "expect": {
+    "status": 409,
+    "bodyMode": "subset",
+    "body": {
+      "code": "DUPLICATE_BOOK"
+    },
+    "ignorePaths": []
+  }
+}

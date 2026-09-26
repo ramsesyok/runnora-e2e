@@ -1,0 +1,46 @@
+{
+  "generator": "runnora-docgen",
+  "scenario": "LIB-001 本を借りて返すまでの正常系（在庫増減・ID引き継ぎ・二重返却）",
+  "source": "runbooks/scenarios/lib-001-loan-lifecycle.yml",
+  "sha256": "229ee1bda376f37f2cd143cbdf7cdbe11d357115e02022c00698d43a8abde8b0",
+  "files": [
+    "after.qmd",
+    "before.qmd",
+    "expectations.qmd",
+    "http.qmd",
+    "request-json.qmd",
+    "scenario.qmd"
+  ],
+  "inputs": [
+    {
+      "kind": "runbook",
+      "path": "runbooks/scenarios/lib-001-loan-lifecycle.yml",
+      "sha256": "229ee1bda376f37f2cd143cbdf7cdbe11d357115e02022c00698d43a8abde8b0"
+    },
+    {
+      "kind": "config",
+      "path": "config.yaml",
+      "sha256": "8e7c2385aa5e0e1c08cf3ffe134a55283731931a467a245b012c1e5ceb75cf8c"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/common/00_reset.sql",
+      "sha256": "d9eb8b4d88152cac1536b45ee7c61cbb081ae8e487b547eac919dfceee1cc77e"
+    },
+    {
+      "kind": "before-sql",
+      "path": "sql/common/10_seed_master.sql",
+      "sha256": "e3cde2dac9a6191735242025960ccddd47b867ffe574d2062fc4f3c64c8ebfba"
+    },
+    {
+      "kind": "after-sql",
+      "path": "sql/cases/lib001_assert_after.sql",
+      "sha256": "eae33df1e6bbe82536808e8edc41490237340fbee47f633e4c6aedb1ef035ecc"
+    },
+    {
+      "kind": "after-sql",
+      "path": "sql/common/90_verify_integrity.sql",
+      "sha256": "2b9b30c6c72c6ad4e78d3f0ccf8998dd9062dc8354111cdd3393e0bef9e4cdda"
+    }
+  ]
+}

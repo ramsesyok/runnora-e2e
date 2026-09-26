@@ -1,0 +1,17 @@
+{
+  "name": "up",
+  "description": "API と DB が稼働中",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {},
+  "requestBody": null,
+  "expect": {
+    "status": 200,
+    "bodyMode": "subset",
+    "body": {
+      "status": "UP",
+      "database": "UP"
+    },
+    "ignorePaths": []
+  }
+}

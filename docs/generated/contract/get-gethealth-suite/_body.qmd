@@ -1,0 +1,18 @@
+<!-- scripts/build-docs.ps1 が生成する。手で編集しない。 -->
+
+### テストシナリオ
+
+{{< include ../../generated/contract/get-gethealth-suite/scenario.qmd >}}
+
+### ケースデータ
+
+{{< include ../../generated/contract/get-gethealth-suite/cases.qmd >}}
+
+### HTTP 呼び出し
+
+{{< include ../../generated/contract/get-gethealth-suite/http.qmd >}}
+
+### 期待値・検証条件
+
+{{< include ../../generated/contract/get-gethealth-suite/expectations.qmd >}}
+
