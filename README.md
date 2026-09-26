@@ -146,7 +146,7 @@ runnora を直接呼ぶ例（シナリオ LIB-005）:
 | 5 | runnora generate | requestBody の無い POST（returnLoan）にも `{"TODO": ...}` ボディを送る。クエリは全パラメータを空値でも付与 | 実装が余分なボディ・空クエリを無視するので実害なし |
 | 6 | runnora (runn DB) | Oracle の NUMBER は文字列で返る | `== "14"` / `int(...)` で比較 |
 | 7 | oapi2wire | mapping の `id` が build ごとにランダム UUID（README 例は caseId）で、生成物の差分が安定しない | `mock/wiremock-out/` を Git 管理外に |
-| 8 | runnora-docgen | 前処理・後処理表で SQL の改行が失われ 1 段落になる（GridTable セル内） | runnora-docgen をファイル名のみ表示する方式に修正（runnora-docgen のブランチ `feature/hook-sql-filename-only`）。SQL 全文は手順書の付録に掲載 |
+| 8 | runnora-docgen | 前処理・後処理表で SQL の改行が失われ 1 段落になる（GridTable セル内） | runnora-docgen をファイル名のみ表示する方式に修正（[ramsesyok/runnora-docgen#3](https://github.com/ramsesyok/runnora-docgen/pull/3) で main にマージ済み）。SQL 全文は手順書の付録に掲載 |
 | 9 | runnora-docgen | DB 照会ステップは SQL が表に出ず「検証のみ」になる | 手順書本文で補足 |
 | 10 | ddq | PlantUML サーバを 127.0.0.1:18080 で探すため WireMock と衝突する | WireMock 停止後に手順書を生成 |
 | 11 | go-ora | TZ なし `TIMESTAMP` と `SYSTIMESTAMP` の比較がセッション TZ 依存で、go-ora 接続では 9 時間ずれて失敗した | ログ列を `TIMESTAMP WITH TIME ZONE` に |
