@@ -2,7 +2,7 @@
 
 ## 準備 {#sec-prepare}
 
-| No. | 作業 | コマンド（リポジトリ直下、PowerShell） | 確認 |
+| No. | 作業 | コマンド（`api-test/` 直下、PowerShell） | 確認 |
 |-----|------|----------------------------------------|------|
 | 1 | Docker Desktop を起動する | - | `docker info` が応答する |
 | 2 | Oracle を起動しスキーマを作る | `./scripts/db-up.ps1` | 「LIBAPP スキーマを作成しました」と表示 |

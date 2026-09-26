@@ -1,9 +1,9 @@
-# ==== runnora-e2e ====
-# ビルド成果物・実行結果
-/bin/
-/reports/
+# ==== runnora-e2e (テストセットごとのフォルダ: api-test/, grpc-test/) ====
+# ビルド成果物・実行結果 (各テストセット直下)
+/*/bin/
+/*/reports/
 # oapi2wire build の出力 (mapping の id が毎回変わるため管理しない。scripts/mock-build.ps1 で再生成)
-/mock/wiremock-out/
+/*/mock/wiremock-out/
 
 # ==== ddq / Quarto (docs/) ====
 # 管理対象: 本文 (_quarto.yml / index.qmd / chapters/ / diagrams/)、機構ファイル、design-doc.pdf、
@@ -18,7 +18,7 @@ _quarto-publish.yml
 # Quarto のレンダリング中間物 (PDF 用の mermaid 画像など)
 **/*_files/
 **/*.quarto_ipynb
-/*/.gitignore
+/*/docs/.gitignore
 **/diagrams/mmd-*
 **/diagrams/puml-*
 chk-*.png
