@@ -34,13 +34,13 @@
     },
     {
       "kind": "json",
-      "path": "fixtures/responses/createLoan/createLoan_member_suspended.json",
-      "sha256": "48536d59b2155ed94b7d82b47bd3380323c4ecd28919f51496736d9726edd028"
+      "path": "cases/contract/loans/post_createLoan/02_member_suspended.json",
+      "sha256": "6535185cc85731cae48dc44807de1ee1eb5d76a068ef840c524c4909cc819cd3"
     },
     {
       "kind": "json",
-      "path": "cases/contract/loans/post_createLoan/02_member_suspended.json",
-      "sha256": "6535185cc85731cae48dc44807de1ee1eb5d76a068ef840c524c4909cc819cd3"
+      "path": "fixtures/responses/createLoan/createLoan_member_suspended.json",
+      "sha256": "48536d59b2155ed94b7d82b47bd3380323c4ecd28919f51496736d9726edd028"
     },
     {
       "kind": "json",

@@ -43,13 +43,13 @@
     },
     {
       "kind": "json",
-      "path": "fixtures/responses/listBooks/listBooks_invalid_genre.json",
-      "sha256": "8d38d408cf922f4201b7ab4d8f2c47bd5eef4cccc62055b3aff4c3eb8e209bac"
+      "path": "cases/contract/books/get_listBooks/03_invalid_genre.json",
+      "sha256": "08ebf17f2533f5711562d317a1d845c7d52791511aa683dd77c5f840130d0e01"
     },
     {
       "kind": "json",
-      "path": "cases/contract/books/get_listBooks/03_invalid_genre.json",
-      "sha256": "08ebf17f2533f5711562d317a1d845c7d52791511aa683dd77c5f840130d0e01"
+      "path": "fixtures/responses/listBooks/listBooks_invalid_genre.json",
+      "sha256": "8d38d408cf922f4201b7ab4d8f2c47bd5eef4cccc62055b3aff4c3eb8e209bac"
     },
     {
       "kind": "config",

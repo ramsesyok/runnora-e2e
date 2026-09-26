@@ -33,13 +33,13 @@
     },
     {
       "kind": "json",
-      "path": "fixtures/responses/getBook/getBook_not_found.json",
-      "sha256": "5eded1e42d5f3cbede4113dcc413bfebe30933ce6d8fab266c2922cceded5168"
+      "path": "cases/contract/books/get_getBook/02_not_found.json",
+      "sha256": "ae27cd7db32296d8304c49ac08828951d8aebfb13b4d762617c72658cc74d440"
     },
     {
       "kind": "json",
-      "path": "cases/contract/books/get_getBook/02_not_found.json",
-      "sha256": "ae27cd7db32296d8304c49ac08828951d8aebfb13b4d762617c72658cc74d440"
+      "path": "fixtures/responses/getBook/getBook_not_found.json",
+      "sha256": "5eded1e42d5f3cbede4113dcc413bfebe30933ce6d8fab266c2922cceded5168"
     },
     {
       "kind": "config",
