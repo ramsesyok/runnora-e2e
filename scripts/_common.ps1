@@ -51,6 +51,22 @@ function Invoke-Runnora {
     [pscustomobject]@{ Name = $Name; Exit = $code; Expect = $Expect; Ok = $ok }
 }
 
+# ディレクトリを削除する。直前に書いたファイルをエディタやウイルス対策が一時的に掴んでいると
+# Remove-Item が IOException で失敗することがあるため、間隔を空けて数回やり直す。
+function Remove-DirectoryWithRetry([string]$Path, [int]$Attempts = 5, [int]$DelayMs = 500) {
+    for ($i = 1; $i -le $Attempts; $i++) {
+        if (-not (Test-Path -LiteralPath $Path)) { return }
+        try {
+            Remove-Item -LiteralPath $Path -Recurse -Force -ErrorAction Stop
+            return
+        } catch {
+            if ($i -eq $Attempts) { throw }
+            Write-Host "  $Path を削除できませんでした (使用中のファイルあり)。再試行します ($i/$Attempts)"
+            Start-Sleep -Milliseconds ($DelayMs * $i)
+        }
+    }
+}
+
 function Wait-Http([string]$Url, [int]$TimeoutSec = 60) {
     $deadline = (Get-Date).AddSeconds($TimeoutSec)
     while ((Get-Date) -lt $deadline) {

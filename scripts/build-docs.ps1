@@ -38,7 +38,7 @@ function Write-Body([string]$Sub, [string]$Heading, [switch]$NoHooks) {
 Push-Location $Root
 try {
     $gen = Join-Path $Root 'docs\generated'
-    if (Test-Path $gen) { Remove-Item -Recurse -Force $gen }
+    Remove-DirectoryWithRetry $gen
 
     Write-Host '== API 仕様 (tools/openapi-doc)'
     go build -C tools -o ../bin/openapi-doc.exe ./openapi-doc
