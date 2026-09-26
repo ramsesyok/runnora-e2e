@@ -1,8 +1,9 @@
 ﻿# 各スクリプトが dot-source する共通設定。
-# ツールの場所は既定で隣接リポジトリ (..\runnora 等) を見る。別の場所にある場合は環境変数で上書きする。
+# ツールの場所は既定で隣接リポジトリ (runnora-e2e と並ぶ ..\..\runnora 等) を見る。別の場所にある場合は環境変数で上書きする。
 $ErrorActionPreference = 'Stop'
 $script:Root = Split-Path $PSScriptRoot -Parent
-$script:Projects = Split-Path $script:Root -Parent
+# Root はテストセットのフォルダ (runnora-e2e/api-test)。兄弟リポジトリ (runnora 等) はリポジトリの 1 つ上にある
+$script:Projects = Split-Path (Split-Path $script:Root -Parent) -Parent
 
 function Resolve-Tool {
     param([string]$EnvName, [string]$Default, [string]$CommandName)
