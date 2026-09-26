@@ -2,7 +2,7 @@
   "generator": "runnora-docgen",
   "scenario": "LIB-003 延滞中の会員は借りられず、返却すると借りられる",
   "source": "runbooks/scenarios/lib-003-overdue.yml",
-  "sha256": "cfb2f00fdf14ba6cc9489165a7d3f1d91cb7b93477c54b8105fb39c6462e4505",
+  "sha256": "87d16af27cd391d344308d7fa40d0ac7943c1a1ff870c3e9791c859f97e520de",
   "files": [
     "after.qmd",
     "before.qmd",
@@ -15,7 +15,7 @@
     {
       "kind": "runbook",
       "path": "runbooks/scenarios/lib-003-overdue.yml",
-      "sha256": "cfb2f00fdf14ba6cc9489165a7d3f1d91cb7b93477c54b8105fb39c6462e4505"
+      "sha256": "87d16af27cd391d344308d7fa40d0ac7943c1a1ff870c3e9791c859f97e520de"
     },
     {
       "kind": "config",

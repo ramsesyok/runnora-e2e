@@ -116,7 +116,7 @@ runnora を直接呼ぶ例（シナリオ LIB-005）:
 |---|---|---|---|
 | LIB-001 | 貸出〜返却・二重返却 | - | SELECT INTO + 例外で事後条件検証 |
 | LIB-002 | 在庫切れ（1 冊の取り合い） | - | - |
-| LIB-003 | 延滞者の貸出拒否 | %ROWTYPE で延滞貸出を作成 | - |
+| LIB-003 | 延滞者の貸出拒否（応答から延滞中の貸出を探して返却・照会に引き継ぐ） | %ROWTYPE で延滞貸出を作成 | - |
 | LIB-004 | 貸出上限（応答の貸出 ID を返却・照会に引き継ぐ） | 明示カーソル + WHILE LOOP | - |
 | LIB-005 | SAVEPOINT による部分確定 | SAVEPOINT / ROLLBACK TO / EXCEPTION_INIT | 取消結果と自律型ログを検証 |
 | LIB-006 | 異常系 400/404/409 | - | DB 不変（件数・採番）を検証 |
@@ -158,7 +158,7 @@ runbooks/contract/get_getMember.suite.yml
 - 実 API: 生成 8/8、契約 8/8、シナリオ 7/7 成功、検知確認は期待どおり exit 4
   （`ORA-20100: integrity check failed (1): B0001 available=2 expected=3`）
 - OpenAPI カバレッジ（契約 + シナリオ）: 8/8 operation
-- 手順書: HTML（`docs/_book/`）と PDF（`docs/design-doc.pdf`、114 ページ）を発行
+- 手順書: HTML（`docs/_book/`）と PDF（`docs/design-doc.pdf`、115 ページ）を発行
 - 期待値を 1 項目だけ誤らせた契約ケースが失敗すること（検証が空振りしていないこと）
 
 ## 作成中に分かったこと（ツールへのフィードバック）

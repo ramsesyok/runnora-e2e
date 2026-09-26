@@ -1,8 +1,11 @@
 ## LIB-003 延滞中の貸出拒否 {#sec-lib-003}
 
 - 目的：返却期限を過ぎた貸出がある会員は借りられず（409 `OVERDUE_LOAN`）、返却すると借りられることを確認する。
-- 前提：前処理 `lib003_overdue_before.sql` が、API では作れない「21 日前に借りて未返却（期限は 7 日前）」の貸出 1 を
+- 前提：前処理 `lib003_overdue_before.sql` が、API では作れない「21 日前に借りて未返却（期限は 7 日前）」の貸出を
   `%ROWTYPE` レコードで組み立てて登録し、在庫も 1 減らす。
+- 引き継ぎ：貸出 ID・蔵書 ID は固定値で書かない。貸出中一覧の応答から返却期限が本日より前の貸出を探して
+  `bind` で保存し、蔵書照会 URL（`/books/{{ overdue_book_id }}`）、返却 URL（`/loans/{{ overdue_loan_id }}/return`）、
+  新しい貸出 ID が返却した貸出と異なることや貸出履歴での状態の検証に使う。
 - 合格条件：全手順の検証式が真であり、共通後処理が正常終了すること。
 - 実行：`runnora run --config config.yaml --before-sql sql/cases/lib003_overdue_before.sql runbooks/scenarios/lib-003-overdue.yml`
 
