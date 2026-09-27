@@ -6,9 +6,7 @@
   },
   "queryParams": {},
   "headers": {},
-  "requestBody": {
-    "TODO": "fill in request body"
-  },
+  "requestBody": null,
   "expect": {
     "status": 200,
     "bodyMode": "subset",

@@ -1,21 +1,21 @@
-desc: 会員と貸出状況を取得する suite
+desc: "会員と貸出状況を取得する suite"
 labels:
   - generated
   - openapi
-  - members
+  - "members"
   - method:get
-  - operation:getMember
+  - "operation:getMember"
   - mode:suite
 
 vars:
   cases:
-    - json://../../../cases/generated/members/get_getMember/default.json
+    - "json://../../../cases/generated/members/get_getMember/default.json"
 
 steps:
   run_case:
     loop:
       count: len(vars.cases)
     include:
-      path: ./get_getMember.template.yml
+      path: "./get_getMember.template.yml"
       vars:
         case: "{{ vars.cases[i] }}"

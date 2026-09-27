@@ -208,7 +208,7 @@ runbooks/contract/get_getMember.suite.yml
 | 2 | runnora | フック SQL はファイル全体を 1 文で実行。SQL*Plus の `/` 終端は `PLS-00103` | 1 ファイル 1 無名ブロックで記述（[sql/README.md](sql/README.md)） |
 | 3 | runnora | エラー終了時に cobra の Usage が毎回出力され、エラーが読みにくい | - |
 | 4 | runnora (runn) | suite の `json://` 相対パスは include 先 template の位置で解決される | template を suite と同じディレクトリに配置 |
-| 5 | runnora generate | requestBody の無い POST（returnLoan）にも `{"TODO": ...}` ボディを送る。クエリは全パラメータを空値でも付与 | 実装が余分なボディ・空クエリを無視するので実害なし |
+| 5 | runnora generate | 作成時は requestBody の無い POST（returnLoan）にも `{"TODO": ...}` ボディを送っていた（[ramsesyok/runnora#19](https://github.com/ramsesyok/runnora/pull/19) で修正済み。生成物も作り直し済み）。クエリは全パラメータを空値でも付与する | 実装が空クエリを無視するので実害なし |
 | 6 | runnora (runn DB) | Oracle の NUMBER は文字列で返る | `== "14"` / `int(...)` で比較 |
 | 7 | oapi2wire | 作成時は mapping の `id` が build ごとにランダム UUID で、生成物の差分が安定しなかった（[ramsesyok/oapi2wire#7](https://github.com/ramsesyok/oapi2wire/pull/7) で operationId と caseId から決まる UUID に修正済み） | `mock/wiremock-out/` を Git 管理外に |
 | 8 | runnora-docgen | 前処理・後処理表で SQL の改行が失われ 1 段落になる（GridTable セル内） | runnora-docgen をファイル名のみ表示する方式に修正（[ramsesyok/runnora-docgen#3](https://github.com/ramsesyok/runnora-docgen/pull/3) で main にマージ済み）。SQL 全文は手順書の付録に掲載 |

@@ -1,14 +1,14 @@
-desc: 蔵書を登録する template
+desc: "蔵書を登録する template"
 labels:
   - generated
   - openapi
-  - books
+  - "books"
   - method:post
-  - operation:createBook
+  - "operation:createBook"
   - mode:template
 
 runners:
-  req:
+  "req":
     endpoint: ${RUNNORA_BASE_URL}
 
 vars:
@@ -16,8 +16,8 @@ vars:
 
 steps:
   call_api:
-    req:
-      /books:
+    "req":
+      "/books":
         post:
           headers: "{{ vars.case.headers }}"
           body:

@@ -1,14 +1,14 @@
-desc: 蔵書を検索する template
+desc: "蔵書を検索する template"
 labels:
   - generated
   - openapi
-  - books
+  - "books"
   - method:get
-  - operation:listBooks
+  - "operation:listBooks"
   - mode:template
 
 runners:
-  req:
+  "req":
     endpoint: ${RUNNORA_BASE_URL}
 
 vars:
@@ -16,8 +16,8 @@ vars:
 
 steps:
   call_api:
-    req:
-      /books?genre={{ vars.case.queryParams.genre }}&availableOnly={{ vars.case.queryParams.availableOnly }}:
+    "req":
+      "/books?genre={{ vars.case.queryParams.genre }}\u0026availableOnly={{ vars.case.queryParams.availableOnly }}":
         get:
           headers: "{{ vars.case.headers }}"
 

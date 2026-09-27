@@ -1,21 +1,21 @@
-desc: 蔵書を 1 件取得する suite
+desc: "蔵書を 1 件取得する suite"
 labels:
   - generated
   - openapi
-  - books
+  - "books"
   - method:get
-  - operation:getBook
+  - "operation:getBook"
   - mode:suite
 
 vars:
   cases:
-    - json://../../../cases/generated/books/get_getBook/default.json
+    - "json://../../../cases/generated/books/get_getBook/default.json"
 
 steps:
   run_case:
     loop:
       count: len(vars.cases)
     include:
-      path: ./get_getBook.template.yml
+      path: "./get_getBook.template.yml"
       vars:
         case: "{{ vars.cases[i] }}"
