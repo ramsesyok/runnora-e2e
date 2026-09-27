@@ -18,6 +18,11 @@ HTTP と gRPC の各応答は runnora が証跡として自動で JSON ファイ
 
 ツール群の連携方針は [runnora の連携設計](https://github.com/ramsesyok/runnora/blob/main/docs/integration-design.md) を参照してください。
 
+| 資料 | 内容 |
+|---|---|
+| [コマンドマニュアル](docs/command-manual.md) | スクリプトを使わず、runnora・oapi2wire・runnora-docgen のコマンドだけでテストの一連の流れ（モック生成 → テスト雛形 → モック / 実環境で実行 → 結果確認 → 手順書）を行う手順と早見表 |
+| [スクリプトの処理解説](docs/scripts-explained.md) | `api-test/scripts/run-all.ps1` と `grpc-test/scripts/run.ps1` が内部で何を・どの順で・何のために実行しているか |
+
 ## runnora.yaml とスクリプトの分担
 
 各テストセットでは、テストの中身を `runnora.yaml`（環境の接続先と共通の前後処理、runbook をまとめて流すスイート）と、
