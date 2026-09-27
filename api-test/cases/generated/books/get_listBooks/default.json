@@ -3,7 +3,7 @@
   "description": "蔵書を検索する",
   "pathParams": {},
   "queryParams": {
-    "availableOnly": false,
+    "availableOnly": true,
     "genre": "NOVEL"
   },
   "headers": {},
