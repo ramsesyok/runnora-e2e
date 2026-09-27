@@ -1,8 +1,95 @@
 {
   "generator": "runnora-docgen",
   "scenario": "LIB-005 SAVEPOINTで一部だけ確定した初期データをAPIから確認する",
+  "scenarioId": "LIB-005",
   "source": "runbooks/scenarios/lib-005-savepoint.yml",
   "sha256": "601f7d88f8bf58af70123da913a06375c3aee1c4d9a7ccda7287ed1810e8b390",
+  "steps": [
+    {
+      "number": 1,
+      "key": "test_books"
+    },
+    {
+      "number": 2,
+      "key": "check_test_books"
+    },
+    {
+      "number": 3,
+      "key": "duplicate_rolled_back"
+    },
+    {
+      "number": 4,
+      "key": "check_duplicate_rolled_back"
+    },
+    {
+      "number": 5,
+      "key": "fk_rolled_back"
+    },
+    {
+      "number": 6,
+      "key": "check_fk_rolled_back"
+    },
+    {
+      "number": 7,
+      "key": "unit_with_loan"
+    },
+    {
+      "number": 8,
+      "key": "check_unit_with_loan"
+    },
+    {
+      "number": 9,
+      "key": "sequence_gap"
+    },
+    {
+      "number": 10,
+      "key": "check_sequence_gap"
+    },
+    {
+      "number": 11,
+      "key": "bulk_suspend_rolled_back"
+    },
+    {
+      "number": 12,
+      "key": "check_bulk_suspend_rolled_back"
+    },
+    {
+      "number": 13,
+      "key": "single_suspend"
+    },
+    {
+      "number": 14,
+      "key": "check_single_suspend"
+    },
+    {
+      "number": 15,
+      "key": "suspended_cannot_borrow"
+    },
+    {
+      "number": 16,
+      "key": "check_suspended_cannot_borrow"
+    },
+    {
+      "number": 17,
+      "key": "api_duplicate_isbn"
+    },
+    {
+      "number": 18,
+      "key": "check_api_duplicate_isbn"
+    },
+    {
+      "number": 19,
+      "key": "api_register_b0103"
+    },
+    {
+      "number": 20,
+      "key": "check_api_register_b0103"
+    },
+    {
+      "number": 21,
+      "key": "db_hook_log"
+    }
+  ],
   "files": [
     "after.qmd",
     "before.qmd",

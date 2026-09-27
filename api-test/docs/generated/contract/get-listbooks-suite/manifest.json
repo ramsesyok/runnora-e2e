@@ -1,8 +1,35 @@
 {
   "generator": "runnora-docgen",
   "scenario": "契約 listBooks 蔵書を検索する（モック・実APIの両方で実行する）",
+  "scenarioId": "CONTRACT-listBooks",
   "source": "runbooks/contract/get_listBooks.suite.yml",
   "sha256": "7fb2b5b16d9a353e279ea6bec9cdd2002bf043cb061d92f46382b3b3a30061e0",
+  "steps": [
+    {
+      "number": 1,
+      "key": "novel.call_api"
+    },
+    {
+      "number": 2,
+      "key": "novel.check_call_api"
+    },
+    {
+      "number": 3,
+      "key": "tech_available.call_api"
+    },
+    {
+      "number": 4,
+      "key": "tech_available.check_call_api"
+    },
+    {
+      "number": 5,
+      "key": "invalid_genre.call_api"
+    },
+    {
+      "number": 6,
+      "key": "invalid_genre.check_call_api"
+    }
+  ],
   "files": [
     "after.qmd",
     "before.qmd",

@@ -1,8 +1,43 @@
 {
   "generator": "runnora-docgen",
   "scenario": "契約 createLoan 本を貸し出す（モック・実APIの両方で実行する）",
+  "scenarioId": "CONTRACT-createLoan",
   "source": "runbooks/contract/post_createLoan.suite.yml",
   "sha256": "5013558b82053140ad9ec4d3897551f65d9909d5669b55d17a9e81aad1b94672",
+  "steps": [
+    {
+      "number": 1,
+      "key": "created.call_api"
+    },
+    {
+      "number": 2,
+      "key": "created.check_call_api"
+    },
+    {
+      "number": 3,
+      "key": "member_suspended.call_api"
+    },
+    {
+      "number": 4,
+      "key": "member_suspended.check_call_api"
+    },
+    {
+      "number": 5,
+      "key": "book_not_found.call_api"
+    },
+    {
+      "number": 6,
+      "key": "book_not_found.check_call_api"
+    },
+    {
+      "number": 7,
+      "key": "missing_book_id.call_api"
+    },
+    {
+      "number": 8,
+      "key": "missing_book_id.check_call_api"
+    }
+  ],
   "files": [
     "after.qmd",
     "before.qmd",

@@ -1,8 +1,35 @@
 {
   "generator": "runnora-docgen",
   "scenario": "契約 returnLoan 本を返却する（モック・実APIの両方で実行する）",
+  "scenarioId": "CONTRACT-returnLoan",
   "source": "runbooks/contract/post_returnLoan.suite.yml",
   "sha256": "7c2905d07db1430dee14b14f02bfdcef79918b07041dd857c284215f054ae3df",
+  "steps": [
+    {
+      "number": 1,
+      "key": "returned.call_api"
+    },
+    {
+      "number": 2,
+      "key": "returned.check_call_api"
+    },
+    {
+      "number": 3,
+      "key": "already_returned.call_api"
+    },
+    {
+      "number": 4,
+      "key": "already_returned.check_call_api"
+    },
+    {
+      "number": 5,
+      "key": "not_found.call_api"
+    },
+    {
+      "number": 6,
+      "key": "not_found.check_call_api"
+    }
+  ],
   "files": [
     "after.qmd",
     "before.qmd",

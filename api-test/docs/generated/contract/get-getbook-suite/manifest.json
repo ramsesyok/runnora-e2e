@@ -1,8 +1,27 @@
 {
   "generator": "runnora-docgen",
   "scenario": "契約 getBook 蔵書を 1 件取得する（モック・実APIの両方で実行する）",
+  "scenarioId": "CONTRACT-getBook",
   "source": "runbooks/contract/get_getBook.suite.yml",
   "sha256": "7f1ac9fb4dd8713d931431d74c3279791c9ac91919d18e07d0be05435b43dfff",
+  "steps": [
+    {
+      "number": 1,
+      "key": "B0001.call_api"
+    },
+    {
+      "number": 2,
+      "key": "B0001.check_call_api"
+    },
+    {
+      "number": 3,
+      "key": "not_found.call_api"
+    },
+    {
+      "number": 4,
+      "key": "not_found.check_call_api"
+    }
+  ],
   "files": [
     "after.qmd",
     "before.qmd",

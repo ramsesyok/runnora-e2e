@@ -1,8 +1,91 @@
 {
   "generator": "runnora-docgen",
   "scenario": "LIB-006 異常系（入力不正400・存在しない404・利用停止409）でDBが変わらない",
+  "scenarioId": "LIB-006",
   "source": "runbooks/scenarios/lib-006-validation-errors.yml",
   "sha256": "b395fe27bfc40752d3ecc3914312cb8e42f16399f332e22eaed32f43914e87ff",
+  "steps": [
+    {
+      "number": 1,
+      "key": "suspended_member"
+    },
+    {
+      "number": 2,
+      "key": "check_suspended_member"
+    },
+    {
+      "number": 3,
+      "key": "unknown_member"
+    },
+    {
+      "number": 4,
+      "key": "check_unknown_member"
+    },
+    {
+      "number": 5,
+      "key": "unknown_book"
+    },
+    {
+      "number": 6,
+      "key": "check_unknown_book"
+    },
+    {
+      "number": 7,
+      "key": "missing_book_id"
+    },
+    {
+      "number": 8,
+      "key": "check_missing_book_id"
+    },
+    {
+      "number": 9,
+      "key": "unknown_field"
+    },
+    {
+      "number": 10,
+      "key": "check_unknown_field"
+    },
+    {
+      "number": 11,
+      "key": "invalid_isbn"
+    },
+    {
+      "number": 12,
+      "key": "check_invalid_isbn"
+    },
+    {
+      "number": 13,
+      "key": "invalid_copies"
+    },
+    {
+      "number": 14,
+      "key": "check_invalid_copies"
+    },
+    {
+      "number": 15,
+      "key": "invalid_genre"
+    },
+    {
+      "number": 16,
+      "key": "check_invalid_genre"
+    },
+    {
+      "number": 17,
+      "key": "invalid_status_filter"
+    },
+    {
+      "number": 18,
+      "key": "check_invalid_status_filter"
+    },
+    {
+      "number": 19,
+      "key": "unknown_loan"
+    },
+    {
+      "number": 20,
+      "key": "check_unknown_loan"
+    }
+  ],
   "files": [
     "after.qmd",
     "before.qmd",

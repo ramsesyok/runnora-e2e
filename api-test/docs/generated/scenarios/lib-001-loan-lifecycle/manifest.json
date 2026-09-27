@@ -1,8 +1,88 @@
 {
   "generator": "runnora-docgen",
   "scenario": "LIB-001 本を借りて返すまでの正常系（在庫増減・ID引き継ぎ・二重返却）",
+  "scenarioId": "LIB-001",
   "source": "runbooks/scenarios/lib-001-loan-lifecycle.yml",
   "sha256": "c6ddf296908c11d1ee3160814856ed3f1d6adb0060aa3f20d941d105f5cd14d0",
+  "steps": [
+    {
+      "number": 1,
+      "key": "member_before"
+    },
+    {
+      "number": 2,
+      "key": "check_member_before"
+    },
+    {
+      "number": 3,
+      "key": "book_before"
+    },
+    {
+      "number": 4,
+      "key": "check_book_before"
+    },
+    {
+      "number": 5,
+      "key": "create_loan"
+    },
+    {
+      "number": 6,
+      "key": "check_create_loan"
+    },
+    {
+      "number": 7,
+      "key": "save_loan_id"
+    },
+    {
+      "number": 8,
+      "key": "db_loan_row"
+    },
+    {
+      "number": 9,
+      "key": "book_lent"
+    },
+    {
+      "number": 10,
+      "key": "check_book_lent"
+    },
+    {
+      "number": 11,
+      "key": "member_loans.fetch",
+      "loop": true
+    },
+    {
+      "number": 12,
+      "key": "return_loan"
+    },
+    {
+      "number": 13,
+      "key": "check_return_loan"
+    },
+    {
+      "number": 14,
+      "key": "return_again"
+    },
+    {
+      "number": 15,
+      "key": "check_return_again"
+    },
+    {
+      "number": 16,
+      "key": "book_restored"
+    },
+    {
+      "number": 17,
+      "key": "check_book_restored"
+    },
+    {
+      "number": 18,
+      "key": "member_after"
+    },
+    {
+      "number": 19,
+      "key": "check_member_after"
+    }
+  ],
   "files": [
     "after.qmd",
     "before.qmd",

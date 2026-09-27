@@ -1,8 +1,91 @@
 {
   "generator": "runnora-docgen",
   "scenario": "LIB-003 延滞中の会員は借りられず、返却すると借りられる",
+  "scenarioId": "LIB-003",
   "source": "runbooks/scenarios/lib-003-overdue.yml",
   "sha256": "1bfea3f1ed7b44138e2e713efe3c3dea94fb180f640d558fa776d08d98278f70",
+  "steps": [
+    {
+      "number": 1,
+      "key": "member_overdue"
+    },
+    {
+      "number": 2,
+      "key": "check_member_overdue"
+    },
+    {
+      "number": 3,
+      "key": "active_loans"
+    },
+    {
+      "number": 4,
+      "key": "check_active_loans"
+    },
+    {
+      "number": 5,
+      "key": "save_overdue_loan"
+    },
+    {
+      "number": 6,
+      "key": "book_lent"
+    },
+    {
+      "number": 7,
+      "key": "check_book_lent"
+    },
+    {
+      "number": 8,
+      "key": "loan_rejected"
+    },
+    {
+      "number": 9,
+      "key": "check_loan_rejected"
+    },
+    {
+      "number": 10,
+      "key": "return_overdue"
+    },
+    {
+      "number": 11,
+      "key": "check_return_overdue"
+    },
+    {
+      "number": 12,
+      "key": "book_returned"
+    },
+    {
+      "number": 13,
+      "key": "check_book_returned"
+    },
+    {
+      "number": 14,
+      "key": "member_cleared"
+    },
+    {
+      "number": 15,
+      "key": "check_member_cleared"
+    },
+    {
+      "number": 16,
+      "key": "loan_ok"
+    },
+    {
+      "number": 17,
+      "key": "check_loan_ok"
+    },
+    {
+      "number": 18,
+      "key": "save_new_loan"
+    },
+    {
+      "number": 19,
+      "key": "loan_history"
+    },
+    {
+      "number": 20,
+      "key": "check_loan_history"
+    }
+  ],
   "files": [
     "after.qmd",
     "before.qmd",

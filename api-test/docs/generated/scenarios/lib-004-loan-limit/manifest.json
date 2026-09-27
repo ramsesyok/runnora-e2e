@@ -1,8 +1,83 @@
 {
   "generator": "runnora-docgen",
   "scenario": "LIB-004 貸出上限3冊に達した会員は借りられず、1冊返すと借りられる",
+  "scenarioId": "LIB-004",
   "source": "runbooks/scenarios/lib-004-loan-limit.yml",
   "sha256": "f23eb6e6471a914804192c1897e6cd2448ce6e1e946ea65f2f1480468ce92e79",
+  "steps": [
+    {
+      "number": 1,
+      "key": "member_full"
+    },
+    {
+      "number": 2,
+      "key": "check_member_full"
+    },
+    {
+      "number": 3,
+      "key": "active_loans"
+    },
+    {
+      "number": 4,
+      "key": "check_active_loans"
+    },
+    {
+      "number": 5,
+      "key": "save_loans"
+    },
+    {
+      "number": 6,
+      "key": "loan_rejected"
+    },
+    {
+      "number": 7,
+      "key": "check_loan_rejected"
+    },
+    {
+      "number": 8,
+      "key": "return_one"
+    },
+    {
+      "number": 9,
+      "key": "check_return_one"
+    },
+    {
+      "number": 10,
+      "key": "book_returned"
+    },
+    {
+      "number": 11,
+      "key": "check_book_returned"
+    },
+    {
+      "number": 12,
+      "key": "loan_ok"
+    },
+    {
+      "number": 13,
+      "key": "check_loan_ok"
+    },
+    {
+      "number": 14,
+      "key": "save_new_loan"
+    },
+    {
+      "number": 15,
+      "key": "active_loans_after"
+    },
+    {
+      "number": 16,
+      "key": "check_active_loans_after"
+    },
+    {
+      "number": 17,
+      "key": "db_returned_row"
+    },
+    {
+      "number": 18,
+      "key": "db_active_count"
+    }
+  ],
   "files": [
     "after.qmd",
     "before.qmd",

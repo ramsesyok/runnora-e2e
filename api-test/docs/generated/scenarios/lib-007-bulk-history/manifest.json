@@ -1,8 +1,71 @@
 {
   "generator": "runnora-docgen",
   "scenario": "LIB-007 BULK COLLECT/FORALLで投入した大量の貸出履歴を照会する",
+  "scenarioId": "LIB-007",
   "source": "runbooks/scenarios/lib-007-bulk-history.yml",
   "sha256": "ca8b2d695587a6f20f55c07149796c382c8e75871347200a0e8105ef6a226fa4",
+  "steps": [
+    {
+      "number": 1,
+      "key": "returned_history"
+    },
+    {
+      "number": 2,
+      "key": "check_returned_history"
+    },
+    {
+      "number": 3,
+      "key": "inspect_history_book_0.fetch"
+    },
+    {
+      "number": 4,
+      "key": "inspect_history_book_0.check_response"
+    },
+    {
+      "number": 5,
+      "key": "inspect_history_book_1.fetch"
+    },
+    {
+      "number": 6,
+      "key": "inspect_history_book_1.check_response"
+    },
+    {
+      "number": 7,
+      "key": "inspect_history_book_2.fetch"
+    },
+    {
+      "number": 8,
+      "key": "inspect_history_book_2.check_response"
+    },
+    {
+      "number": 9,
+      "key": "no_active"
+    },
+    {
+      "number": 10,
+      "key": "check_no_active"
+    },
+    {
+      "number": 11,
+      "key": "member_clean"
+    },
+    {
+      "number": 12,
+      "key": "check_member_clean"
+    },
+    {
+      "number": 13,
+      "key": "loan_after_history"
+    },
+    {
+      "number": 14,
+      "key": "check_loan_after_history"
+    },
+    {
+      "number": 15,
+      "key": "db_batch_log"
+    }
+  ],
   "files": [
     "after.qmd",
     "before.qmd",

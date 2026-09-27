@@ -1,8 +1,75 @@
 {
   "generator": "runnora-docgen",
   "scenario": "LIB-002 在庫1冊の本の取り合い（在庫切れ409と返却後の再貸出）",
+  "scenarioId": "LIB-002",
   "source": "runbooks/scenarios/lib-002-no-stock.yml",
   "sha256": "262d3ef56f442eea9ed64ad63f4820ef549140aaa20bc267fc7e50776a624e56",
+  "steps": [
+    {
+      "number": 1,
+      "key": "first_loan"
+    },
+    {
+      "number": 2,
+      "key": "check_first_loan"
+    },
+    {
+      "number": 3,
+      "key": "save_first"
+    },
+    {
+      "number": 4,
+      "key": "book_empty"
+    },
+    {
+      "number": 5,
+      "key": "check_book_empty"
+    },
+    {
+      "number": 6,
+      "key": "available_novels"
+    },
+    {
+      "number": 7,
+      "key": "check_available_novels"
+    },
+    {
+      "number": 8,
+      "key": "second_loan_rejected"
+    },
+    {
+      "number": 9,
+      "key": "check_second_loan_rejected"
+    },
+    {
+      "number": 10,
+      "key": "db_no_extra_loan"
+    },
+    {
+      "number": 11,
+      "key": "return_first"
+    },
+    {
+      "number": 12,
+      "key": "check_return_first"
+    },
+    {
+      "number": 13,
+      "key": "second_loan_ok"
+    },
+    {
+      "number": 14,
+      "key": "check_second_loan_ok"
+    },
+    {
+      "number": 15,
+      "key": "book_empty_again"
+    },
+    {
+      "number": 16,
+      "key": "check_book_empty_again"
+    }
+  ],
   "files": [
     "after.qmd",
     "before.qmd",

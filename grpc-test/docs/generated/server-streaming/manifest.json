@@ -1,8 +1,31 @@
 {
   "generator": "runnora-docgen",
   "scenario": "Unaryの応答と検索条件の整合を確認してServer streaming RPCを検証する",
+  "scenarioId": "GRPC-server-streaming",
   "source": "runbooks/server-streaming.yml",
   "sha256": "5fcfd532234016a0ca4ac20bc58e46b2184f3c564ec88d6ca972d5a5fda85e52",
+  "steps": [
+    {
+      "number": 1,
+      "key": "get_book"
+    },
+    {
+      "number": 2,
+      "key": "check_get_book"
+    },
+    {
+      "number": 3,
+      "key": "save_genre"
+    },
+    {
+      "number": 4,
+      "key": "list_books"
+    },
+    {
+      "number": 5,
+      "key": "check_list_books"
+    }
+  ],
   "files": [
     "expectations.qmd",
     "grpc-request.qmd",

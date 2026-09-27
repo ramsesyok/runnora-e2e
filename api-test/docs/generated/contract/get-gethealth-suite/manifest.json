@@ -1,8 +1,19 @@
 {
   "generator": "runnora-docgen",
   "scenario": "契約 getHealth 稼働状態を確認する（モック・実APIの両方で実行する）",
+  "scenarioId": "CONTRACT-getHealth",
   "source": "runbooks/contract/get_getHealth.suite.yml",
   "sha256": "e2bfcb6734ea2f7a34ea6cb0c975c4744762aa0abfa46823cd253d2d9dff0119",
+  "steps": [
+    {
+      "number": 1,
+      "key": "up.call_api"
+    },
+    {
+      "number": 2,
+      "key": "up.check_call_api"
+    }
+  ],
   "files": [
     "after.qmd",
     "before.qmd",

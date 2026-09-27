@@ -1,8 +1,19 @@
 {
   "generator": "runnora-docgen",
   "scenario": "計算結果を逐次配信し、最後のメッセージだけに集計結果を含める",
+  "scenarioId": "GRPC-calculation-streaming",
   "source": "runbooks/calculation-streaming.yml",
   "sha256": "d5b862c8fd2565bd3362b7da4aeea84f57663c9437a20d43a3cc08decad622d2",
+  "steps": [
+    {
+      "number": 1,
+      "key": "calculate"
+    },
+    {
+      "number": 2,
+      "key": "check_calculate"
+    }
+  ],
   "files": [
     "expectations.qmd",
     "grpc-request.qmd",

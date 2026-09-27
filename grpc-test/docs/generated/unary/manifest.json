@@ -1,8 +1,19 @@
 {
   "generator": "runnora-docgen",
   "scenario": "Unary RPC で蔵書を1冊取得する",
+  "scenarioId": "GRPC-unary",
   "source": "runbooks/unary.yml",
   "sha256": "6ebeb278887d9adf7d3d9c6890c4f5b2a6ec250ccd760db38422c85dfd9f8c52",
+  "steps": [
+    {
+      "number": 1,
+      "key": "get_book"
+    },
+    {
+      "number": 2,
+      "key": "check_get_book"
+    }
+  ],
   "files": [
     "expectations.qmd",
     "grpc-request.qmd",
