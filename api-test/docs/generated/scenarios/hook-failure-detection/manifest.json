@@ -1,8 +1,8 @@
 {
   "generator": "runnora-docgen",
-  "scenario": "DEMO 事後処理の整合性検証がDB不整合を検知できることの確認（exit 4 が期待値）",
+  "scenario": "DEMO 事後処理の整合性検証がDB不整合を検知できることの確認（事後処理の失敗が期待値）",
   "source": "runbooks/demo/hook-failure-detection.yml",
-  "sha256": "ad7987a1cc660de74197dbff32a2d58ab9f27e06916239b5123e4deeace7d476",
+  "sha256": "f21b6fe5f987ced1304afc135853a8a7bc67c104c1b77f96448388ffa90f80d8",
   "files": [
     "after.qmd",
     "before.qmd",
@@ -14,32 +14,32 @@
     {
       "kind": "runbook",
       "path": "runbooks/demo/hook-failure-detection.yml",
-      "sha256": "ad7987a1cc660de74197dbff32a2d58ab9f27e06916239b5123e4deeace7d476"
+      "sha256": "f21b6fe5f987ced1304afc135853a8a7bc67c104c1b77f96448388ffa90f80d8"
     },
     {
-      "kind": "config",
-      "path": "config.yaml",
-      "sha256": "c52ed7d584e275a45a420c139fa058455490a157e525dfb3026dfc5068c07d08"
+      "kind": "project",
+      "path": "runnora.yaml",
+      "sha256": "5d7ceabf7e21ff480869433e05dfd7a43db2cf3658c917029f3dc927e2fb1f04"
     },
     {
       "kind": "before-sql",
       "path": "sql/common/00_reset.sql",
-      "sha256": "db5c04b97ef0474925339080d3f4283a4640319f44d300209b3f966061259f3c"
+      "sha256": "8d092d26614fd31bd8f3723b8bbd224292437c929cb7651c5427e18bd81db6de"
     },
     {
       "kind": "before-sql",
       "path": "sql/common/10_seed_master.sql",
-      "sha256": "d1fed60782fdf0e542e35c2a95eb03adc006d74b733a4e7e3d8f2e7c696063d4"
+      "sha256": "262508b19482f0c2bb6766c1d0261de427b72210a6ce8c36872f0461f60284e0"
     },
     {
       "kind": "after-sql",
       "path": "sql/cases/demo_break_invariant_after.sql",
-      "sha256": "bb1989d92eee4e54d8d3df0b74efab57ffa5351dd4870e5657220e8a669d09bf"
+      "sha256": "743943ea7978b5f902acb7f9289bb0af4ef09d29cb2c350084c50142fe8a1f32"
     },
     {
       "kind": "after-sql",
       "path": "sql/common/90_verify_integrity.sql",
-      "sha256": "27ff9d2c6798ee60d1a0897496dcf2435bc3e6ec1b845d9d445979b1f4e55087"
+      "sha256": "d77156ec95f6e7a0cd60e21696a0b1fd707f2968d5fb5bf92304fa764d336205"
     }
   ]
 }

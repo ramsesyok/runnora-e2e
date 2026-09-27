@@ -59,8 +59,10 @@ runnora run runbooks/scenarios/lib-005-savepoint.yml   # 1 本だけ実行する
 
 ## 証跡 {#sec-evidence}
 
-`reports/<日時>-mock/`、`reports/<日時>-api/` に、実行ごとの結果（`*.txt`）、
-標準出力（`*.log`）、カバレッジ（`coverage.txt`）が残る。
+runnora がスイートの実行ごとに `reports/<日時>-<スイート名>/` を作り、
+サマリー HTML（`summary.html`）、ステップ単位の結果（`report.json`）、画面の出力（`runnora.log`）、
+各ステップの応答（`evidence/<シナリオ ID>/<番号>-<ステップのキー>.json`）を残す。
+カバレッジは `reports/coverage.txt`、API・WireMock のログは `logs/` に残る（どちらも実行のたびに上書き）。
 DB 側の証跡として、前後処理のログが `TEST_HOOK_LOG` 表に残る（1 日で自動削除）。
 
 ## 終了 {#sec-finish}

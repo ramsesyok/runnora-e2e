@@ -2,7 +2,7 @@
   "generator": "runnora-docgen",
   "scenario": "階層・配列を含む数値計算結果をパス別の許容誤差で比較する",
   "source": "runbooks/series-analysis.yml",
-  "sha256": "45aa0b9407e8b21462ca2c2587304d99496cb656759fe5ccf9379e2bcb210293",
+  "sha256": "a5179e403a62ec3e90a70ba9d7b9e34ef367f3870d0c65ffa550710ed1aeb8a4",
   "files": [
     "expectations.qmd",
     "grpc-request.qmd",
@@ -13,12 +13,12 @@
     {
       "kind": "runbook",
       "path": "runbooks/series-analysis.yml",
-      "sha256": "45aa0b9407e8b21462ca2c2587304d99496cb656759fe5ccf9379e2bcb210293"
+      "sha256": "a5179e403a62ec3e90a70ba9d7b9e34ef367f3870d0c65ffa550710ed1aeb8a4"
     },
     {
       "kind": "proto",
       "path": "proto/library.proto",
-      "sha256": "f60fb000d59bdf72bd9ff169634c270090f69352777e0ab59acaf01f4bfe45a5"
+      "sha256": "612c015d7ac639c008cfb3b59b2a275f51d9d020cdd79ca127429a357306244a"
     },
     {
       "kind": "json",
@@ -26,9 +26,14 @@
       "sha256": "9880a9f40305e23d836ac57a10ab24f1962d6101b1d5f253b247dfc9819a7c56"
     },
     {
-      "kind": "config",
-      "path": "config.yaml",
-      "sha256": "07883df8d8280590475df5cb700d3927b3837d695bf4f90905a774fb06cce781"
+      "kind": "json",
+      "path": "cases/series-analysis/expected.json",
+      "sha256": "0e36c85237ff67e80ccd588d13a7666bdaf2ce8896603a8158b0b221ebb01b74"
+    },
+    {
+      "kind": "project",
+      "path": "runnora.yaml",
+      "sha256": "3db04f846e105b0794fa8c85af67250d453ca2c9c36da682f7756d931b42a891"
     }
   ]
 }

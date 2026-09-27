@@ -2,7 +2,7 @@
   "generator": "runnora-docgen",
   "scenario": "LIB-005 SAVEPOINTで一部だけ確定した初期データをAPIから確認する",
   "source": "runbooks/scenarios/lib-005-savepoint.yml",
-  "sha256": "1b31d60c9255f41f35372831e65fd6317d4acd73431266f1a33a6ed78f36d0ab",
+  "sha256": "601f7d88f8bf58af70123da913a06375c3aee1c4d9a7ccda7287ed1810e8b390",
   "files": [
     "after.qmd",
     "before.qmd",
@@ -15,37 +15,37 @@
     {
       "kind": "runbook",
       "path": "runbooks/scenarios/lib-005-savepoint.yml",
-      "sha256": "1b31d60c9255f41f35372831e65fd6317d4acd73431266f1a33a6ed78f36d0ab"
+      "sha256": "601f7d88f8bf58af70123da913a06375c3aee1c4d9a7ccda7287ed1810e8b390"
     },
     {
-      "kind": "config",
-      "path": "config.yaml",
-      "sha256": "c52ed7d584e275a45a420c139fa058455490a157e525dfb3026dfc5068c07d08"
+      "kind": "project",
+      "path": "runnora.yaml",
+      "sha256": "5d7ceabf7e21ff480869433e05dfd7a43db2cf3658c917029f3dc927e2fb1f04"
     },
     {
       "kind": "before-sql",
       "path": "sql/common/00_reset.sql",
-      "sha256": "db5c04b97ef0474925339080d3f4283a4640319f44d300209b3f966061259f3c"
+      "sha256": "8d092d26614fd31bd8f3723b8bbd224292437c929cb7651c5427e18bd81db6de"
     },
     {
       "kind": "before-sql",
       "path": "sql/common/10_seed_master.sql",
-      "sha256": "d1fed60782fdf0e542e35c2a95eb03adc006d74b733a4e7e3d8f2e7c696063d4"
+      "sha256": "262508b19482f0c2bb6766c1d0261de427b72210a6ce8c36872f0461f60284e0"
     },
     {
       "kind": "before-sql",
       "path": "sql/cases/lib005_savepoint_before.sql",
-      "sha256": "723d4a7a919aa4f664f10f636d2ccb74569011ce42b2319014b06e57d56a5040"
+      "sha256": "cc953dddd87572c5e091bb2c56b28dc4acc6ebd5e200fe8fabc60c08b5108433"
     },
     {
       "kind": "after-sql",
       "path": "sql/cases/lib005_assert_after.sql",
-      "sha256": "70e9bfa921c3811fee197f6af536559873117176fd252e671feebb2c9b525ba0"
+      "sha256": "2a5946da2ab7d7417f6c4d9411c0197a41c2269abcbe214c5f087914e8a3ac33"
     },
     {
       "kind": "after-sql",
       "path": "sql/common/90_verify_integrity.sql",
-      "sha256": "27ff9d2c6798ee60d1a0897496dcf2435bc3e6ec1b845d9d445979b1f4e55087"
+      "sha256": "d77156ec95f6e7a0cd60e21696a0b1fd707f2968d5fb5bf92304fa764d336205"
     }
   ]
 }

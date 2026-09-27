@@ -7,9 +7,9 @@
 >
 > 隣のフォルダの runnora と runnora-docgen は `main` の最新版を使ってください。
 
-**runnora** と周辺ツール（oapi2wire / runnora-docgen / runnora-diff）を使ったテストの、フルセット検証用サンプル集です。
+**runnora** と周辺ツール（oapi2wire / runnora-docgen）を使ったテストの、フルセット検証用サンプル集です。
 対象のプロトコルごとにテストセットのフォルダを分けています。各フォルダは独立していて、それぞれのフォルダで実行します。
-HTTP と gRPC の各応答は runbook の判定前に JSON ファイルへ保存し、テストレポートとともに各テストセットの `reports/` に残します。
+HTTP と gRPC の各応答は runnora が証跡として自動で JSON ファイルに保存し、レポート（`summary.html`・`report.json`）とともに各テストセットの `reports/<日時>-<スイート名>/` に残します。
 
 | フォルダ | 対象 | 内容 | 状態 |
 |---|---|---|---|
@@ -22,17 +22,18 @@ HTTP と gRPC の各応答は runbook の判定前に JSON ファイルへ保存
 
 各テストセットでは、テストの中身を `runnora.yaml`（環境の接続先と共通の前後処理、runbook をまとめて流すスイート）と、
 各 runbook の `runnora:` ブロック（シナリオ ID、固有の前後処理、期待する結果）に書きます。
-スクリプト（`scripts/*.ps1`）に残るのは、runnora の範囲外である**テスト対象の環境の起動と停止**と、レポートの保存先を決めてツールを呼ぶ部分だけです。
+スクリプト（`scripts/*.ps1`）に残るのは、runnora の範囲外である**テスト対象の環境の起動と停止**と、ツールを呼ぶ部分だけです。
 
 | スクリプトに残るもの | 理由 |
 |---|---|
 | Oracle・API・WireMock・gRPC サーバの起動と停止、起動待ち | テスト対象の環境の用意は runnora の範囲外（連携設計 3 章） |
 | oapi2wire によるモック資産の生成、ツールのビルド、手順書の発行（ddq） | 同上 |
-| レポートと証跡の保存先（`reports/<日時>/`）の決定 | 証跡の自動保存は runnora の実施順 3 で実装する予定。それまではスクリプトが `RUNNORA_EVIDENCE_DIR` を設定する |
 | `runnora run --suite <名前>`、`runnora-docgen generate --suite <名前>` の呼び出し | どの環境・どの runbook・どの前後処理かはスイートが決めるので、スクリプトは名前を渡すだけ |
 
 旧形式ではスクリプトが持っていた、runbook ごとの前後処理 SQL（`--before-sql` / `--after-sql`）、期待する終了コード、
 接続先の環境変数（`RUNNORA_BASE_URL`）、`--config` の切り替えは、すべて `runnora.yaml` と `runnora:` ブロックに移りました。
+レポートと証跡の保存先（`reports/<日時>-<スイート名>/`）は runnora が決めるので、スクリプトはフォルダを作らず、`RUNNORA_EVIDENCE_DIR` も設定しません。
+runbook には応答を保存する `dump` ステップを書きません。数値の許容誤差付き比較は、runnora-diff を `exec` で呼ぶ代わりに runnora の `diffEps()` を使います。
 
 ## 前提とするフォルダ配置
 
@@ -42,7 +43,6 @@ HTTP と gRPC の各応答は runbook の判定前に JSON ファイルへ保存
 Projects/
 ├─ runnora/            runnora.exe（テスト実行）
 ├─ oapi2wire/          oapi2wire.exe（WireMock モック生成）
-├─ runnora-diff/       runnora-diff.exe のビルド元（数値の許容誤差比較）
 ├─ runnora-docgen/     runnora-docgen.exe（手順書の表生成）
 └─ runnora-e2e/        このリポジトリ
    ├─ api-test/

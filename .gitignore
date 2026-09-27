@@ -2,6 +2,7 @@
 # ビルド成果物・実行結果 (各テストセット直下)
 /*/bin/
 /*/reports/
+/*/logs/
 # oapi2wire build の出力 (mapping の id が毎回変わるため管理しない。scripts/mock-build.ps1 で再生成)
 /*/mock/wiremock-out/
 

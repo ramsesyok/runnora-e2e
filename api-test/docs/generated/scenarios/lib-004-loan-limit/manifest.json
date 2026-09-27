@@ -2,7 +2,7 @@
   "generator": "runnora-docgen",
   "scenario": "LIB-004 貸出上限3冊に達した会員は借りられず、1冊返すと借りられる",
   "source": "runbooks/scenarios/lib-004-loan-limit.yml",
-  "sha256": "b45070b908ef70083b4f679bd34fe4a81bfa34f88ebb287292a2e4ef0ef13a32",
+  "sha256": "f23eb6e6471a914804192c1897e6cd2448ce6e1e946ea65f2f1480468ce92e79",
   "files": [
     "after.qmd",
     "before.qmd",
@@ -15,32 +15,32 @@
     {
       "kind": "runbook",
       "path": "runbooks/scenarios/lib-004-loan-limit.yml",
-      "sha256": "b45070b908ef70083b4f679bd34fe4a81bfa34f88ebb287292a2e4ef0ef13a32"
+      "sha256": "f23eb6e6471a914804192c1897e6cd2448ce6e1e946ea65f2f1480468ce92e79"
     },
     {
-      "kind": "config",
-      "path": "config.yaml",
-      "sha256": "c52ed7d584e275a45a420c139fa058455490a157e525dfb3026dfc5068c07d08"
+      "kind": "project",
+      "path": "runnora.yaml",
+      "sha256": "5d7ceabf7e21ff480869433e05dfd7a43db2cf3658c917029f3dc927e2fb1f04"
     },
     {
       "kind": "before-sql",
       "path": "sql/common/00_reset.sql",
-      "sha256": "db5c04b97ef0474925339080d3f4283a4640319f44d300209b3f966061259f3c"
+      "sha256": "8d092d26614fd31bd8f3723b8bbd224292437c929cb7651c5427e18bd81db6de"
     },
     {
       "kind": "before-sql",
       "path": "sql/common/10_seed_master.sql",
-      "sha256": "d1fed60782fdf0e542e35c2a95eb03adc006d74b733a4e7e3d8f2e7c696063d4"
+      "sha256": "262508b19482f0c2bb6766c1d0261de427b72210a6ce8c36872f0461f60284e0"
     },
     {
       "kind": "before-sql",
       "path": "sql/cases/lib004_fill_loans_before.sql",
-      "sha256": "88c1dfb906e3673a9f0a49808b989864ef0097a3c0cb651de8a2f58314439714"
+      "sha256": "13c388f7ae9985664e515c092a18a3a700b1fa5a8ac1d0fe21e448051b1db614"
     },
     {
       "kind": "after-sql",
       "path": "sql/common/90_verify_integrity.sql",
-      "sha256": "27ff9d2c6798ee60d1a0897496dcf2435bc3e6ec1b845d9d445979b1f4e55087"
+      "sha256": "d77156ec95f6e7a0cd60e21696a0b1fd707f2968d5fb5bf92304fa764d336205"
     }
   ]
 }
