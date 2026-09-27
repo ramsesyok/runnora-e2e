@@ -4,7 +4,7 @@
 Push-Location $Root
 try {
     & $Runnora generate --config config.mock.yaml --openapi openapi/library-api.yaml --out . `
-        --emit-response-example --clean --force
+        --clean --force
     if ($LASTEXITCODE -ne 0) { throw 'runnora generate に失敗しました' }
     & (Join-Path $PSScriptRoot 'add-response-evidence.ps1')
 } finally {

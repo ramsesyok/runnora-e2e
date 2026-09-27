@@ -210,7 +210,7 @@ runbooks/contract/get_getMember.suite.yml
 | 4 | runnora (runn) | suite の `json://` 相対パスは include 先 template の位置で解決される | template を suite と同じディレクトリに配置 |
 | 5 | runnora generate | requestBody の無い POST（returnLoan）にも `{"TODO": ...}` ボディを送る。クエリは全パラメータを空値でも付与 | 実装が余分なボディ・空クエリを無視するので実害なし |
 | 6 | runnora (runn DB) | Oracle の NUMBER は文字列で返る | `== "14"` / `int(...)` で比較 |
-| 7 | oapi2wire | mapping の `id` が build ごとにランダム UUID（README 例は caseId）で、生成物の差分が安定しない | `mock/wiremock-out/` を Git 管理外に |
+| 7 | oapi2wire | 作成時は mapping の `id` が build ごとにランダム UUID で、生成物の差分が安定しなかった（[ramsesyok/oapi2wire#7](https://github.com/ramsesyok/oapi2wire/pull/7) で operationId と caseId から決まる UUID に修正済み） | `mock/wiremock-out/` を Git 管理外に |
 | 8 | runnora-docgen | 前処理・後処理表で SQL の改行が失われ 1 段落になる（GridTable セル内） | runnora-docgen をファイル名のみ表示する方式に修正（[ramsesyok/runnora-docgen#3](https://github.com/ramsesyok/runnora-docgen/pull/3) で main にマージ済み）。SQL 全文は手順書の付録に掲載 |
 | 9 | runnora-docgen | DB 照会ステップは SQL が表に出ず「検証のみ」になる | 手順書本文で補足 |
 | 10 | ddq | PlantUML サーバを 127.0.0.1:18080 で探すため WireMock と衝突する | WireMock 停止後に手順書を生成 |
