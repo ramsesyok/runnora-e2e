@@ -24,38 +24,58 @@ $script:Oapi2wire = Resolve-Tool 'OAPI2WIRE_EXE' (Join-Path $Projects 'oapi2wire
 $script:ApiUrl = 'http://127.0.0.1:18081'
 $script:MockUrl = 'http://127.0.0.1:18080'
 
-function New-ReportDir([string]$Kind) {
-    $dir = Join-Path $Root ("reports\{0}-{1}" -f (Get-Date -Format 'yyyyMMdd-HHmmss'), $Kind)
+# サーバ (API / WireMock) のログの置き場所。実行のたびに上書きする
+function Get-LogDir {
+    $dir = Join-Path $Root 'logs'
     New-Item -ItemType Directory -Force $dir | Out-Null
     return $dir
 }
 
-# runnora.yaml のスイートを 1 つ実行し、成功したかどうかを結果オブジェクトで返す。
+# runnora.yaml のスイートを 1 つ実行し、成功したかどうかと実行ごとのフォルダを結果オブジェクトで返す。
 # 環境 (接続先・共通の前後処理)、runbook ごとの前後処理、期待する結果 (expect) は
 # runnora.yaml と各 runbook の runnora: ブロックに書いてあるので、ここではスイート名だけを渡す。
 # runnora は全 runbook が期待どおりなら 0 を返す (期待どおりのフック失敗も 0)。
+# レポート (report.json / summary.html) と各ステップの応答 (証跡) は、runnora が
+# reports/<日時>-<スイート名>/ に保存する。画面の出力はそのフォルダの runnora.log に残す。
 function Invoke-Runnora {
-    param([string]$Name, [string]$Suite, [string]$ReportDir)
-    # 人が読むレポートとして text で保存する (json/junit は runnora#15 で実装済み。サマリー HTML 化の際に切り替える)
-    $runArgs = @('run', '--suite', $Suite, '--report-format', 'text', '--report-out', (Join-Path $ReportDir "$Name.txt"))
-    $log = Join-Path $ReportDir "$Name.log"
-    $evidenceDir = Join-Path $ReportDir "evidence\$Name"
-    New-Item -ItemType Directory -Force $evidenceDir | Out-Null
-    $previousEvidenceDir = [Environment]::GetEnvironmentVariable('RUNNORA_EVIDENCE_DIR')
+    param([string]$Name, [string]$Suite)
+    $reports = Join-Path $Root 'reports'
+    New-Item -ItemType Directory -Force $reports | Out-Null
+    $log = Join-Path $reports "$Name.log"
     # Windows PowerShell 5.1 では Stop 設定下でネイティブコマンドの stderr が例外になるため一時的に緩める
     $ErrorActionPreference = 'Continue'
-    try {
-        $env:RUNNORA_EVIDENCE_DIR = $evidenceDir
-        & $Runnora @runArgs *> $log
-        $code = $LASTEXITCODE
-    } finally {
-        [Environment]::SetEnvironmentVariable('RUNNORA_EVIDENCE_DIR', $previousEvidenceDir)
+    & $Runnora run --suite $Suite *> $log
+    $code = $LASTEXITCODE
+    $ErrorActionPreference = 'Stop'
+    $runDir = Get-RunFolder $Suite
+    if ($runDir) {
+        Move-Item -LiteralPath $log -Destination (Join-Path $runDir 'runnora.log') -Force
+        $log = Join-Path $runDir 'runnora.log'
     }
     $ok = ($code -eq 0)
     $mark = if ($ok) { 'OK ' } else { 'NG ' }
     Write-Host ("  [{0}] {1,-28} suite={2} exit={3}" -f $mark, $Name, $Suite, $code)
     if (-not $ok) { Get-Content $log -TotalCount 15 | ForEach-Object { Write-Host "        $_" } }
-    [pscustomobject]@{ Name = $Name; Exit = $code; Ok = $ok }
+    [pscustomobject]@{ Name = $Name; Exit = $code; Ok = $ok; Report = $runDir }
+}
+
+# runnora がスイートの実行で作った最新のフォルダ (reports/<日時>-<スイート名>[-n]) を返す。なければ $null。
+function Get-RunFolder([string]$Suite) {
+    $pattern = '^\d{8}-\d{6}-' + [regex]::Escape($Suite) + '(-\d+)?$'
+    Get-ChildItem -LiteralPath (Join-Path $Root 'reports') -Directory -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -match $pattern } |
+        Sort-Object CreationTime, Name |
+        Select-Object -Last 1 -ExpandProperty FullName
+}
+
+# 結果の一覧と、各スイートのサマリー HTML の場所を表示する
+function Write-RunSummary([string]$Title, $Results) {
+    $failed = @($Results | Where-Object { -not $_.Ok })
+    Write-Host ("{0}: {1}/{2} OK" -f $Title, ($Results.Count - $failed.Count), $Results.Count)
+    foreach ($r in $Results) {
+        if ($r.Report) { Write-Host ("  {0,-28} {1}" -f $r.Name, (Join-Path $r.Report 'summary.html')) }
+    }
+    return $failed.Count
 }
 
 # ディレクトリを削除する。直前に書いたファイルをエディタやウイルス対策が一時的に掴んでいると

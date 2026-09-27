@@ -3,20 +3,17 @@
 #   2. contract-mock  : 契約テスト (ステータス + 本文の全体一致 + OpenAPI 応答スキーマ検証)
 # 接続先 (環境 mock) と実行する runbook は runnora.yaml のスイートに書いてある。
 # 事前に scripts/mock-build.ps1 と scripts/mock-start.ps1 (別ターミナル) を実行しておく。
-param([string]$ReportDir)
+# 結果は reports/<日時>-<スイート名>/ (summary.html・report.json・evidence/) に保存される。
 . (Join-Path $PSScriptRoot '_common.ps1')
-if (-not $ReportDir) { $ReportDir = New-ReportDir 'mock' }
 Push-Location $Root
 try {
     Wait-Http "$MockUrl/health" 10
     Write-Host "== モック ($MockUrl) に対するテスト"
     $results = @(
-        Invoke-Runnora -Name 'mock-generated' -Suite 'generated-mock' -ReportDir $ReportDir
-        Invoke-Runnora -Name 'mock-contract' -Suite 'contract-mock' -ReportDir $ReportDir
+        Invoke-Runnora -Name 'mock-generated' -Suite 'generated-mock'
+        Invoke-Runnora -Name 'mock-contract' -Suite 'contract-mock'
     )
-    $failed = @($results | Where-Object { -not $_.Ok })
-    Write-Host ("モック: {0}/{1} OK  レポート: {2}" -f ($results.Count - $failed.Count), $results.Count, $ReportDir)
-    if ($failed.Count -gt 0) { exit 1 }
+    if ((Write-RunSummary 'モック' $results) -gt 0) { exit 1 }
     exit 0
 } finally {
     Pop-Location

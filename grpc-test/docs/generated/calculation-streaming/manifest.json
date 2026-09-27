@@ -1,8 +1,19 @@
 {
   "generator": "runnora-docgen",
   "scenario": "計算結果を逐次配信し、最後のメッセージだけに集計結果を含める",
+  "scenarioId": "GRPC-calculation-streaming",
   "source": "runbooks/calculation-streaming.yml",
-  "sha256": "92b8debe6c78bcd18e64abedd5cf709ac57d122e0cf88f5d5fd3a69f5fa8ca8d",
+  "sha256": "d5b862c8fd2565bd3362b7da4aeea84f57663c9437a20d43a3cc08decad622d2",
+  "steps": [
+    {
+      "number": 1,
+      "key": "calculate"
+    },
+    {
+      "number": 2,
+      "key": "check_calculate"
+    }
+  ],
   "files": [
     "expectations.qmd",
     "grpc-request.qmd",
@@ -13,12 +24,12 @@
     {
       "kind": "runbook",
       "path": "runbooks/calculation-streaming.yml",
-      "sha256": "92b8debe6c78bcd18e64abedd5cf709ac57d122e0cf88f5d5fd3a69f5fa8ca8d"
+      "sha256": "d5b862c8fd2565bd3362b7da4aeea84f57663c9437a20d43a3cc08decad622d2"
     },
     {
       "kind": "proto",
       "path": "proto/library.proto",
-      "sha256": "f60fb000d59bdf72bd9ff169634c270090f69352777e0ab59acaf01f4bfe45a5"
+      "sha256": "612c015d7ac639c008cfb3b59b2a275f51d9d020cdd79ca127429a357306244a"
     },
     {
       "kind": "json",
@@ -31,9 +42,9 @@
       "sha256": "196b03f9d50f5f23fc3cb0880584f937b5543d0fcea26b554ce9bd4864d31482"
     },
     {
-      "kind": "config",
-      "path": "config.yaml",
-      "sha256": "07883df8d8280590475df5cb700d3927b3837d695bf4f90905a774fb06cce781"
+      "kind": "project",
+      "path": "runnora.yaml",
+      "sha256": "3db04f846e105b0794fa8c85af67250d453ca2c9c36da682f7756d931b42a891"
     }
   ]
 }

@@ -23,10 +23,6 @@ steps:
             application/json:
               memberId: M0001
               bookId: B0002
-  dump_first_loan:
-    dump:
-      expr: steps.first_loan.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-002-first_loan.json'
   check_first_loan:
     test: |
       steps.first_loan.res.status == 201 &&
@@ -45,10 +41,6 @@ steps:
           headers:
             X-Test-Scenario: LIB-002
           body: null
-  dump_book_empty:
-    dump:
-      expr: steps.book_empty.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-002-book_empty.json'
   check_book_empty:
     test: |
       steps.book_empty.res.status == 200 &&
@@ -62,10 +54,6 @@ steps:
           headers:
             X-Test-Scenario: LIB-002
           body: null
-  dump_available_novels:
-    dump:
-      expr: steps.available_novels.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-002-available_novels.json'
   check_available_novels:
     test: |
       steps.available_novels.res.status == 200 &&
@@ -83,10 +71,6 @@ steps:
             application/json:
               memberId: M0002
               bookId: B0002
-  dump_second_loan_rejected:
-    dump:
-      expr: steps.second_loan_rejected.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-002-second_loan_rejected.json'
   check_second_loan_rejected:
     test: |
       steps.second_loan_rejected.res.status == 409 &&
@@ -107,10 +91,6 @@ steps:
             X-Test-Scenario: LIB-002
           body:
             application/json: {}
-  dump_return_first:
-    dump:
-      expr: steps.return_first.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-002-return_first.json'
   check_return_first:
     test: |
       steps.return_first.res.status == 200 &&
@@ -127,10 +107,6 @@ steps:
             application/json:
               memberId: M0002
               bookId: B0002
-  dump_second_loan_ok:
-    dump:
-      expr: steps.second_loan_ok.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-002-second_loan_ok.json'
   check_second_loan_ok:
     test: |
       steps.second_loan_ok.res.status == 201 &&
@@ -145,10 +121,6 @@ steps:
           headers:
             X-Test-Scenario: LIB-002
           body: null
-  dump_book_empty_again:
-    dump:
-      expr: steps.book_empty_again.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-002-book_empty_again.json'
   check_book_empty_again:
     test: |
       steps.book_empty_again.res.status == 200 &&

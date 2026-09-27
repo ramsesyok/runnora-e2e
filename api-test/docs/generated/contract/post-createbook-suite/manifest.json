@@ -1,8 +1,35 @@
 {
   "generator": "runnora-docgen",
   "scenario": "契約 createBook 蔵書を登録する（モック・実APIの両方で実行する）",
+  "scenarioId": "CONTRACT-createBook",
   "source": "runbooks/contract/post_createBook.suite.yml",
-  "sha256": "1335a531652cc5c908d61f087a46f0e6f2f2eb6975b3cb97f547bb5397481d83",
+  "sha256": "f04c462ff6573306cc8deceb1f9b52661863ce6b011cdd6fa688224e7797c4dd",
+  "steps": [
+    {
+      "number": 1,
+      "key": "created.call_api"
+    },
+    {
+      "number": 2,
+      "key": "created.check_call_api"
+    },
+    {
+      "number": 3,
+      "key": "duplicate_isbn.call_api"
+    },
+    {
+      "number": 4,
+      "key": "duplicate_isbn.check_call_api"
+    },
+    {
+      "number": 5,
+      "key": "invalid_isbn.call_api"
+    },
+    {
+      "number": 6,
+      "key": "invalid_isbn.check_call_api"
+    }
+  ],
   "files": [
     "after.qmd",
     "before.qmd",
@@ -15,12 +42,12 @@
     {
       "kind": "runbook",
       "path": "runbooks/contract/post_createBook.suite.yml",
-      "sha256": "1335a531652cc5c908d61f087a46f0e6f2f2eb6975b3cb97f547bb5397481d83"
+      "sha256": "f04c462ff6573306cc8deceb1f9b52661863ce6b011cdd6fa688224e7797c4dd"
     },
     {
       "kind": "runbook",
       "path": "runbooks/contract/post_createBook.template.yml",
-      "sha256": "c2dbdeade90d1712ff22b1fdded61398c3c055eb407c12bbac777c6f7b80ac29"
+      "sha256": "4aba85a90c4179c09e328f36c6f128a9ed4c59ab1819823bd23031dd2e60dd21"
     },
     {
       "kind": "json",
@@ -53,29 +80,29 @@
       "sha256": "94ac4263342ad550dee92786f36c6dc92c25e5c298381380fd3825529c2eb46c"
     },
     {
-      "kind": "config",
-      "path": "config.yaml",
-      "sha256": "c52ed7d584e275a45a420c139fa058455490a157e525dfb3026dfc5068c07d08"
+      "kind": "project",
+      "path": "runnora.yaml",
+      "sha256": "5d7ceabf7e21ff480869433e05dfd7a43db2cf3658c917029f3dc927e2fb1f04"
     },
     {
       "kind": "before-sql",
       "path": "sql/common/00_reset.sql",
-      "sha256": "db5c04b97ef0474925339080d3f4283a4640319f44d300209b3f966061259f3c"
+      "sha256": "8d092d26614fd31bd8f3723b8bbd224292437c929cb7651c5427e18bd81db6de"
     },
     {
       "kind": "before-sql",
       "path": "sql/common/10_seed_master.sql",
-      "sha256": "d1fed60782fdf0e542e35c2a95eb03adc006d74b733a4e7e3d8f2e7c696063d4"
+      "sha256": "262508b19482f0c2bb6766c1d0261de427b72210a6ce8c36872f0461f60284e0"
     },
     {
       "kind": "before-sql",
       "path": "sql/cases/contract_setup.sql",
-      "sha256": "3008c010dbcf26a9df07f175d35512026f1531e901f63950148b236c39c52344"
+      "sha256": "d5e9c4c6d868c4c3938964de19d3b6f041741a19c347895675f531bcd5ff570f"
     },
     {
       "kind": "after-sql",
       "path": "sql/common/90_verify_integrity.sql",
-      "sha256": "27ff9d2c6798ee60d1a0897496dcf2435bc3e6ec1b845d9d445979b1f4e55087"
+      "sha256": "d77156ec95f6e7a0cd60e21696a0b1fd707f2968d5fb5bf92304fa764d336205"
     }
   ]
 }

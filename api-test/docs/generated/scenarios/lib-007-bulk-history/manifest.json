@@ -1,8 +1,71 @@
 {
   "generator": "runnora-docgen",
   "scenario": "LIB-007 BULK COLLECT/FORALLで投入した大量の貸出履歴を照会する",
+  "scenarioId": "LIB-007",
   "source": "runbooks/scenarios/lib-007-bulk-history.yml",
-  "sha256": "15f859e22f70a36ea52c64938ca419df363b449bc82346b01a5d63ea39814bda",
+  "sha256": "ca8b2d695587a6f20f55c07149796c382c8e75871347200a0e8105ef6a226fa4",
+  "steps": [
+    {
+      "number": 1,
+      "key": "returned_history"
+    },
+    {
+      "number": 2,
+      "key": "check_returned_history"
+    },
+    {
+      "number": 3,
+      "key": "inspect_history_book_0.fetch"
+    },
+    {
+      "number": 4,
+      "key": "inspect_history_book_0.check_response"
+    },
+    {
+      "number": 5,
+      "key": "inspect_history_book_1.fetch"
+    },
+    {
+      "number": 6,
+      "key": "inspect_history_book_1.check_response"
+    },
+    {
+      "number": 7,
+      "key": "inspect_history_book_2.fetch"
+    },
+    {
+      "number": 8,
+      "key": "inspect_history_book_2.check_response"
+    },
+    {
+      "number": 9,
+      "key": "no_active"
+    },
+    {
+      "number": 10,
+      "key": "check_no_active"
+    },
+    {
+      "number": 11,
+      "key": "member_clean"
+    },
+    {
+      "number": 12,
+      "key": "check_member_clean"
+    },
+    {
+      "number": 13,
+      "key": "loan_after_history"
+    },
+    {
+      "number": 14,
+      "key": "check_loan_after_history"
+    },
+    {
+      "number": 15,
+      "key": "db_batch_log"
+    }
+  ],
   "files": [
     "after.qmd",
     "before.qmd",
@@ -15,37 +78,37 @@
     {
       "kind": "runbook",
       "path": "runbooks/scenarios/lib-007-bulk-history.yml",
-      "sha256": "15f859e22f70a36ea52c64938ca419df363b449bc82346b01a5d63ea39814bda"
+      "sha256": "ca8b2d695587a6f20f55c07149796c382c8e75871347200a0e8105ef6a226fa4"
     },
     {
       "kind": "runbook",
       "path": "runbooks/scenarios/lib-007-inspect-history-book.yml",
-      "sha256": "f053f536a87013a0fa668001bf440433151099a98d19732d55384891727404b8"
+      "sha256": "36282050698dc63ac4176a02b97c6ab23a6cb972df5c08ea6ae15add099374ca"
     },
     {
-      "kind": "config",
-      "path": "config.yaml",
-      "sha256": "c52ed7d584e275a45a420c139fa058455490a157e525dfb3026dfc5068c07d08"
+      "kind": "project",
+      "path": "runnora.yaml",
+      "sha256": "5d7ceabf7e21ff480869433e05dfd7a43db2cf3658c917029f3dc927e2fb1f04"
     },
     {
       "kind": "before-sql",
       "path": "sql/common/00_reset.sql",
-      "sha256": "db5c04b97ef0474925339080d3f4283a4640319f44d300209b3f966061259f3c"
+      "sha256": "8d092d26614fd31bd8f3723b8bbd224292437c929cb7651c5427e18bd81db6de"
     },
     {
       "kind": "before-sql",
       "path": "sql/common/10_seed_master.sql",
-      "sha256": "d1fed60782fdf0e542e35c2a95eb03adc006d74b733a4e7e3d8f2e7c696063d4"
+      "sha256": "262508b19482f0c2bb6766c1d0261de427b72210a6ce8c36872f0461f60284e0"
     },
     {
       "kind": "before-sql",
       "path": "sql/cases/lib007_history_before.sql",
-      "sha256": "b62590c4d275fc688538316335f9d227bba0e63f72684dcff61bd201734a12ac"
+      "sha256": "8ab2512530bfbcf986c4aa210c6bdf5efc647077b76b0694a14e77ecbc3c47c9"
     },
     {
       "kind": "after-sql",
       "path": "sql/common/90_verify_integrity.sql",
-      "sha256": "27ff9d2c6798ee60d1a0897496dcf2435bc3e6ec1b845d9d445979b1f4e55087"
+      "sha256": "d77156ec95f6e7a0cd60e21696a0b1fd707f2968d5fb5bf92304fa764d336205"
     }
   ]
 }

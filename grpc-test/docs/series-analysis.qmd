@@ -1,7 +1,7 @@
 # 許容誤差付きの系列分析 {.landscape-chapter}
 
 `AnalyzeSeries` は複数系列の各入力・加重値・平均からの偏差、系列別の合計・平均・母分散、全体の加重平均を返す。
-期待値と許容誤差は `cases/series-analysis/` に置き、`runnora-diff` で応答 JSON 全体を比較する。
+期待値と許容誤差は `cases/series-analysis/` に置き、runnora の `diffEps()`（runnora-diff と同じ比較処理）で応答 JSON 全体を比較する。
 基準の絶対誤差に加え、サンプルの加重値、系列統計、分散、全体の加重平均に個別のルールを設ける。分散のルールは親の系列統計ルールより深いため優先される。
 
 {{< include generated/series-analysis/scenario.qmd >}}

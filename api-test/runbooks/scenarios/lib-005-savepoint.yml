@@ -28,10 +28,6 @@ steps:
           headers:
             X-Test-Scenario: LIB-005
           body: null
-  dump_test_books:
-    dump:
-      expr: steps.test_books.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-test_books.json'
   check_test_books:
     test: |
       steps.test_books.res.status == 200 &&
@@ -46,10 +42,6 @@ steps:
           headers:
             X-Test-Scenario: LIB-005
           body: null
-  dump_duplicate_rolled_back:
-    dump:
-      expr: steps.duplicate_rolled_back.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-duplicate_rolled_back.json'
   check_duplicate_rolled_back:
     test: |
       steps.duplicate_rolled_back.res.status == 404 &&
@@ -63,10 +55,6 @@ steps:
           headers:
             X-Test-Scenario: LIB-005
           body: null
-  dump_fk_rolled_back:
-    dump:
-      expr: steps.fk_rolled_back.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-fk_rolled_back.json'
   check_fk_rolled_back:
     test: steps.fk_rolled_back.res.status == 404
 
@@ -78,10 +66,6 @@ steps:
           headers:
             X-Test-Scenario: LIB-005
           body: null
-  dump_unit_with_loan:
-    dump:
-      expr: steps.unit_with_loan.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-unit_with_loan.json'
   check_unit_with_loan:
     test: |
       steps.unit_with_loan.res.status == 200 &&
@@ -96,10 +80,6 @@ steps:
           headers:
             X-Test-Scenario: LIB-005
           body: null
-  dump_sequence_gap:
-    dump:
-      expr: steps.sequence_gap.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-sequence_gap.json'
   check_sequence_gap:
     test: |
       steps.sequence_gap.res.status == 200 &&
@@ -115,10 +95,6 @@ steps:
           headers:
             X-Test-Scenario: LIB-005
           body: null
-  dump_bulk_suspend_rolled_back:
-    dump:
-      expr: steps.bulk_suspend_rolled_back.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-bulk_suspend_rolled_back.json'
   check_bulk_suspend_rolled_back:
     test: |
       steps.bulk_suspend_rolled_back.res.status == 200 &&
@@ -132,10 +108,6 @@ steps:
           headers:
             X-Test-Scenario: LIB-005
           body: null
-  dump_single_suspend:
-    dump:
-      expr: steps.single_suspend.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-single_suspend.json'
   check_single_suspend:
     test: |
       steps.single_suspend.res.status == 200 &&
@@ -152,10 +124,6 @@ steps:
             application/json:
               memberId: M0008
               bookId: B0102
-  dump_suspended_cannot_borrow:
-    dump:
-      expr: steps.suspended_cannot_borrow.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-suspended_cannot_borrow.json'
   check_suspended_cannot_borrow:
     test: |
       steps.suspended_cannot_borrow.res.status == 409 &&
@@ -176,10 +144,6 @@ steps:
               author: 試験 花子
               genre: TEST
               totalCopies: 1
-  dump_api_duplicate_isbn:
-    dump:
-      expr: steps.api_duplicate_isbn.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-api_duplicate_isbn.json'
   check_api_duplicate_isbn:
     test: |
       steps.api_duplicate_isbn.res.status == 409 &&
@@ -200,10 +164,6 @@ steps:
               author: 試験 花子
               genre: TEST
               totalCopies: 1
-  dump_api_register_b0103:
-    dump:
-      expr: steps.api_register_b0103.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-api_register_b0103.json'
   check_api_register_b0103:
     test: |
       steps.api_register_b0103.res.status == 201 &&

@@ -1,8 +1,75 @@
 {
   "generator": "runnora-docgen",
   "scenario": "LIB-002 在庫1冊の本の取り合い（在庫切れ409と返却後の再貸出）",
+  "scenarioId": "LIB-002",
   "source": "runbooks/scenarios/lib-002-no-stock.yml",
-  "sha256": "54fd7e9bfc36a91319ec369594ac634f0cb12e6ddd690b88bb98c401bf62890b",
+  "sha256": "262d3ef56f442eea9ed64ad63f4820ef549140aaa20bc267fc7e50776a624e56",
+  "steps": [
+    {
+      "number": 1,
+      "key": "first_loan"
+    },
+    {
+      "number": 2,
+      "key": "check_first_loan"
+    },
+    {
+      "number": 3,
+      "key": "save_first"
+    },
+    {
+      "number": 4,
+      "key": "book_empty"
+    },
+    {
+      "number": 5,
+      "key": "check_book_empty"
+    },
+    {
+      "number": 6,
+      "key": "available_novels"
+    },
+    {
+      "number": 7,
+      "key": "check_available_novels"
+    },
+    {
+      "number": 8,
+      "key": "second_loan_rejected"
+    },
+    {
+      "number": 9,
+      "key": "check_second_loan_rejected"
+    },
+    {
+      "number": 10,
+      "key": "db_no_extra_loan"
+    },
+    {
+      "number": 11,
+      "key": "return_first"
+    },
+    {
+      "number": 12,
+      "key": "check_return_first"
+    },
+    {
+      "number": 13,
+      "key": "second_loan_ok"
+    },
+    {
+      "number": 14,
+      "key": "check_second_loan_ok"
+    },
+    {
+      "number": 15,
+      "key": "book_empty_again"
+    },
+    {
+      "number": 16,
+      "key": "check_book_empty_again"
+    }
+  ],
   "files": [
     "after.qmd",
     "before.qmd",
@@ -15,27 +82,27 @@
     {
       "kind": "runbook",
       "path": "runbooks/scenarios/lib-002-no-stock.yml",
-      "sha256": "54fd7e9bfc36a91319ec369594ac634f0cb12e6ddd690b88bb98c401bf62890b"
+      "sha256": "262d3ef56f442eea9ed64ad63f4820ef549140aaa20bc267fc7e50776a624e56"
     },
     {
-      "kind": "config",
-      "path": "config.yaml",
-      "sha256": "c52ed7d584e275a45a420c139fa058455490a157e525dfb3026dfc5068c07d08"
+      "kind": "project",
+      "path": "runnora.yaml",
+      "sha256": "5d7ceabf7e21ff480869433e05dfd7a43db2cf3658c917029f3dc927e2fb1f04"
     },
     {
       "kind": "before-sql",
       "path": "sql/common/00_reset.sql",
-      "sha256": "db5c04b97ef0474925339080d3f4283a4640319f44d300209b3f966061259f3c"
+      "sha256": "8d092d26614fd31bd8f3723b8bbd224292437c929cb7651c5427e18bd81db6de"
     },
     {
       "kind": "before-sql",
       "path": "sql/common/10_seed_master.sql",
-      "sha256": "d1fed60782fdf0e542e35c2a95eb03adc006d74b733a4e7e3d8f2e7c696063d4"
+      "sha256": "262508b19482f0c2bb6766c1d0261de427b72210a6ce8c36872f0461f60284e0"
     },
     {
       "kind": "after-sql",
       "path": "sql/common/90_verify_integrity.sql",
-      "sha256": "27ff9d2c6798ee60d1a0897496dcf2435bc3e6ec1b845d9d445979b1f4e55087"
+      "sha256": "d77156ec95f6e7a0cd60e21696a0b1fd707f2968d5fb5bf92304fa764d336205"
     }
   ]
 }

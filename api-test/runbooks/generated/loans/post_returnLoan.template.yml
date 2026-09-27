@@ -20,10 +20,7 @@ steps:
       "/loans/{{ vars.case.pathParams.loanId }}/return":
         post:
           headers: "{{ vars.case.headers }}"
-
-  dump_response:
-    dump:
-      expr: steps.call_api.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/post_returnLoan-{{ vars.case.name }}.json'
-  check_response:
-    test: steps.call_api.res.status == vars.case.expect.status
+          body:
+            text/plain: ""
+    test: |
+      current.res.status == vars.case.expect.status

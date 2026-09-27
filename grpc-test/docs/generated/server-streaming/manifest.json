@@ -1,8 +1,31 @@
 {
   "generator": "runnora-docgen",
   "scenario": "Unaryの応答と検索条件の整合を確認してServer streaming RPCを検証する",
+  "scenarioId": "GRPC-server-streaming",
   "source": "runbooks/server-streaming.yml",
-  "sha256": "d3b0026e4deb8b2493e057af7e4946ae123cfa7fb1ae9c2c9d5b7b785b1011fb",
+  "sha256": "5fcfd532234016a0ca4ac20bc58e46b2184f3c564ec88d6ca972d5a5fda85e52",
+  "steps": [
+    {
+      "number": 1,
+      "key": "get_book"
+    },
+    {
+      "number": 2,
+      "key": "check_get_book"
+    },
+    {
+      "number": 3,
+      "key": "save_genre"
+    },
+    {
+      "number": 4,
+      "key": "list_books"
+    },
+    {
+      "number": 5,
+      "key": "check_list_books"
+    }
+  ],
   "files": [
     "expectations.qmd",
     "grpc-request.qmd",
@@ -13,12 +36,12 @@
     {
       "kind": "runbook",
       "path": "runbooks/server-streaming.yml",
-      "sha256": "d3b0026e4deb8b2493e057af7e4946ae123cfa7fb1ae9c2c9d5b7b785b1011fb"
+      "sha256": "5fcfd532234016a0ca4ac20bc58e46b2184f3c564ec88d6ca972d5a5fda85e52"
     },
     {
       "kind": "proto",
       "path": "proto/library.proto",
-      "sha256": "f60fb000d59bdf72bd9ff169634c270090f69352777e0ab59acaf01f4bfe45a5"
+      "sha256": "612c015d7ac639c008cfb3b59b2a275f51d9d020cdd79ca127429a357306244a"
     },
     {
       "kind": "json",
@@ -41,9 +64,9 @@
       "sha256": "2db3fab11d425ecfb1240aa33d16c87bf91b7f2272700c73fb2e10bc5e690918"
     },
     {
-      "kind": "config",
-      "path": "config.yaml",
-      "sha256": "07883df8d8280590475df5cb700d3927b3837d695bf4f90905a774fb06cce781"
+      "kind": "project",
+      "path": "runnora.yaml",
+      "sha256": "3db04f846e105b0794fa8c85af67250d453ca2c9c36da682f7756d931b42a891"
     }
   ]
 }

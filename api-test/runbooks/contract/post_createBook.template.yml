@@ -29,10 +29,6 @@ steps:
           headers: "{{ vars.case.headers }}"
           body:
             application/json: "{{ vars.case.requestBody }}"
-  dump_call_api:
-    dump:
-      expr: steps.call_api.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/post_createBook-{{ vars.case.name }}.json'
   check_call_api:
     test: |
       steps.call_api.res.status == vars.case.expect.status &&

@@ -1,8 +1,35 @@
 {
   "generator": "runnora-docgen",
   "scenario": "契約 returnLoan 本を返却する（モック・実APIの両方で実行する）",
+  "scenarioId": "CONTRACT-returnLoan",
   "source": "runbooks/contract/post_returnLoan.suite.yml",
-  "sha256": "a4e532571439119ad94233225c39d4a75e9f24055d0bfa77d21e7d124e694773",
+  "sha256": "7c2905d07db1430dee14b14f02bfdcef79918b07041dd857c284215f054ae3df",
+  "steps": [
+    {
+      "number": 1,
+      "key": "returned.call_api"
+    },
+    {
+      "number": 2,
+      "key": "returned.check_call_api"
+    },
+    {
+      "number": 3,
+      "key": "already_returned.call_api"
+    },
+    {
+      "number": 4,
+      "key": "already_returned.check_call_api"
+    },
+    {
+      "number": 5,
+      "key": "not_found.call_api"
+    },
+    {
+      "number": 6,
+      "key": "not_found.check_call_api"
+    }
+  ],
   "files": [
     "after.qmd",
     "before.qmd",
@@ -15,12 +42,12 @@
     {
       "kind": "runbook",
       "path": "runbooks/contract/post_returnLoan.suite.yml",
-      "sha256": "a4e532571439119ad94233225c39d4a75e9f24055d0bfa77d21e7d124e694773"
+      "sha256": "7c2905d07db1430dee14b14f02bfdcef79918b07041dd857c284215f054ae3df"
     },
     {
       "kind": "runbook",
       "path": "runbooks/contract/post_returnLoan.template.yml",
-      "sha256": "c62a7635a0baa10d31d694843cbcc5c48394ea9fcde1ffa00ceaa8550a12b55e"
+      "sha256": "10bc4214b6f0f37fe03d55c29749f120e2457bd59f5de6adb437da037d0680a8"
     },
     {
       "kind": "json",
@@ -53,29 +80,29 @@
       "sha256": "bf7d996fd66b2ffa53b92cfece6aade3ba9163393db356f0755b921e46c4a776"
     },
     {
-      "kind": "config",
-      "path": "config.yaml",
-      "sha256": "c52ed7d584e275a45a420c139fa058455490a157e525dfb3026dfc5068c07d08"
+      "kind": "project",
+      "path": "runnora.yaml",
+      "sha256": "5d7ceabf7e21ff480869433e05dfd7a43db2cf3658c917029f3dc927e2fb1f04"
     },
     {
       "kind": "before-sql",
       "path": "sql/common/00_reset.sql",
-      "sha256": "db5c04b97ef0474925339080d3f4283a4640319f44d300209b3f966061259f3c"
+      "sha256": "8d092d26614fd31bd8f3723b8bbd224292437c929cb7651c5427e18bd81db6de"
     },
     {
       "kind": "before-sql",
       "path": "sql/common/10_seed_master.sql",
-      "sha256": "d1fed60782fdf0e542e35c2a95eb03adc006d74b733a4e7e3d8f2e7c696063d4"
+      "sha256": "262508b19482f0c2bb6766c1d0261de427b72210a6ce8c36872f0461f60284e0"
     },
     {
       "kind": "before-sql",
       "path": "sql/cases/contract_setup.sql",
-      "sha256": "3008c010dbcf26a9df07f175d35512026f1531e901f63950148b236c39c52344"
+      "sha256": "d5e9c4c6d868c4c3938964de19d3b6f041741a19c347895675f531bcd5ff570f"
     },
     {
       "kind": "after-sql",
       "path": "sql/common/90_verify_integrity.sql",
-      "sha256": "27ff9d2c6798ee60d1a0897496dcf2435bc3e6ec1b845d9d445979b1f4e55087"
+      "sha256": "d77156ec95f6e7a0cd60e21696a0b1fd707f2968d5fb5bf92304fa764d336205"
     }
   ]
 }

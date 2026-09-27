@@ -14,7 +14,3 @@ steps:
           headers:
             X-Test-Scenario: LIB-001
           body: null
-  dump_response:
-    dump:
-      expr: steps.fetch.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-001-member_loans-{{ vars.attempt }}.json'

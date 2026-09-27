@@ -1,23 +1,23 @@
 # 実施記録 {#sec-records}
 
-実施者が記入する。証跡は `reports/<日時>-mock/`、`reports/<日時>-api/` に保存する。
-シナリオ試験と検知確認はスイート `scenarios` として 1 回で実行し、`api-scenarios.txt` に runbook ごとの期待（expect）と結果（actual）が載る。
+実施者が記入する。証跡は runnora がスイートの実行ごとに `reports/<日時>-<スイート名>/` に保存する（表の証跡欄はそのフォルダ）。
+シナリオ試験と検知確認はスイート `scenarios` として 1 回で実行し、`summary.html` に runbook ごとの期待（expect）と結果（actual）、失敗したステップと応答の証跡へのリンクが載る。
 
 | 区分 | 対象 | 期待 | 結果 | 実施日 | 実施者 | 証跡 |
 |------|------|------|------|--------|--------|------|
-| 生成テスト | モック（8 suite） | 終了コード 0 | | | | mock-generated.txt |
-| 契約テスト | モック（8 suite） | 終了コード 0 | | | | mock-contract.txt |
-| 生成テスト | 実 API（8 suite） | 終了コード 0 | | | | api-generated.txt |
-| 契約テスト | 実 API（8 suite） | 終了コード 0 | | | | api-contract.txt |
-| シナリオ | LIB-001 | pass（期待どおり） | | | | api-scenarios.txt |
-| シナリオ | LIB-002 | pass（期待どおり） | | | | api-scenarios.txt |
-| シナリオ | LIB-003 | pass（期待どおり） | | | | api-scenarios.txt |
-| シナリオ | LIB-004 | pass（期待どおり） | | | | api-scenarios.txt |
-| シナリオ | LIB-005 | pass（期待どおり） | | | | api-scenarios.txt |
-| シナリオ | LIB-006 | pass（期待どおり） | | | | api-scenarios.txt |
-| シナリオ | LIB-007 | pass（期待どおり） | | | | api-scenarios.txt |
-| 検知確認 | DEMO-HOOK-FAILURE | hookFail（期待どおり） | | | | api-scenarios.txt |
-| カバレッジ | 契約 + シナリオ | 8 / 8 operation | | | | coverage.txt |
+| 生成テスト | モック（8 suite） | 終了コード 0 | | | | `<日時>-generated-mock/` |
+| 契約テスト | モック（8 suite） | 終了コード 0 | | | | `<日時>-contract-mock/` |
+| 生成テスト | 実 API（8 suite） | 終了コード 0 | | | | `<日時>-generated-unit/` |
+| 契約テスト | 実 API（8 suite） | 終了コード 0 | | | | `<日時>-contract-unit/` |
+| シナリオ | LIB-001 | pass（期待どおり） | | | | `<日時>-scenarios/` |
+| シナリオ | LIB-002 | pass（期待どおり） | | | | `<日時>-scenarios/` |
+| シナリオ | LIB-003 | pass（期待どおり） | | | | `<日時>-scenarios/` |
+| シナリオ | LIB-004 | pass（期待どおり） | | | | `<日時>-scenarios/` |
+| シナリオ | LIB-005 | pass（期待どおり） | | | | `<日時>-scenarios/` |
+| シナリオ | LIB-006 | pass（期待どおり） | | | | `<日時>-scenarios/` |
+| シナリオ | LIB-007 | pass（期待どおり） | | | | `<日時>-scenarios/` |
+| 検知確認 | DEMO-HOOK-FAILURE | hookFail（期待どおり） | | | | `<日時>-scenarios/` |
+| カバレッジ | 契約 + シナリオ | 8 / 8 operation | | | | `coverage.txt` |
 
 : 実施記録 {#tbl-records}
 

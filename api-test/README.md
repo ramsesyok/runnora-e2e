@@ -108,7 +108,7 @@ Oracle イメージ `container-registry.oracle.com/database/free:latest` を使�
 | runbook の `runnora:` ブロック | シナリオ ID（`LIB-001` など）、ケース固有の前後処理（`before` / `after`）、期待する結果（検知確認は `expect: hookFail`） |
 
 スクリプトに残るのは、runnora の範囲外である**環境の起動**（Oracle・API・WireMock の起動と停止、モックの生成）と、
-レポートと証跡の保存先を決めてツールを呼ぶ部分だけです。
+ツールを呼ぶ部分だけです（レポートと証跡の保存先は runnora が決めます）。
 `run-all.ps1` はそれらを順に呼ぶだけで、runbook ごとの前後処理や期待する終了コードは持っていません。
 
 runnora を直接呼ぶ例（環境の起動は済ませておく）:
@@ -117,21 +117,31 @@ runnora を直接呼ぶ例（環境の起動は済ませておく）:
 $runnora = '..\..\runnora\runnora.exe'
 & $runnora validate                     # runnora.yaml と runbook の検査 (実行しない)
 & $runnora list 'runbooks/**/*.yml'     # シナリオ ID と、それを選ぶスイートの一覧
-$env:RUNNORA_EVIDENCE_DIR = (New-Item -ItemType Directory -Force reports/manual).FullName
 & $runnora run --suite scenarios        # シナリオ試験と検知確認 (環境 unit)
 & $runnora run runbooks/scenarios/lib-005-savepoint.yml   # 1 本だけ (前後処理は runnora: ブロックから)
 & $runnora run --suite contract-mock    # モックに対する契約テスト (環境 mock)
 ```
 
-### レスポンス証跡
+### レポートとレスポンス証跡
 
-テストスクリプトは `reports/<日時>-<種類>/evidence/<実行名>/`（実行名はスイートごとの `api-scenarios` など）に、HTTP ステータス・ヘッダ・本文を含む応答を JSON で保存します。
-シナリオ試験はスイートでまとめて実行するので、ファイル名の先頭にシナリオ（`lib-001-` など、検知確認は `demo-`）を付けています。
-各 runbook は「リクエスト → dump → 判定」の順で実行するため、判定が失敗したケースの応答も残ります。
-生成テストへの `dump` と判定の追加は `scripts/generate.ps1` が再生成時に行います。
-LIB-001 の再照会は試行回数別、LIB-007 の蔵書照会は対象別にファイルを保存します。
-直接 runnora を実行する場合は、上の例のように保存先ディレクトリを作り、`RUNNORA_EVIDENCE_DIR` に絶対パスを指定してください。
-通信や OpenAPI 応答スキーマ検証でリクエストステップ自体が失敗した場合は、dump まで進まないため証跡ファイルは作られません。
+`runnora run` は実行のたびに `reports/<日時>-<スイート名>/` を作り、次を保存します（スクリプトから実行しても、直接実行しても同じです）。
+
+```text
+reports/20260927-153012-scenarios/
+├─ summary.html                         サマリー HTML（ブラウザで開く。失敗したステップ・差分・証跡へのリンク）
+├─ report.json                          ステップ単位の結果
+├─ runnora.log                          画面の出力 (スクリプトから実行した場合)
+└─ evidence/
+   └─ LIB-001/                          シナリオ ID ごと
+      ├─ 01-member_before.json          <ステップの番号>-<ステップのキー>.json
+      └─ 15-member_loans[2].json        loop の回ごと
+```
+
+- 証跡は HTTP ステータス・ヘッダ・本文を含む応答の JSON です。runnora がステップごとに自動で保存するので、runbook に `dump` ステップは書きません。判定が失敗したステップの応答も残ります。
+- 生成テスト・契約テストは template を include して繰り返すので、`01-run_case[0].call_api.json` のように、呼び出したステップ・回・template のステップをつないだ名前になります。
+- LIB-001 の再照会は試行回数別、LIB-007 の蔵書照会は対象別に、loop の回ごとのファイルになります。
+- 通信の失敗などでリクエストそのものが完了しなかった場合は、応答がないので証跡ファイルは作られません。
+- API サーバと WireMock のログ（`run-all.ps1` で起動した場合）は `logs/` に上書きで保存します。
 
 ## テストの内容
 
@@ -142,7 +152,7 @@ LIB-001 の再照会は試行回数別、LIB-007 の蔵書照会は対象別に�
 
 | やりたいこと | 最初に見る場所 | 注目する記述 |
 |---|---|---|
-| HTTP を呼び、ステータスと応答を検証する | [get_getHealth.template.yml](runbooks/contract/get_getHealth.template.yml) | `req` → `dump` → `test`。入力と期待値は [suite](runbooks/contract/get_getHealth.suite.yml) から渡す |
+| HTTP を呼び、ステータスと応答を検証する | [get_getHealth.template.yml](runbooks/contract/get_getHealth.template.yml) | `req` → `test`。入力と期待値は [suite](runbooks/contract/get_getHealth.suite.yml) から渡す |
 | JSON 全体を期待ファイルと比較する | [get_getBook.template.yml](runbooks/contract/get_getBook.template.yml)、[B0001 ケース](cases/contract/books/get_getBook/01_B0001.json) | `compare(steps.call_api.res.body, vars.expected, ...)` と `ignorePaths: []` |
 | 変動する項目だけ比較から除外する | [post_createLoan.template.yml](runbooks/contract/post_createLoan.template.yml)、[created ケース](cases/contract/loans/post_createLoan/01_created.json) | `ignorePaths` で貸出 ID と日時を除外し、残りの JSON 全体を比較する |
 | 複数ケースで同じ手順を使う | [post_createBook.suite.yml](runbooks/contract/post_createBook.suite.yml) | ケースごとの `include` と `vars.case` / `vars.expected` |

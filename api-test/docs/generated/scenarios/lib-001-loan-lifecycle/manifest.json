@@ -1,8 +1,88 @@
 {
   "generator": "runnora-docgen",
   "scenario": "LIB-001 本を借りて返すまでの正常系（在庫増減・ID引き継ぎ・二重返却）",
+  "scenarioId": "LIB-001",
   "source": "runbooks/scenarios/lib-001-loan-lifecycle.yml",
-  "sha256": "fed277cc3cd0c946f42fc69ed45698a6f39468379fc389eac94f1f0a6e04c60a",
+  "sha256": "c6ddf296908c11d1ee3160814856ed3f1d6adb0060aa3f20d941d105f5cd14d0",
+  "steps": [
+    {
+      "number": 1,
+      "key": "member_before"
+    },
+    {
+      "number": 2,
+      "key": "check_member_before"
+    },
+    {
+      "number": 3,
+      "key": "book_before"
+    },
+    {
+      "number": 4,
+      "key": "check_book_before"
+    },
+    {
+      "number": 5,
+      "key": "create_loan"
+    },
+    {
+      "number": 6,
+      "key": "check_create_loan"
+    },
+    {
+      "number": 7,
+      "key": "save_loan_id"
+    },
+    {
+      "number": 8,
+      "key": "db_loan_row"
+    },
+    {
+      "number": 9,
+      "key": "book_lent"
+    },
+    {
+      "number": 10,
+      "key": "check_book_lent"
+    },
+    {
+      "number": 11,
+      "key": "member_loans.fetch",
+      "loop": true
+    },
+    {
+      "number": 12,
+      "key": "return_loan"
+    },
+    {
+      "number": 13,
+      "key": "check_return_loan"
+    },
+    {
+      "number": 14,
+      "key": "return_again"
+    },
+    {
+      "number": 15,
+      "key": "check_return_again"
+    },
+    {
+      "number": 16,
+      "key": "book_restored"
+    },
+    {
+      "number": 17,
+      "key": "check_book_restored"
+    },
+    {
+      "number": 18,
+      "key": "member_after"
+    },
+    {
+      "number": 19,
+      "key": "check_member_after"
+    }
+  ],
   "files": [
     "after.qmd",
     "before.qmd",
@@ -15,37 +95,37 @@
     {
       "kind": "runbook",
       "path": "runbooks/scenarios/lib-001-loan-lifecycle.yml",
-      "sha256": "fed277cc3cd0c946f42fc69ed45698a6f39468379fc389eac94f1f0a6e04c60a"
+      "sha256": "c6ddf296908c11d1ee3160814856ed3f1d6adb0060aa3f20d941d105f5cd14d0"
     },
     {
       "kind": "runbook",
       "path": "runbooks/scenarios/lib-001-member-loans-poll.yml",
-      "sha256": "4eebe227b631157ada1840d3adf187ae22528c64289e48c7952a669575ce1aa0"
+      "sha256": "3311d67a733c63ca9e4d2609cf0e53f4291fc203e72fca25cb04367d0297a2fd"
     },
     {
-      "kind": "config",
-      "path": "config.yaml",
-      "sha256": "c52ed7d584e275a45a420c139fa058455490a157e525dfb3026dfc5068c07d08"
+      "kind": "project",
+      "path": "runnora.yaml",
+      "sha256": "5d7ceabf7e21ff480869433e05dfd7a43db2cf3658c917029f3dc927e2fb1f04"
     },
     {
       "kind": "before-sql",
       "path": "sql/common/00_reset.sql",
-      "sha256": "db5c04b97ef0474925339080d3f4283a4640319f44d300209b3f966061259f3c"
+      "sha256": "8d092d26614fd31bd8f3723b8bbd224292437c929cb7651c5427e18bd81db6de"
     },
     {
       "kind": "before-sql",
       "path": "sql/common/10_seed_master.sql",
-      "sha256": "d1fed60782fdf0e542e35c2a95eb03adc006d74b733a4e7e3d8f2e7c696063d4"
+      "sha256": "262508b19482f0c2bb6766c1d0261de427b72210a6ce8c36872f0461f60284e0"
     },
     {
       "kind": "after-sql",
       "path": "sql/cases/lib001_assert_after.sql",
-      "sha256": "35a95ad6aa71f8d49f97aae03a878283854b7329f3fc8d89e5e098a451d2cbfc"
+      "sha256": "db77e8a0fa1901f4c22bc96114a4cf5aed8d505c9f094780a5ee2b7e7bd10054"
     },
     {
       "kind": "after-sql",
       "path": "sql/common/90_verify_integrity.sql",
-      "sha256": "27ff9d2c6798ee60d1a0897496dcf2435bc3e6ec1b845d9d445979b1f4e55087"
+      "sha256": "d77156ec95f6e7a0cd60e21696a0b1fd707f2968d5fb5bf92304fa764d336205"
     }
   ]
 }

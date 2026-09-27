@@ -28,14 +28,13 @@ grpc-test/
 
 - Go 1.24 以降（初回ビルド時は Go モジュールを取得できる環境）
 - [runnora](https://github.com/ramsesyok/runnora) のソース（既定: `../../runnora/` からビルド、既存バイナリを使う場合は `RUNNORA_EXE`）
-- [runnora-diff](https://github.com/ramsesyok/runnora-diff) のソース（既定: `../../runnora-diff/`、別の場所にある場合は `RUNNORA_DIFF_SOURCE_DIR` にソースディレクトリを指定）
 - [runnora-docgen](https://github.com/ramsesyok/runnora-docgen)（既定: `../../runnora-docgen/runnora-docgen.exe`、変更時は `RUNNORA_DOCGEN_EXE`）
 - 手順書を HTML 発行する場合は Quarto と ddq 2.4.0
 
 ## 実行
 
-PowerShell で次を実行します。スクリプトがサーバ・runnora・runnora-diff をビルドし、サーバ起動後にスイート `grpc`（4 本の runbook）と RPC カバレッジを確認して停止します。
-接続先（`GRPC_ADDR`）と runn に許可するスコープ（`run:exec`）は [runnora.yaml](runnora.yaml) に書いてあるので、スクリプトはサーバの起動・停止と、レポートの保存先を決めて runnora を呼ぶだけです。
+PowerShell で次を実行します。スクリプトがサーバと runnora をビルドし、サーバ起動後にスイート `grpc`（4 本の runbook）と RPC カバレッジを確認して停止します。
+接続先（`GRPC_ADDR`）は [runnora.yaml](runnora.yaml) に書いてあるので、スクリプトはサーバの起動・停止と、runnora を呼ぶだけです。
 
 ```powershell
 ./scripts/run.ps1
@@ -43,7 +42,7 @@ PowerShell で次を実行します。スクリプトがサーバ・runnora・ru
 ./scripts/build-docs.ps1 -Pdf  # HTML と PDF の両方を発行
 ```
 
-テスト結果は `reports/<日時>/`、各 RPC の応答 JSON は `reports/<日時>/evidence/` に出力します。各 runbook は「リクエスト → dump → 判定」の順で、判定失敗時も取得済みの応答を残します。通信自体が失敗してリクエストステップが完了しない場合は応答ファイルを作れません。
+runnora が実行のたびに `reports/<日時>-grpc/` を作り、サマリー HTML（`summary.html`）、ステップ単位の結果（`report.json`）、各 RPC の応答 JSON（`evidence/<シナリオ ID>/<番号>-<ステップのキー>.json`。Server streaming は受信した全メッセージ）を保存します。判定が失敗したステップの応答も残ります。通信自体が失敗してリクエストが完了しない場合は応答ファイルを作れません。サーバのログは `logs/` に上書きで保存します。
 HTML 手順書は `docs/_book/index.html`、PDF は [docs/design-doc.pdf](docs/design-doc.pdf) に出力します。
 原稿だけを更新するときは `./scripts/build-docs.ps1 -GenerateOnly` を使えます。
 
@@ -54,7 +53,6 @@ go run ./cmd/libraryd -proto proto/library.proto
 ```
 
 ```powershell
-$env:RUNNORA_EVIDENCE_DIR = (New-Item -ItemType Directory -Force reports/manual).FullName
 ./bin/runnora.exe run --suite grpc              # 4 本まとめて
 ./bin/runnora.exe run runbooks/unary.yml         # 1 本だけ
 ```
@@ -64,7 +62,7 @@ $env:RUNNORA_EVIDENCE_DIR = (New-Item -ItemType Directory -Force reports/manual)
 1. [Unary](runbooks/unary.yml) は `vars.request` と `vars.expected` に `json://` で [入力](cases/unary/get-book-request.json)・[期待値](cases/unary/get-book-expected.json)を読み込みます。`message: "{{ vars.request }}"` で JSON オブジェクトを送信し、期待 JSON の `status` と `message` で gRPC ステータスと応答全体を比較します。
 2. [Server streaming](runbooks/server-streaming.yml) も [検索入力](cases/server-streaming/list-books-request.json)と[期待するステータス・メッセージ配列](cases/server-streaming/list-books-expected.json)を JSON ファイルから読み込みます。`bind` で保存した Unary 応答のジャンルが検索入力と一致することを確かめ、保存後に `steps.list_books.res.messages` を配列全体で比較します。配列の順序も検証対象です。
 3. [計算ストリーミング](runbooks/calculation-streaming.yml) は [入力](cases/calculation-streaming/request.json)の `2, 3, 5` を順に加算して配信します。[期待 JSON](cases/calculation-streaming/expected.json)には `completion` を最後のメッセージだけに書き、途中では未設定であることも含めて比較します。
-4. [系列分析](runbooks/series-analysis.yml) は階層・配列を持つ応答を [期待 JSON](cases/series-analysis/expected.json) と照合します。[許容誤差設定](cases/series-analysis/tolerances.yaml)は基準の絶対誤差、サンプルの絶対誤差、統計の相対誤差、分散の狭い絶対誤差、全体の加重平均の絶対誤差を指定します。許容誤差なしでは差分が出ることも確認します。`exec` ステップに必要な `run:exec` のスコープは `runnora.yaml` の `runn.scopes` で許可しています。
+4. [系列分析](runbooks/series-analysis.yml) は階層・配列を持つ応答を [期待 JSON](cases/series-analysis/expected.json) と照合します。[許容誤差設定](cases/series-analysis/tolerances.yaml)は基準の絶対誤差、サンプルの絶対誤差、統計の相対誤差、分散の狭い絶対誤差、全体の加重平均の絶対誤差を指定します。比較は runnora の `diffEps(期待, 実際, 許容誤差の設定)` で行います（runnora-diff と同じ比較処理。差分がなければ `true`）。許容誤差なしでは差分が出ること（`!diffEps(...)`）も確認します。差分の全件は証跡の `<番号>-<キー>.diff.json` に保存します。
 5. runnora の gRPC 応答では、proto の `book_id` や `available_copies` をそのままの名前で参照します。
 6. [手順書生成スクリプト](scripts/build-docs.ps1)は runnora-docgen にスイート `grpc` と `--proto` を渡し、Unary と Server streaming の RPC 種別を表に載せます。
 
