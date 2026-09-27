@@ -1,14 +1,14 @@
-desc: 会員と貸出状況を取得する template
+desc: "会員と貸出状況を取得する template"
 labels:
   - generated
   - openapi
-  - members
+  - "members"
   - method:get
-  - operation:getMember
+  - "operation:getMember"
   - mode:template
 
 runners:
-  req:
+  "req":
     endpoint: ${RUNNORA_BASE_URL}
 
 vars:
@@ -16,8 +16,8 @@ vars:
 
 steps:
   call_api:
-    req:
-      /members/{{ vars.case.pathParams.memberId }}:
+    "req":
+      "/members/{{ vars.case.pathParams.memberId }}":
         get:
           headers: "{{ vars.case.headers }}"
 

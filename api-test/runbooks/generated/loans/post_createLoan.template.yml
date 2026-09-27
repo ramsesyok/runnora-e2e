@@ -1,14 +1,14 @@
-desc: 本を貸し出す template
+desc: "本を貸し出す template"
 labels:
   - generated
   - openapi
-  - loans
+  - "loans"
   - method:post
-  - operation:createLoan
+  - "operation:createLoan"
   - mode:template
 
 runners:
-  req:
+  "req":
     endpoint: ${RUNNORA_BASE_URL}
 
 vars:
@@ -16,8 +16,8 @@ vars:
 
 steps:
   call_api:
-    req:
-      /loans:
+    "req":
+      "/loans":
         post:
           headers: "{{ vars.case.headers }}"
           body:

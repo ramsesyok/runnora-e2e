@@ -1,14 +1,14 @@
-desc: 本を返却する template
+desc: "本を返却する template"
 labels:
   - generated
   - openapi
-  - loans
+  - "loans"
   - method:post
-  - operation:returnLoan
+  - "operation:returnLoan"
   - mode:template
 
 runners:
-  req:
+  "req":
     endpoint: ${RUNNORA_BASE_URL}
 
 vars:
@@ -16,12 +16,10 @@ vars:
 
 steps:
   call_api:
-    req:
-      /loans/{{ vars.case.pathParams.loanId }}/return:
+    "req":
+      "/loans/{{ vars.case.pathParams.loanId }}/return":
         post:
           headers: "{{ vars.case.headers }}"
-          body:
-            application/json: "{{ vars.case.requestBody }}"
 
   dump_response:
     dump:

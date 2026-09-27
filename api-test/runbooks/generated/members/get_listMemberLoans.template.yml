@@ -1,14 +1,14 @@
-desc: 会員の貸出履歴を取得する template
+desc: "会員の貸出履歴を取得する template"
 labels:
   - generated
   - openapi
-  - members
+  - "members"
   - method:get
-  - operation:listMemberLoans
+  - "operation:listMemberLoans"
   - mode:template
 
 runners:
-  req:
+  "req":
     endpoint: ${RUNNORA_BASE_URL}
 
 vars:
@@ -16,8 +16,8 @@ vars:
 
 steps:
   call_api:
-    req:
-      /members/{{ vars.case.pathParams.memberId }}/loans?status={{ vars.case.queryParams.status }}:
+    "req":
+      "/members/{{ vars.case.pathParams.memberId }}/loans?status={{ vars.case.queryParams.status }}":
         get:
           headers: "{{ vars.case.headers }}"
 

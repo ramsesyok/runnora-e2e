@@ -1,14 +1,14 @@
-desc: 稼働状態を確認する template
+desc: "稼働状態を確認する template"
 labels:
   - generated
   - openapi
-  - system
+  - "system"
   - method:get
-  - operation:getHealth
+  - "operation:getHealth"
   - mode:template
 
 runners:
-  req:
+  "req":
     endpoint: ${RUNNORA_BASE_URL}
 
 vars:
@@ -16,8 +16,8 @@ vars:
 
 steps:
   call_api:
-    req:
-      /health:
+    "req":
+      "/health":
         get:
           headers: "{{ vars.case.headers }}"
 

@@ -1,14 +1,14 @@
-desc: 蔵書を 1 件取得する template
+desc: "蔵書を 1 件取得する template"
 labels:
   - generated
   - openapi
-  - books
+  - "books"
   - method:get
-  - operation:getBook
+  - "operation:getBook"
   - mode:template
 
 runners:
-  req:
+  "req":
     endpoint: ${RUNNORA_BASE_URL}
 
 vars:
@@ -16,8 +16,8 @@ vars:
 
 steps:
   call_api:
-    req:
-      /books/{{ vars.case.pathParams.bookId }}:
+    "req":
+      "/books/{{ vars.case.pathParams.bookId }}":
         get:
           headers: "{{ vars.case.headers }}"
 
