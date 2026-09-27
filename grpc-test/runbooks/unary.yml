@@ -1,4 +1,6 @@
 desc: Unary RPC で蔵書を1冊取得する
+runnora:
+  id: GRPC-unary
 labels:
   - grpc
   - unary
@@ -7,7 +9,7 @@ vars:
   expected: json://../cases/unary/get-book-expected.json
 runners:
   greq:
-    addr: 127.0.0.1:19090
+    addr: ${GRPC_ADDR}
     tls: false
     importPaths:
       - ../proto

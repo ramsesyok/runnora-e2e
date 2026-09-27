@@ -7,6 +7,6 @@
   `bind` で保存し、蔵書照会 URL（`/books/{{ overdue_book_id }}`）、返却 URL（`/loans/{{ overdue_loan_id }}/return`）、
   新しい貸出 ID が返却した貸出と異なることや貸出履歴での状態の検証に使う。
 - 合格条件：全手順の検証式が真であり、共通後処理が正常終了すること。
-- 実行：`runnora run --config config.yaml --before-sql sql/cases/lib003_overdue_before.sql runbooks/scenarios/lib-003-overdue.yml`
+- 実行：`runnora run runbooks/scenarios/lib-003-overdue.yml`（ケース固有の前後処理は runbook の `runnora:` ブロックに書いてある）
 
 {{< include ../../generated/scenarios/lib-003-overdue/_body.qmd >}}

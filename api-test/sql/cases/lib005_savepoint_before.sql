@@ -1,5 +1,5 @@
 -- =============================================================
--- cases/lib005_savepoint_before.sql  (--before-sql : LIB-005 SAVEPOINT)
+-- cases/lib005_savepoint_before.sql  (LIB-005 の runnora: ブロックの before : SAVEPOINT)
 -- 「蔵書登録 + 初回貸出」を 1 単位として 5 件投入し、失敗した単位だけを
 -- ROLLBACK TO SAVEPOINT で取り消して、成功した単位は最後にまとめて COMMIT する。
 --

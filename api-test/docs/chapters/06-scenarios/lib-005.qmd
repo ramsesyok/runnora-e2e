@@ -15,6 +15,6 @@
   後半で M0006〜M0008 を一括停止し、件数超過として ROLLBACK TO SAVEPOINT で取り消したうえで M0008 だけを停止する。
 - 合格条件：全手順の検証式が真であり、後処理 `lib005_assert_after.sql` が
   「TEST 蔵書 4 件（前処理 3 + API 登録 1）・B0104 なし・ROLLBACK のログ 2 件以上」を確認して正常終了すること。
-- 実行：`runnora run --config config.yaml --before-sql sql/cases/lib005_savepoint_before.sql --after-sql sql/cases/lib005_assert_after.sql runbooks/scenarios/lib-005-savepoint.yml`
+- 実行：`runnora run runbooks/scenarios/lib-005-savepoint.yml`（ケース固有の前後処理は runbook の `runnora:` ブロックに書いてある）
 
 {{< include ../../generated/scenarios/lib-005-savepoint/_body.qmd >}}

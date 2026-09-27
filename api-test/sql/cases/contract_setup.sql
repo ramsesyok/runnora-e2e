@@ -1,5 +1,5 @@
 -- =============================================================
--- cases/contract_setup.sql  (--before-sql : 契約テスト・生成テスト用)
+-- cases/contract_setup.sql  (runnora.yaml のスイート generated-unit / contract-unit の hooks.before)
 -- モック (oapi2wire) と同じ前提データを実 DB に作る。
 --   loan 1 : M0002 が B0003 を貸出中 (ACTIVE)   → POST /loans/1/return は 200
 --   loan 2 : M0002 が B0004 を返却済 (RETURNED) → POST /loans/2/return は 409

@@ -1,4 +1,6 @@
 desc: 契約 listMemberLoans 会員の貸出履歴を取得する（モック・実APIの両方で実行する）
+runnora:
+  id: CONTRACT-listMemberLoans
 labels:
   - contract
   - members

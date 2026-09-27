@@ -12,7 +12,7 @@
 | LIB-005 | SAVEPOINT | lib005_savepoint_before | lib005_assert_after | 一部だけ確定した初期データ、採番の欠番 |
 | LIB-006 | 異常系 | - | lib006_assert_no_loans_after | 400/404/409 の後に DB が変わっていない |
 | LIB-007 | 大量履歴 | lib007_history_before | - | BULK COLLECT/FORALL で投入した履歴の照会、runbook の `loop.count` と `i` |
-| DEMO | 検知確認 | - | demo_break_invariant_after | 事後検証が不整合を検知して終了コード 4 |
+| DEMO | 検知確認 | - | demo_break_invariant_after | 事後検証が不整合を検知して後処理が失敗する（`expect: hookFail`） |
 
 : シナリオ一覧 {#tbl-scenarios}
 

@@ -1,11 +1,15 @@
 desc: LIB-006 異常系（入力不正400・存在しない404・利用停止409）でDBが変わらない
-# 実行: runnora run --config config.yaml --after-sql sql/cases/lib006_assert_no_loans_after.sql <this>
+runnora:
+  id: LIB-006
+  after:
+    - sql/cases/lib006_assert_no_loans_after.sql
+# 実行: runnora run <this> (前後処理は上の runnora: ブロック。スイートでまとめて流すときは runnora run --suite scenarios)
 labels:
   - scenario
   - negative
 runners:
   req:
-    endpoint: http://127.0.0.1:18081
+    endpoint: ${API_URL}
     # 応答を OpenAPI 定義で自動検証する。異常系の入力を送るためリクエスト側の検証は行わない
     openapi3: ../../openapi/library-api.yaml
     skipValidateRequest: true
@@ -24,7 +28,7 @@ steps:
   dump_suspended_member:
     dump:
       expr: steps.suspended_member.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/suspended_member.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-006-suspended_member.json'
   check_suspended_member:
     test: |
       steps.suspended_member.res.status == 409 &&
@@ -44,7 +48,7 @@ steps:
   dump_unknown_member:
     dump:
       expr: steps.unknown_member.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/unknown_member.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-006-unknown_member.json'
   check_unknown_member:
     test: |
       steps.unknown_member.res.status == 404 &&
@@ -64,7 +68,7 @@ steps:
   dump_unknown_book:
     dump:
       expr: steps.unknown_book.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/unknown_book.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-006-unknown_book.json'
   check_unknown_book:
     test: |
       steps.unknown_book.res.status == 404 &&
@@ -83,7 +87,7 @@ steps:
   dump_missing_book_id:
     dump:
       expr: steps.missing_book_id.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/missing_book_id.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-006-missing_book_id.json'
   check_missing_book_id:
     test: |
       steps.missing_book_id.res.status == 400 &&
@@ -105,7 +109,7 @@ steps:
   dump_unknown_field:
     dump:
       expr: steps.unknown_field.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/unknown_field.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-006-unknown_field.json'
   check_unknown_field:
     test: |
       steps.unknown_field.res.status == 400 &&
@@ -129,7 +133,7 @@ steps:
   dump_invalid_isbn:
     dump:
       expr: steps.invalid_isbn.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/invalid_isbn.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-006-invalid_isbn.json'
   check_invalid_isbn:
     test: |
       steps.invalid_isbn.res.status == 400 &&
@@ -153,7 +157,7 @@ steps:
   dump_invalid_copies:
     dump:
       expr: steps.invalid_copies.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/invalid_copies.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-006-invalid_copies.json'
   check_invalid_copies:
     test: |
       steps.invalid_copies.res.status == 400 &&
@@ -170,7 +174,7 @@ steps:
   dump_invalid_genre:
     dump:
       expr: steps.invalid_genre.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/invalid_genre.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-006-invalid_genre.json'
   check_invalid_genre:
     test: |
       steps.invalid_genre.res.status == 400 &&
@@ -187,7 +191,7 @@ steps:
   dump_invalid_status_filter:
     dump:
       expr: steps.invalid_status_filter.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/invalid_status_filter.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-006-invalid_status_filter.json'
   check_invalid_status_filter:
     test: steps.invalid_status_filter.res.status == 400
 
@@ -203,7 +207,7 @@ steps:
   dump_unknown_loan:
     dump:
       expr: steps.unknown_loan.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/unknown_loan.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-006-unknown_loan.json'
   check_unknown_loan:
     test: |
       steps.unknown_loan.res.status == 404 &&

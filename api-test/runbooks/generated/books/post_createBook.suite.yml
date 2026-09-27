@@ -1,4 +1,6 @@
 desc: "蔵書を登録する suite"
+runnora:
+  id: "GEN-createBook"
 labels:
   - generated
   - openapi

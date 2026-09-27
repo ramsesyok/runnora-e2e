@@ -1,7 +1,11 @@
 desc: LIB-005 SAVEPOINTで一部だけ確定した初期データをAPIから確認する
-# 実行: runnora run --config config.yaml
-#         --before-sql sql/cases/lib005_savepoint_before.sql
-#         --after-sql  sql/cases/lib005_assert_after.sql <this>
+runnora:
+  id: LIB-005
+  before:
+    - sql/cases/lib005_savepoint_before.sql
+  after:
+    - sql/cases/lib005_assert_after.sql
+# 実行: runnora run <this> (前後処理は上の runnora: ブロック。スイートでまとめて流すときは runnora run --suite scenarios)
 # 前処理: B0101/B0102/B0105 は確定、B0103 (ISBN 重複) と B0104 (会員なし) は ROLLBACK TO SAVEPOINT で取消。
 #         一括停止も取り消され、M0008 だけが SUSPENDED になる。
 labels:
@@ -10,11 +14,11 @@ labels:
   - plsql-setup
 runners:
   req:
-    endpoint: http://127.0.0.1:18081
+    endpoint: ${API_URL}
     # 応答を OpenAPI 定義で自動検証する。異常系の入力を送るためリクエスト側の検証は行わない
     openapi3: ../../openapi/library-api.yaml
     skipValidateRequest: true
-  db: oracle://libapp:libapp_pw@127.0.0.1:1522/FREEPDB1
+  db: ${ORACLE_DSN}
 steps:
   test_books:
     desc: TESTジャンルの蔵書が確定した3件だけであることを確認する
@@ -27,7 +31,7 @@ steps:
   dump_test_books:
     dump:
       expr: steps.test_books.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/test_books.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-test_books.json'
   check_test_books:
     test: |
       steps.test_books.res.status == 200 &&
@@ -45,7 +49,7 @@ steps:
   dump_duplicate_rolled_back:
     dump:
       expr: steps.duplicate_rolled_back.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/duplicate_rolled_back.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-duplicate_rolled_back.json'
   check_duplicate_rolled_back:
     test: |
       steps.duplicate_rolled_back.res.status == 404 &&
@@ -62,7 +66,7 @@ steps:
   dump_fk_rolled_back:
     dump:
       expr: steps.fk_rolled_back.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/fk_rolled_back.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-fk_rolled_back.json'
   check_fk_rolled_back:
     test: steps.fk_rolled_back.res.status == 404
 
@@ -77,7 +81,7 @@ steps:
   dump_unit_with_loan:
     dump:
       expr: steps.unit_with_loan.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/unit_with_loan.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-unit_with_loan.json'
   check_unit_with_loan:
     test: |
       steps.unit_with_loan.res.status == 200 &&
@@ -95,7 +99,7 @@ steps:
   dump_sequence_gap:
     dump:
       expr: steps.sequence_gap.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/sequence_gap.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-sequence_gap.json'
   check_sequence_gap:
     test: |
       steps.sequence_gap.res.status == 200 &&
@@ -114,7 +118,7 @@ steps:
   dump_bulk_suspend_rolled_back:
     dump:
       expr: steps.bulk_suspend_rolled_back.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/bulk_suspend_rolled_back.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-bulk_suspend_rolled_back.json'
   check_bulk_suspend_rolled_back:
     test: |
       steps.bulk_suspend_rolled_back.res.status == 200 &&
@@ -131,7 +135,7 @@ steps:
   dump_single_suspend:
     dump:
       expr: steps.single_suspend.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/single_suspend.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-single_suspend.json'
   check_single_suspend:
     test: |
       steps.single_suspend.res.status == 200 &&
@@ -151,7 +155,7 @@ steps:
   dump_suspended_cannot_borrow:
     dump:
       expr: steps.suspended_cannot_borrow.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/suspended_cannot_borrow.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-suspended_cannot_borrow.json'
   check_suspended_cannot_borrow:
     test: |
       steps.suspended_cannot_borrow.res.status == 409 &&
@@ -175,7 +179,7 @@ steps:
   dump_api_duplicate_isbn:
     dump:
       expr: steps.api_duplicate_isbn.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/api_duplicate_isbn.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-api_duplicate_isbn.json'
   check_api_duplicate_isbn:
     test: |
       steps.api_duplicate_isbn.res.status == 409 &&
@@ -199,7 +203,7 @@ steps:
   dump_api_register_b0103:
     dump:
       expr: steps.api_register_b0103.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/api_register_b0103.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-005-api_register_b0103.json'
   check_api_register_b0103:
     test: |
       steps.api_register_b0103.res.status == 201 &&

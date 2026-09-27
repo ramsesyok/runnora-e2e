@@ -1,4 +1,6 @@
 desc: Unaryの応答と検索条件の整合を確認してServer streaming RPCを検証する
+runnora:
+  id: GRPC-server-streaming
 labels:
   - grpc
   - server-streaming
@@ -9,7 +11,7 @@ vars:
   list_expected: json://../cases/server-streaming/list-books-expected.json
 runners:
   greq:
-    addr: 127.0.0.1:19090
+    addr: ${GRPC_ADDR}
     tls: false
     importPaths:
       - ../proto

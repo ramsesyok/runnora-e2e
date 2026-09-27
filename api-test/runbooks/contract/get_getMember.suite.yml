@@ -1,4 +1,6 @@
 desc: 契約 getMember 会員と貸出状況を取得する（モック・実APIの両方で実行する）
+runnora:
+  id: CONTRACT-getMember
 labels:
   - contract
   - members

@@ -42,19 +42,18 @@ api-test/
 ├─ docker-compose.yml            Oracle Database Free 23ai → 127.0.0.1:1522/FREEPDB1
 ├─ mock/                         oapi2wire の case YAML → WireMock 127.0.0.1:18080
 ├─ fixtures/responses/           応答本文（モックの戻り値 = 契約テストの期待値。両方から参照）
-├─ config.yaml                   runnora 設定（実 API 用。共通 PL/SQL フック）
-├─ config.mock.yaml              runnora 設定（モック用。DB なし）
+├─ runnora.yaml                  runnora のプロジェクトファイル（環境 unit / mock、スイート）
 ├─ sql/common/                   共通 前処理（リセット・シード）/ 後処理（不変条件検証）
-├─ sql/cases/                    ケース固有の前処理・後処理
+├─ sql/cases/                    スイート・ケース固有の前処理・後処理
 ├─ runbooks/generated/           runnora generate の出力（再生成後に応答保存を追加）
 ├─ runbooks/contract/            契約テスト suite + template（モック・実 API 両方で実行）
 ├─ runbooks/scenarios/           シナリオ試験 LIB-001〜007（実 API のみ）
-├─ runbooks/demo/                事後検証が不整合を検知することの確認（exit 4 が期待値）
+├─ runbooks/demo/                事後検証が不整合を検知することの確認（expect: hookFail）
 ├─ cases/                        ケース JSON（generated / contract）
 ├─ tools/openapi-doc/            OpenAPI → 手順書 API 仕様章（.qmd）の変換
 ├─ tools/contract-check/         契約ケースとモックケースが同じ応答ファイルを指しているかの検査
 ├─ docs/                         手順書（ddq / Quarto book）。docs/generated/ は生成物
-└─ scripts/                      実行スクリプト（PowerShell 5.1 / 7 両対応）
+└─ scripts/                      環境の起動とツールの呼び出し（PowerShell 5.1 / 7 両対応）
 ```
 
 ## 必要なもの
@@ -91,25 +90,43 @@ Oracle イメージ `container-registry.oracle.com/database/free:latest` を使�
 ./scripts/generate.ps1      # runnora generate + 応答保存ステップの追加
 ./scripts/api-start.ps1     # ターミナル A: API
 ./scripts/mock-start.ps1    # ターミナル B: WireMock
-./scripts/test-mock.ps1     # モックに対して 生成 + 契約
-./scripts/test-api.ps1      # 実 API に対して 生成 + 契約 + シナリオ + 検知確認 + カバレッジ
+./scripts/test-mock.ps1     # モックに対して スイート generated-mock + contract-mock
+./scripts/test-api.ps1      # 実 API に対して スイート generated-unit + contract-unit + scenarios + カバレッジ
 ./scripts/build-docs.ps1 -Format Both
 ./scripts/db-down.ps1       # Oracle 停止・削除
 ```
 
-runnora を直接呼ぶ例（シナリオ LIB-005）:
+### runnora.yaml とスクリプトの役割
+
+テストの中身（接続先、共通と固有の前後処理、期待する結果、どの runbook をまとめて流すか）は
+[runnora.yaml](runnora.yaml) と各 runbook の `runnora:` ブロックに書き、スクリプトには書きません。
+
+| 書く場所 | 内容 |
+|---|---|
+| `runnora.yaml` の `environments` | 環境 `unit`（実 API + Oracle）と `mock`（WireMock）の接続先（`vars`）、Oracle の接続、共通の前後処理（`hooks`） |
+| `runnora.yaml` の `suites` | `generated-mock` / `generated-unit` / `contract-mock` / `contract-unit` / `scenarios`。スイートが選ぶ runbook と、スイート固有の前処理（実 API の生成・契約テストの `contract_setup.sql`） |
+| runbook の `runnora:` ブロック | シナリオ ID（`LIB-001` など）、ケース固有の前後処理（`before` / `after`）、期待する結果（検知確認は `expect: hookFail`） |
+
+スクリプトに残るのは、runnora の範囲外である**環境の起動**（Oracle・API・WireMock の起動と停止、モックの生成）と、
+レポートと証跡の保存先を決めてツールを呼ぶ部分だけです。
+`run-all.ps1` はそれらを順に呼ぶだけで、runbook ごとの前後処理や期待する終了コードは持っていません。
+
+runnora を直接呼ぶ例（環境の起動は済ませておく）:
 
 ```powershell
+$runnora = '..\..\runnora\runnora.exe'
+& $runnora validate                     # runnora.yaml と runbook の検査 (実行しない)
+& $runnora list 'runbooks/**/*.yml'     # シナリオ ID と、それを選ぶスイートの一覧
 $env:RUNNORA_EVIDENCE_DIR = (New-Item -ItemType Directory -Force reports/manual).FullName
-..\..\runnora\runnora.exe run --config config.yaml `
-  --before-sql sql/cases/lib005_savepoint_before.sql `
-  --after-sql  sql/cases/lib005_assert_after.sql `
-  runbooks/scenarios/lib-005-savepoint.yml
+& $runnora run --suite scenarios        # シナリオ試験と検知確認 (環境 unit)
+& $runnora run runbooks/scenarios/lib-005-savepoint.yml   # 1 本だけ (前後処理は runnora: ブロックから)
+& $runnora run --suite contract-mock    # モックに対する契約テスト (環境 mock)
 ```
 
 ### レスポンス証跡
 
-テストスクリプトは `reports/<日時>-<種類>/evidence/<実行名>/` に、HTTP ステータス・ヘッダ・本文を含む応答を JSON で保存します。
+テストスクリプトは `reports/<日時>-<種類>/evidence/<実行名>/`（実行名はスイートごとの `api-scenarios` など）に、HTTP ステータス・ヘッダ・本文を含む応答を JSON で保存します。
+シナリオ試験はスイートでまとめて実行するので、ファイル名の先頭にシナリオ（`lib-001-` など、検知確認は `demo-`）を付けています。
 各 runbook は「リクエスト → dump → 判定」の順で実行するため、判定が失敗したケースの応答も残ります。
 生成テストへの `dump` と判定の追加は `scripts/generate.ps1` が再生成時に行います。
 LIB-001 の再照会は試行回数別、LIB-007 の蔵書照会は対象別にファイルを保存します。
@@ -144,7 +161,7 @@ LIB-001 の再照会は試行回数別、LIB-007 の蔵書照会は対象別に�
 | 生成テスト | モック / 実 API | 8 suite | OpenAPI example で呼び出しステータスを確認 |
 | 契約テスト | モック / 実 API | 8 suite・21 ケース | ステータス + **本文の全体一致（モックと共有する期待ファイル）** + **OpenAPI 応答スキーマ検証**（`openapi3` ランナー） |
 | シナリオ試験 | 実 API | 7 runbook | 状態変化・ID 引き継ぎ・**DB 直接照会（runn DB ランナー）**・前後処理での DB 検証 |
-| 検知確認 | 実 API | 1 | 事後検証が DB 不整合を検知して exit 4 |
+| 検知確認 | 実 API | 1 | 事後検証が DB 不整合を検知して後処理が失敗する（`expect: hookFail` なので合格） |
 
 | ID | シナリオ | 前処理 (PL/SQL) | 後処理 (PL/SQL) |
 |---|---|---|---|
@@ -160,7 +177,7 @@ LIB-007 は履歴の先頭 3 冊を個別の include ステップで照会し、
 
 すべての runbook の前後で、共通フック（`00_reset` → `10_seed_master` / `90_verify_integrity`）が走ります。
 `90_verify_integrity` は「貸出可能冊数 = 所蔵 − 貸出中」などの不変条件をカーソル FOR LOOP で検証し、
-違反があれば `RAISE_APPLICATION_ERROR` で runnora を exit 4 にします。
+違反があれば `RAISE_APPLICATION_ERROR` で後処理を失敗させます（期待していない runbook なら runnora は exit 4 で終了します）。
 
 API が参照しないテスト用ヘッダを付けて送っています（手順書の HTTP 呼び出し表の Headers 欄に出ます）。
 契約テストは `X-Test-Case: <operationId>/<ケース名>`（ケース JSON の `headers`）、シナリオ試験は `X-Test-Scenario: <シナリオ ID>` です。
@@ -189,9 +206,10 @@ runbooks/contract/get_getMember.suite.yml
 - suite はケースごとに include ステップを並べ、`loop` は使いません（下表 #12）。
 - この形の suite を手順書にするには、include の `vars` の `json://` を読む runnora-docgen が必要です（[ramsesyok/runnora-docgen#4](https://github.com/ramsesyok/runnora-docgen/pull/4) で main にマージ済み）。
 
-## 検証結果（2026-09-26、Windows 11 / Windows PowerShell 5.1）
+## 検証結果（2026-09-26、Windows 11 / Windows PowerShell 5.1、旧形式）
 
-`./scripts/run-all.ps1` で次を確認しました。
+旧形式（タグ `format-v1`、runnora `v0.3.0`）の `./scripts/run-all.ps1` で次を確認しました。
+新形式への書き換え（runnora-migrate で移行し、TODO を手で対応）後の同じ確認はまだ実施していません。合否が変わらないことを確かめたら、この節を更新します。
 
 - モック: 生成 8/8、契約 8/8 成功
 - 実 API: 生成 8/8、契約 8/8、シナリオ 7/7 成功、検知確認は期待どおり exit 4
@@ -206,7 +224,7 @@ runbooks/contract/get_getMember.suite.yml
 |---|---|---|---|
 | 1 | runnora | 作成時は `--report-format json` / `junit` が未実装で、指定してもテキストが出力された（[ramsesyok/runnora#15](https://github.com/ramsesyok/runnora/pull/15) で実装済み） | text で保存 |
 | 2 | runnora | フック SQL はファイル全体を 1 文で実行。SQL*Plus の `/` 終端は `PLS-00103` | 1 ファイル 1 無名ブロックで記述（[sql/README.md](sql/README.md)） |
-| 3 | runnora | エラー終了時に cobra の Usage が毎回出力され、エラーが読みにくい | - |
+| 3 | runnora | エラー終了時に cobra の Usage が毎回出力され、エラーが読みにくい（新形式の実装（[ramsesyok/runnora#20](https://github.com/ramsesyok/runnora/pull/20)）で修正済み） | - |
 | 4 | runnora (runn) | suite の `json://` 相対パスは include 先 template の位置で解決される | template を suite と同じディレクトリに配置 |
 | 5 | runnora generate | 作成時は requestBody の無い POST（returnLoan）にも `{"TODO": ...}` ボディを送っていた（[ramsesyok/runnora#19](https://github.com/ramsesyok/runnora/pull/19) で修正済み。生成物も作り直し済み）。クエリは全パラメータを空値でも付与する | 実装が空クエリを無視するので実害なし |
 | 6 | runnora (runn DB) | Oracle の NUMBER は文字列で返る | `== "14"` / `int(...)` で比較 |
@@ -224,5 +242,5 @@ OpenAPI 応答検証（`openapi3` ランナー）は、作成時に「`GET /book
 ## 注意
 
 - DB のユーザー・パスワード（`libapp/libapp_pw`、SYS は `RunnoraE2e_Sys1`）はローカル検証専用です。
-  runnora は DSN のテンプレート展開をしないため `config.yaml` に直書きしています。
+  `runnora.yaml` の環境 unit の `ORACLE_DSN` に既定値として書いています。OS の環境変数 `LIBAPP_PASSWORD` を設定すると、パスワードだけを差し替えられます。
 - `db-up.ps1` は LIBAPP ユーザーを削除して作り直します（接続中のセッションは切断します）。

@@ -7,6 +7,6 @@
   `bind` で保存し、返却 URL（`/loans/{{ return_loan_id }}/return`）、蔵書照会 URL、DB 照会の条件、
   新しい貸出 ID が既存と重複しないことの検証に使う。
 - 合格条件：全手順の検証式が真であり、共通後処理が正常終了すること。
-- 実行：`runnora run --config config.yaml --before-sql sql/cases/lib004_fill_loans_before.sql runbooks/scenarios/lib-004-loan-limit.yml`
+- 実行：`runnora run runbooks/scenarios/lib-004-loan-limit.yml`（ケース固有の前後処理は runbook の `runnora:` ブロックに書いてある）
 
 {{< include ../../generated/scenarios/lib-004-loan-limit/_body.qmd >}}

@@ -1,5 +1,9 @@
 desc: LIB-007 BULK COLLECT/FORALLで投入した大量の貸出履歴を照会する
-# 実行: runnora run --config config.yaml --before-sql sql/cases/lib007_history_before.sql <this>
+runnora:
+  id: LIB-007
+  before:
+    - sql/cases/lib007_history_before.sql
+# 実行: runnora run <this> (前後処理は上の runnora: ブロック。スイートでまとめて流すときは runnora run --suite scenarios)
 # 前処理で M0004 に B0005〜B0020 の返却済み貸出 16 件 (loan 1〜16) を投入する
 labels:
   - scenario
@@ -7,11 +11,11 @@ labels:
   - plsql-setup
 runners:
   req:
-    endpoint: http://127.0.0.1:18081
+    endpoint: ${API_URL}
     # 応答を OpenAPI 定義で自動検証する。異常系の入力を送るためリクエスト側の検証は行わない
     openapi3: ../../openapi/library-api.yaml
     skipValidateRequest: true
-  db: oracle://libapp:libapp_pw@127.0.0.1:1522/FREEPDB1
+  db: ${ORACLE_DSN}
 steps:
   returned_history:
     desc: M0004の返却済み履歴が16件、貸出ID順に並んでいることを確認する
@@ -24,7 +28,7 @@ steps:
   dump_returned_history:
     dump:
       expr: steps.returned_history.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/returned_history.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-007-returned_history.json'
   check_returned_history:
     test: |
       steps.returned_history.res.status == 200 &&
@@ -67,7 +71,7 @@ steps:
   dump_no_active:
     dump:
       expr: steps.no_active.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/no_active.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-007-no_active.json'
   check_no_active:
     test: |
       steps.no_active.res.status == 200 &&
@@ -84,7 +88,7 @@ steps:
   dump_member_clean:
     dump:
       expr: steps.member_clean.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/member_clean.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-007-member_clean.json'
   check_member_clean:
     test: |
       steps.member_clean.res.status == 200 &&
@@ -105,7 +109,7 @@ steps:
   dump_loan_after_history:
     dump:
       expr: steps.loan_after_history.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/loan_after_history.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-007-loan_after_history.json'
   check_loan_after_history:
     test: |
       steps.loan_after_history.res.status == 201 &&

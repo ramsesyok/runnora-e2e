@@ -76,6 +76,6 @@ flowchart LR
 | 生成テスト | モック・実装 | `runbooks/generated/`（runnora generate の出力そのまま） | OpenAPI の example で呼び、ステータスのみ |
 | 契約テスト | モック・実装 | `runbooks/contract/`, `cases/contract/` | ステータス + 本文の一部 + OpenAPI 応答スキーマ |
 | シナリオ試験 | 実装のみ | `runbooks/scenarios/`, `sql/cases/` | 状態変化・ID 引き継ぎ・DB 直接照会・前後処理での DB 検証 |
-| 検知確認 | 実装のみ | `runbooks/demo/` | 事後検証が DB 不整合を検知して終了コード 4 になること |
+| 検知確認 | 実装のみ | `runbooks/demo/` | 事後検証が DB 不整合を検知して後処理が失敗すること（`expect: hookFail`） |
 
 : 試験の種類 {#tbl-test-kinds}

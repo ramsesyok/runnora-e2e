@@ -1,5 +1,5 @@
 -- =============================================================
--- cases/lib007_history_before.sql  (--before-sql : LIB-007 大量の貸出履歴)
+-- cases/lib007_history_before.sql  (LIB-007 の runnora: ブロックの before : 大量の貸出履歴)
 -- M0004 に、B0005〜B0020 の 16 冊分の返却済み貸出履歴を一括投入する。
 -- 5 件ずつ BULK COLLECT で読み、FORALL でまとめて INSERT する「バッチ処理」の定型。
 --   loan 1..16 : 全て RETURNED (loaned_at は 1 週間ずつずらす)

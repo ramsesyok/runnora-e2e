@@ -1,5 +1,5 @@
 -- =============================================================
--- common/00_reset.sql  (config.yaml hooks.common.before 1/2)
+-- common/00_reset.sql  (runnora.yaml の環境 unit の hooks.before 1/2)
 -- 全テーブルのデータを削除し、貸出 ID の採番を 1 に戻す。
 -- 毎回同じ初期状態から runbook を始めるための「リセット」フック。
 --

@@ -1,5 +1,5 @@
 -- =============================================================
--- common/10_seed_master.sql  (config.yaml hooks.common.before 2/2)
+-- common/10_seed_master.sql  (runnora.yaml の環境 unit の hooks.before 2/2)
 -- 会員・蔵書のマスタデータを投入する。
 -- OpenAPI の example (B0001, M0001 など) と同じ値にしてあるため、
 -- 生成テスト (runnora generate) とモック (oapi2wire) の期待値が実 API でも成り立つ。

@@ -1,5 +1,5 @@
 -- =============================================================
--- cases/lib005_assert_after.sql  (--after-sql : LIB-005 SAVEPOINT)
+-- cases/lib005_assert_after.sql  (LIB-005 の runnora: ブロックの after : SAVEPOINT)
 -- SAVEPOINT で取り消した単位が残っていないこと、API で再登録した B0103 が
 -- 追加されていることを DB で確認する。
 --
