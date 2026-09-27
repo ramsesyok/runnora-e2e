@@ -7,12 +7,12 @@ runnora はフックファイルの **内容全体を 1 文として** go-ora �
 |---|---|---|
 | 1 ファイル = 1 つの無名ブロック（`DECLARE ... BEGIN ... END;`） | ○ | 複数の DML/DDL はブロック内にまとめる |
 | 先頭・行末の `--` コメント、日本語コメント | ○ | |
-| SQL*Plus の `/` 終端 | × | `PLS-00103: Encountered the symbol "/"` で exit 4 |
+| SQL*Plus の `/` 終端 | × | `PLS-00103: Encountered the symbol "/"` でフック失敗（exit 4） |
 | DDL（`ALTER SEQUENCE` 等） | ○ | `EXECUTE IMMEDIATE` で実行する。暗黙コミットに注意 |
 | ブロック内の局所ファンクションを SQL 文から呼ぶ | × | `PLS-00231`。変数に代入してから使う |
 | `TIMESTAMP`（TZ なし）列と `SYSTIMESTAMP` の比較 | △ | 比較は TZ なし側をセッション TZで解釈するため（go-ora 接続で 9 時間ずれて失敗した）環境依存。`TIMESTAMP WITH TIME ZONE` を使う |
 | ファイルをまたぐ SAVEPOINT・トランザクション | × | ファイルごとに接続プールから実行されるため、各ファイル内で完結させる |
-| `RAISE_APPLICATION_ERROR` | ○ | runnora は exit 4（フック失敗）で終了する。事後条件のアサーションに使える |
+| `RAISE_APPLICATION_ERROR` | ○ | フック失敗になる（期待していなければ runnora は exit 4 で終了する）。事後条件のアサーションに使える |
 
 フックは runbook 1 本ごとに `before → runbook → after` の順で実行されます
 （suite が `include` で template を何度呼んでも 1 回だけ）。after は before や runbook が失敗しても実行されます。
@@ -20,9 +20,12 @@ runnora はフックファイルの **内容全体を 1 文として** go-ora �
 ## 実行順序
 
 ```
-before: config.yaml の common.before → --before-sql
-after : --after-sql → config.yaml の common.after
+before: 環境の hooks.before → スイートの hooks.before → runbook の runnora: ブロックの before
+after : runbook の runnora: ブロックの after → スイートの hooks.after → 環境の hooks.after
 ```
+
+環境 unit の hooks は `sql/common/`、スイート generated-unit / contract-unit の hooks は `sql/cases/contract_setup.sql`、
+シナリオ固有の SQL は各 runbook の `runnora:` ブロックに書いています（[../runnora.yaml](../runnora.yaml)）。
 
 ## ファイル一覧と使っている PL/SQL 構文
 
@@ -39,4 +42,4 @@ after : --after-sql → config.yaml の common.after
 | cases/lib005_assert_after.sql | LIB-005 の事後条件 | 条件付き COUNT, RAISE_APPLICATION_ERROR |
 | cases/lib006_assert_no_loans_after.sql | 異常系で DB が変わっていないこと | SELECT INTO, USER_SEQUENCES, IF ... ELSIF |
 | cases/lib007_history_before.sql | 大量の貸出履歴 | BULK COLLECT ... LIMIT, FORALL, SQL%BULK_ROWCOUNT, 入れ子表 |
-| cases/demo_break_invariant_after.sql | 検知デモ用に不整合を作る | （common/90 が exit 4 で検知することを確認） |
+| cases/demo_break_invariant_after.sql | 検知デモ用に不整合を作る | （common/90 がフック失敗で検知することを確認。runbook は `expect: hookFail`） |

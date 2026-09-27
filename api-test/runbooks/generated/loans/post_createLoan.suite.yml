@@ -1,4 +1,6 @@
 desc: "本を貸し出す suite"
+runnora:
+  id: "GEN-createLoan"
 labels:
   - generated
   - openapi

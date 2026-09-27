@@ -1,4 +1,6 @@
 desc: 契約 listBooks 蔵書を検索する（モック・実APIの両方で実行する）
+runnora:
+  id: CONTRACT-listBooks
 labels:
   - contract
   - books

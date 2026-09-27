@@ -1,15 +1,19 @@
 desc: LIB-001 本を借りて返すまでの正常系（在庫増減・ID引き継ぎ・二重返却）
-# 実行: runnora run --config config.yaml --after-sql sql/cases/lib001_assert_after.sql <this>
+runnora:
+  id: LIB-001
+  after:
+    - sql/cases/lib001_assert_after.sql
+# 実行: runnora run <this> (前後処理は上の runnora: ブロック。スイートでまとめて流すときは runnora run --suite scenarios)
 labels:
   - scenario
   - loans
 runners:
   req:
-    endpoint: http://127.0.0.1:18081
+    endpoint: ${API_URL}
     # 応答を OpenAPI 定義で自動検証する。異常系の入力を送るためリクエスト側の検証は行わない
     openapi3: ../../openapi/library-api.yaml
     skipValidateRequest: true
-  db: oracle://libapp:libapp_pw@127.0.0.1:1522/FREEPDB1
+  db: ${ORACLE_DSN}
 steps:
   member_before:
     desc: 会員M0001が貸出0件・延滞なしであることを確認する
@@ -22,7 +26,7 @@ steps:
   dump_member_before:
     dump:
       expr: steps.member_before.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/member_before.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-001-member_before.json'
   check_member_before:
     test: |
       steps.member_before.res.status == 200 &&
@@ -41,7 +45,7 @@ steps:
   dump_book_before:
     dump:
       expr: steps.book_before.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/book_before.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-001-book_before.json'
   check_book_before:
     test: |
       steps.book_before.res.status == 200 &&
@@ -62,7 +66,7 @@ steps:
   dump_create_loan:
     dump:
       expr: steps.create_loan.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/create_loan.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-001-create_loan.json'
   check_create_loan:
     test: |
       steps.create_loan.res.status == 201 &&
@@ -99,7 +103,7 @@ steps:
   dump_book_lent:
     dump:
       expr: steps.book_lent.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/book_lent.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-001-book_lent.json'
   check_book_lent:
     test: |
       steps.book_lent.res.status == 200 &&
@@ -129,7 +133,7 @@ steps:
   dump_return_loan:
     dump:
       expr: steps.return_loan.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/return_loan.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-001-return_loan.json'
   check_return_loan:
     test: |
       steps.return_loan.res.status == 200 &&
@@ -149,7 +153,7 @@ steps:
   dump_return_again:
     dump:
       expr: steps.return_again.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/return_again.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-001-return_again.json'
   check_return_again:
     test: |
       steps.return_again.res.status == 409 &&
@@ -166,7 +170,7 @@ steps:
   dump_book_restored:
     dump:
       expr: steps.book_restored.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/book_restored.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-001-book_restored.json'
   check_book_restored:
     test: |
       steps.book_restored.res.status == 200 &&
@@ -183,7 +187,7 @@ steps:
   dump_member_after:
     dump:
       expr: steps.member_after.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/member_after.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-001-member_after.json'
   check_member_after:
     test: |
       steps.member_after.res.status == 200 &&

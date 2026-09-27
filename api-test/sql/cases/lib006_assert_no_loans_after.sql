@@ -1,5 +1,5 @@
 -- =============================================================
--- cases/lib006_assert_no_loans_after.sql  (--after-sql : LIB-006 異常系)
+-- cases/lib006_assert_no_loans_after.sql  (LIB-006 の runnora: ブロックの after : 異常系)
 -- エラー応答を返したリクエストが DB を変更していないことを確認する。
 --   - 貸出は 0 件 / 蔵書は初期の 20 件 / 採番は一度も進んでいない
 --

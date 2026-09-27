@@ -1,5 +1,9 @@
 desc: LIB-003 延滞中の会員は借りられず、返却すると借りられる
-# 実行: runnora run --config config.yaml --before-sql sql/cases/lib003_overdue_before.sql <this>
+runnora:
+  id: LIB-003
+  before:
+    - sql/cases/lib003_overdue_before.sql
+# 実行: runnora run <this> (前後処理は上の runnora: ブロック。スイートでまとめて流すときは runnora run --suite scenarios)
 # 前処理で「M0002 が B0004 を 21 日前に借りて未返却 (期限 7 日前)」の貸出を作る。
 # 貸出 ID・蔵書 ID は固定値で書かず、貸出中一覧の応答から「返却期限が本日より前の貸出」を探して引き継ぐ。
 labels:
@@ -8,7 +12,7 @@ labels:
   - plsql-setup
 runners:
   req:
-    endpoint: http://127.0.0.1:18081
+    endpoint: ${API_URL}
     # 応答を OpenAPI 定義で自動検証する。異常系の入力を送るためリクエスト側の検証は行わない
     openapi3: ../../openapi/library-api.yaml
     skipValidateRequest: true
@@ -24,7 +28,7 @@ steps:
   dump_member_overdue:
     dump:
       expr: steps.member_overdue.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/member_overdue.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-003-member_overdue.json'
   check_member_overdue:
     test: |
       steps.member_overdue.res.status == 200 &&
@@ -42,7 +46,7 @@ steps:
   dump_active_loans:
     dump:
       expr: steps.active_loans.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/active_loans.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-003-active_loans.json'
   check_active_loans:
     test: |
       steps.active_loans.res.status == 200 &&
@@ -64,7 +68,7 @@ steps:
   dump_book_lent:
     dump:
       expr: steps.book_lent.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/book_lent.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-003-book_lent.json'
   check_book_lent:
     test: |
       steps.book_lent.res.status == 200 &&
@@ -85,7 +89,7 @@ steps:
   dump_loan_rejected:
     dump:
       expr: steps.loan_rejected.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/loan_rejected.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-003-loan_rejected.json'
   check_loan_rejected:
     test: |
       steps.loan_rejected.res.status == 409 &&
@@ -103,7 +107,7 @@ steps:
   dump_return_overdue:
     dump:
       expr: steps.return_overdue.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/return_overdue.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-003-return_overdue.json'
   check_return_overdue:
     test: |
       steps.return_overdue.res.status == 200 &&
@@ -123,7 +127,7 @@ steps:
   dump_book_returned:
     dump:
       expr: steps.book_returned.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/book_returned.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-003-book_returned.json'
   check_book_returned:
     test: |
       steps.book_returned.res.status == 200 &&
@@ -140,7 +144,7 @@ steps:
   dump_member_cleared:
     dump:
       expr: steps.member_cleared.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/member_cleared.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-003-member_cleared.json'
   check_member_cleared:
     test: |
       steps.member_cleared.res.status == 200 &&
@@ -161,7 +165,7 @@ steps:
   dump_loan_ok:
     dump:
       expr: steps.loan_ok.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/loan_ok.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-003-loan_ok.json'
   check_loan_ok:
     test: |
       steps.loan_ok.res.status == 201 &&
@@ -183,7 +187,7 @@ steps:
   dump_loan_history:
     dump:
       expr: steps.loan_history.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/loan_history.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-003-loan_history.json'
   check_loan_history:
     test: |
       steps.loan_history.res.status == 200 &&

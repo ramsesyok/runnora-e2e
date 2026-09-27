@@ -1,5 +1,9 @@
 desc: LIB-004 貸出上限3冊に達した会員は借りられず、1冊返すと借りられる
-# 実行: runnora run --config config.yaml --before-sql sql/cases/lib004_fill_loans_before.sql <this>
+runnora:
+  id: LIB-004
+  before:
+    - sql/cases/lib004_fill_loans_before.sql
+# 実行: runnora run <this> (前後処理は上の runnora: ブロック。スイートでまとめて流すときは runnora run --suite scenarios)
 # 前処理で M0001 に TECH の本 B0003, B0006, B0008 を貸し出す。
 # 貸出 ID は固定値で書かず、貸出一覧の応答から取り出して後続の返却・照会に引き継ぐ。
 labels:
@@ -8,11 +12,11 @@ labels:
   - plsql-setup
 runners:
   req:
-    endpoint: http://127.0.0.1:18081
+    endpoint: ${API_URL}
     # 応答を OpenAPI 定義で自動検証する。異常系の入力を送るためリクエスト側の検証は行わない
     openapi3: ../../openapi/library-api.yaml
     skipValidateRequest: true
-  db: oracle://libapp:libapp_pw@127.0.0.1:1522/FREEPDB1
+  db: ${ORACLE_DSN}
 steps:
   member_full:
     desc: 前処理によりM0001の貸出中件数が上限3に達していることを確認する
@@ -25,7 +29,7 @@ steps:
   dump_member_full:
     dump:
       expr: steps.member_full.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/member_full.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-004-member_full.json'
   check_member_full:
     test: |
       steps.member_full.res.status == 200 &&
@@ -43,7 +47,7 @@ steps:
   dump_active_loans:
     dump:
       expr: steps.active_loans.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/active_loans.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-004-active_loans.json'
   check_active_loans:
     test: |
       steps.active_loans.res.status == 200 &&
@@ -70,7 +74,7 @@ steps:
   dump_loan_rejected:
     dump:
       expr: steps.loan_rejected.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/loan_rejected.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-004-loan_rejected.json'
   check_loan_rejected:
     test: |
       steps.loan_rejected.res.status == 409 &&
@@ -88,7 +92,7 @@ steps:
   dump_return_one:
     dump:
       expr: steps.return_one.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/return_one.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-004-return_one.json'
   check_return_one:
     test: |
       steps.return_one.res.status == 200 &&
@@ -107,7 +111,7 @@ steps:
   dump_book_returned:
     dump:
       expr: steps.book_returned.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/book_returned.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-004-book_returned.json'
   check_book_returned:
     test: |
       steps.book_returned.res.status == 200 &&
@@ -127,7 +131,7 @@ steps:
   dump_loan_ok:
     dump:
       expr: steps.loan_ok.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/loan_ok.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-004-loan_ok.json'
   check_loan_ok:
     test: |
       steps.loan_ok.res.status == 201 &&
@@ -149,7 +153,7 @@ steps:
   dump_active_loans_after:
     dump:
       expr: steps.active_loans_after.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/active_loans_after.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-004-active_loans_after.json'
   check_active_loans_after:
     test: |
       steps.active_loans_after.res.status == 200 &&

@@ -1,7 +1,7 @@
 -- =============================================================
--- common/90_verify_integrity.sql  (config.yaml hooks.common.after)
+-- common/90_verify_integrity.sql  (runnora.yaml の環境 unit の hooks.after)
 -- runbook 実行後に DB の不変条件を検証する。違反があれば
--- RAISE_APPLICATION_ERROR で失敗させ、runnora を exit 4 で終了させる。
+-- RAISE_APPLICATION_ERROR で失敗させる (フック失敗。期待していなければ runnora は exit 4 で終了する)。
 --
 -- 不変条件:
 --   (1) 蔵書ごとに 貸出可能冊数 = 所蔵冊数 - 貸出中件数

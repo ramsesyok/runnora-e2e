@@ -20,6 +20,7 @@ function Resolve-Tool {
 $script:Runnora = Resolve-Tool 'RUNNORA_EXE' (Join-Path $Projects 'runnora\runnora.exe') 'runnora'
 $script:Oapi2wire = Resolve-Tool 'OAPI2WIRE_EXE' (Join-Path $Projects 'oapi2wire\oapi2wire.exe') 'oapi2wire'
 
+# 起動を待つための URL。runbook の接続先は runnora.yaml の環境 (unit / mock) の vars に書く
 $script:ApiUrl = 'http://127.0.0.1:18081'
 $script:MockUrl = 'http://127.0.0.1:18080'
 
@@ -29,17 +30,14 @@ function New-ReportDir([string]$Kind) {
     return $dir
 }
 
-# runnora を 1 回実行し、期待した終了コードかどうかを結果オブジェクトで返す。
+# runnora.yaml のスイートを 1 つ実行し、成功したかどうかを結果オブジェクトで返す。
+# 環境 (接続先・共通の前後処理)、runbook ごとの前後処理、期待する結果 (expect) は
+# runnora.yaml と各 runbook の runnora: ブロックに書いてあるので、ここではスイート名だけを渡す。
+# runnora は全 runbook が期待どおりなら 0 を返す (期待どおりのフック失敗も 0)。
 function Invoke-Runnora {
-    param(
-        [string]$Name, [string]$Config, [string[]]$Runbooks, [string]$ReportDir,
-        [string[]]$BeforeSql = @(), [string[]]$AfterSql = @(), [int]$Expect = 0
-    )
+    param([string]$Name, [string]$Suite, [string]$ReportDir)
     # 人が読むレポートとして text で保存する (json/junit は runnora#15 で実装済み。サマリー HTML 化の際に切り替える)
-    $runArgs = @('run', '--config', $Config, '--report-format', 'text', '--report-out', (Join-Path $ReportDir "$Name.txt"))
-    foreach ($f in $BeforeSql) { $runArgs += @('--before-sql', $f) }
-    foreach ($f in $AfterSql) { $runArgs += @('--after-sql', $f) }
-    $runArgs += $Runbooks
+    $runArgs = @('run', '--suite', $Suite, '--report-format', 'text', '--report-out', (Join-Path $ReportDir "$Name.txt"))
     $log = Join-Path $ReportDir "$Name.log"
     $evidenceDir = Join-Path $ReportDir "evidence\$Name"
     New-Item -ItemType Directory -Force $evidenceDir | Out-Null
@@ -53,11 +51,11 @@ function Invoke-Runnora {
     } finally {
         [Environment]::SetEnvironmentVariable('RUNNORA_EVIDENCE_DIR', $previousEvidenceDir)
     }
-    $ok = ($code -eq $Expect)
+    $ok = ($code -eq 0)
     $mark = if ($ok) { 'OK ' } else { 'NG ' }
-    Write-Host ("  [{0}] {1,-28} exit={2} (expect {3})" -f $mark, $Name, $code, $Expect)
+    Write-Host ("  [{0}] {1,-28} suite={2} exit={3}" -f $mark, $Name, $Suite, $code)
     if (-not $ok) { Get-Content $log -TotalCount 15 | ForEach-Object { Write-Host "        $_" } }
-    [pscustomobject]@{ Name = $Name; Exit = $code; Expect = $Expect; Ok = $ok }
+    [pscustomobject]@{ Name = $Name; Exit = $code; Ok = $ok }
 }
 
 # ディレクトリを削除する。直前に書いたファイルをエディタやウイルス対策が一時的に掴んでいると

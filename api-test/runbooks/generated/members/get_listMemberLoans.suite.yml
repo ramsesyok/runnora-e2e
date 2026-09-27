@@ -1,4 +1,6 @@
 desc: "会員の貸出履歴を取得する suite"
+runnora:
+  id: "GEN-listMemberLoans"
 labels:
   - generated
   - openapi

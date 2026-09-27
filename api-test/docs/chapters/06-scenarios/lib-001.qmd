@@ -5,6 +5,6 @@
 - `member_loans` は `loop.until` の例。貸出 ID が一覧に現れるまで最大 5 回、0.2 秒間隔で照会し、条件を満たした時点で終了する。
 - 合格条件：全手順の検証式が真であり、後処理 `lib001_assert_after.sql` が DB 上で
   「貸出 1 件・返却済・返却日が本日・B0001 の貸出可能冊数 3」を確認して正常終了すること。
-- 実行：`runnora run --config config.yaml --after-sql sql/cases/lib001_assert_after.sql runbooks/scenarios/lib-001-loan-lifecycle.yml`
+- 実行：`runnora run runbooks/scenarios/lib-001-loan-lifecycle.yml`（ケース固有の前後処理は runbook の `runnora:` ブロックに書いてある）
 
 {{< include ../../generated/scenarios/lib-001-loan-lifecycle/_body.qmd >}}

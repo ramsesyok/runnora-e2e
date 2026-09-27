@@ -1,4 +1,6 @@
 desc: "蔵書を 1 件取得する suite"
+runnora:
+  id: "GEN-getBook"
 labels:
   - generated
   - openapi

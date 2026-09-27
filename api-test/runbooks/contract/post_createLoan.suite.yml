@@ -1,4 +1,6 @@
 desc: 契約 createLoan 本を貸し出す（モック・実APIの両方で実行する）
+runnora:
+  id: CONTRACT-createLoan
 labels:
   - contract
   - loans

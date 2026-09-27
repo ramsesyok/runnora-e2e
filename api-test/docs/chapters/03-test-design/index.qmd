@@ -53,14 +53,15 @@ suite が `include` で template を何度呼んでも、前後処理は suite 1
 |----|------|----------|------|
 | 1 | 共通前処理 | `sql/common/00_reset.sql` | 全データ削除、貸出 ID 採番のリセット |
 | 2 | 共通前処理 | `sql/common/10_seed_master.sql` | 会員・蔵書マスタの投入 |
-| 3 | ケース前処理 | `--before-sql`（`sql/cases/*_before.sql` 等） | API では作れない状態（延滞など）を作る |
+| 3 | スイート前処理 / ケース前処理 | スイートの `hooks.before`（契約・生成テストの `sql/cases/contract_setup.sql`）、runbook の `runnora:` ブロックの `before`（`sql/cases/*_before.sql`） | 契約テスト用の貸出や、API では作れない状態（延滞など）を作る |
 | 4 | runbook | `runbooks/**` | API 呼び出しと検証 |
-| 5 | ケース後処理 | `--after-sql`（`sql/cases/*_after.sql`） | ケース固有の事後条件を DB で検証 |
+| 5 | ケース後処理 | runbook の `runnora:` ブロックの `after`（`sql/cases/*_after.sql`） | ケース固有の事後条件を DB で検証 |
 | 6 | 共通後処理 | `sql/common/90_verify_integrity.sql` | DB 不変条件を検証。違反は `RAISE_APPLICATION_ERROR` |
 
 : 前後処理の実行順序 {#tbl-hook-order}
 
-後処理の SQL が `RAISE_APPLICATION_ERROR` で失敗すると、runnora は終了コード **4**（フック失敗）で終わる。
+後処理の SQL が `RAISE_APPLICATION_ERROR` で失敗すると、その runbook はフック失敗になり、runnora は終了コード **4** で終わる
+（検知確認 DEMO のように `expect: hookFail` で失敗を期待している runbook は合格に数える）。
 これにより「API の応答は正しいが DB が壊れている」不具合を検出できる（検知確認 DEMO で確認）。
 
 ### 記述上の制約

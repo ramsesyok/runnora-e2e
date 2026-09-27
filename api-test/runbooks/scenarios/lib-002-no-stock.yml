@@ -1,14 +1,16 @@
 desc: LIB-002 在庫1冊の本の取り合い（在庫切れ409と返却後の再貸出）
+runnora:
+  id: LIB-002
 labels:
   - scenario
   - loans
 runners:
   req:
-    endpoint: http://127.0.0.1:18081
+    endpoint: ${API_URL}
     # 応答を OpenAPI 定義で自動検証する。異常系の入力を送るためリクエスト側の検証は行わない
     openapi3: ../../openapi/library-api.yaml
     skipValidateRequest: true
-  db: oracle://libapp:libapp_pw@127.0.0.1:1522/FREEPDB1
+  db: ${ORACLE_DSN}
 steps:
   first_loan:
     desc: 所蔵1冊のB0002をM0001が借りる
@@ -24,7 +26,7 @@ steps:
   dump_first_loan:
     dump:
       expr: steps.first_loan.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/first_loan.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-002-first_loan.json'
   check_first_loan:
     test: |
       steps.first_loan.res.status == 201 &&
@@ -46,7 +48,7 @@ steps:
   dump_book_empty:
     dump:
       expr: steps.book_empty.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/book_empty.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-002-book_empty.json'
   check_book_empty:
     test: |
       steps.book_empty.res.status == 200 &&
@@ -63,7 +65,7 @@ steps:
   dump_available_novels:
     dump:
       expr: steps.available_novels.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/available_novels.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-002-available_novels.json'
   check_available_novels:
     test: |
       steps.available_novels.res.status == 200 &&
@@ -84,7 +86,7 @@ steps:
   dump_second_loan_rejected:
     dump:
       expr: steps.second_loan_rejected.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/second_loan_rejected.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-002-second_loan_rejected.json'
   check_second_loan_rejected:
     test: |
       steps.second_loan_rejected.res.status == 409 &&
@@ -108,7 +110,7 @@ steps:
   dump_return_first:
     dump:
       expr: steps.return_first.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/return_first.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-002-return_first.json'
   check_return_first:
     test: |
       steps.return_first.res.status == 200 &&
@@ -128,7 +130,7 @@ steps:
   dump_second_loan_ok:
     dump:
       expr: steps.second_loan_ok.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/second_loan_ok.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-002-second_loan_ok.json'
   check_second_loan_ok:
     test: |
       steps.second_loan_ok.res.status == 201 &&
@@ -146,7 +148,7 @@ steps:
   dump_book_empty_again:
     dump:
       expr: steps.book_empty_again.res
-      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/book_empty_again.json'
+      out: '{{ env.RUNNORA_EVIDENCE_DIR }}/lib-002-book_empty_again.json'
   check_book_empty_again:
     test: |
       steps.book_empty_again.res.status == 200 &&

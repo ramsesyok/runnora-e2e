@@ -1,4 +1,6 @@
 desc: 契約 returnLoan 本を返却する（モック・実APIの両方で実行する）
+runnora:
+  id: CONTRACT-returnLoan
 labels:
   - contract
   - loans

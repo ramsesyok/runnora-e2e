@@ -1,4 +1,6 @@
 desc: 契約 getHealth 稼働状態を確認する（モック・実APIの両方で実行する）
+runnora:
+  id: CONTRACT-getHealth
 labels:
   - contract
   - system

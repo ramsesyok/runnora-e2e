@@ -1,7 +1,7 @@
 ﻿# 手順書 (docs/) の生成原稿を作り、ddq で HTML / PDF を発行する。
 #   1. tools/openapi-doc : OpenAPI → docs/generated/api/api-spec.qmd
-#   2. runnora-docgen    : 契約 suite → docs/generated/contract/<suite>/
-#                          シナリオ + 前後処理 SQL → docs/generated/scenarios/<runbook>/
+#   2. runnora-docgen    : スイート contract-unit (契約 suite) → docs/generated/contract/<suite>/
+#                          スイート scenarios (シナリオ + 前後処理 SQL) → docs/generated/scenarios/<runbook>/
 #   3. 章から include する取り込み原稿 (_body.qmd) を作る
 #   4. ddq html / pdf
 # ツールの場所: 環境変数 RUNNORA_DOCGEN_EXE / DDQ_EXE で変更できる。
@@ -11,7 +11,6 @@ param(
 )
 . (Join-Path $PSScriptRoot '_common.ps1')
 $docgen = Resolve-Tool 'RUNNORA_DOCGEN_EXE' (Join-Path $Projects 'runnora-docgen\runnora-docgen.exe') 'runnora-docgen'
-$defs = Import-PowerShellDataFile (Join-Path $PSScriptRoot 'scenarios.psd1')
 $utf8 = New-Object System.Text.UTF8Encoding($false)
 
 # 章ファイル (docs/chapters/<章>/index.qmd) から見た相対パスで include を並べる。
@@ -47,8 +46,9 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'API 仕様の生成に失敗しました' }
 
     Write-Host '== 契約テスト (runnora-docgen)'
+    # 実 API で流すスイート contract-unit の前後処理 (環境 unit + contract_setup.sql) を載せる
     $contract = @(Get-ChildItem runbooks/contract -Filter *.suite.yml | Sort-Object Name | ForEach-Object { "runbooks/contract/$($_.Name)" })
-    & $docgen generate --base-dir . --config config.yaml --before-sql sql/cases/contract_setup.sql --out docs/generated/contract --force @contract
+    & $docgen generate --suite contract-unit --out docs/generated/contract --force
     if ($LASTEXITCODE -ne 0) { throw '契約テストの原稿生成に失敗しました' }
     # 前処理・後処理は全 suite で同一なので、先頭の suite の表を 1 回だけ載せる
     $first = [IO.Path]::GetFileNameWithoutExtension($contract[0]).Replace('_', '-').Replace('.', '-').ToLower()
@@ -80,14 +80,11 @@ try {
     [IO.File]::WriteAllLines((Join-Path $gen 'sql\sql-listing.qmd'), $listing, $utf8)
 
     Write-Host '== シナリオ試験 (runnora-docgen)'
-    foreach ($s in $defs.Scenarios) {
-        $dgArgs = @('generate', '--base-dir', '.', '--config', 'config.yaml', '--out', 'docs/generated/scenarios', '--force')
-        foreach ($f in $s.BeforeSql) { $dgArgs += @('--before-sql', $f) }
-        foreach ($f in $s.AfterSql) { $dgArgs += @('--after-sql', $f) }
-        & $docgen @dgArgs $s.Runbook
-        if ($LASTEXITCODE -ne 0) { throw "$($s.Id) の原稿生成に失敗しました" }
-        $name = [IO.Path]::GetFileNameWithoutExtension($s.Runbook)
-        Write-Body "scenarios/$name" '###'
+    # 前後処理は 環境 unit の hooks と各 runbook の runnora: ブロックから載せる
+    & $docgen generate --suite scenarios --out docs/generated/scenarios --force
+    if ($LASTEXITCODE -ne 0) { throw 'シナリオ試験の原稿生成に失敗しました' }
+    foreach ($dir in Get-ChildItem (Join-Path $gen 'scenarios') -Directory | Sort-Object Name) {
+        Write-Body "scenarios/$($dir.Name)" '###'
     }
 
     if ($Format -eq 'None') { return }

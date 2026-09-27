@@ -1,5 +1,5 @@
 -- =============================================================
--- cases/lib004_fill_loans_before.sql  (--before-sql : LIB-004 貸出上限)
+-- cases/lib004_fill_loans_before.sql  (LIB-004 の runnora: ブロックの before : 貸出上限)
 -- M0001 に上限 (max_loans = 3) まで TECH の本を貸し出した状態を作る。
 -- 貸出可能な本を book_id 順に探すので loan 1..3 = B0003, B0006, B0008 になる。
 --

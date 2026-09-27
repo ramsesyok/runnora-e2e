@@ -28,7 +28,8 @@ runbook や SQL を直せば再生成で追随する。良否欄は実施者が�
 | runbook | runn/runnora のシナリオ定義 (YAML)。HTTP 呼び出し・DB 照会・検証式を手順として並べる |
 | suite / template | 1 つの API を複数のケース JSON で繰り返し呼ぶ構成。suite がケースを読み、template が 1 回の呼び出しを定義する |
 | ケース JSON | 1 回の呼び出しの入力 (パス・クエリ・ボディ) と期待値 (ステータス・本文の一部) |
-| 前処理 / 後処理 | runbook の前後に runnora が実行する SQL/PL/SQL。共通 (config.yaml) とケース固有 (`--before-sql` / `--after-sql`) がある |
+| 前処理 / 後処理 | runbook の前後に runnora が実行する SQL/PL/SQL。環境共通 (`runnora.yaml` の環境の `hooks`)、スイート固有 (スイートの `hooks`)、ケース固有 (runbook の `runnora:` ブロックの `before` / `after`) がある |
+| 環境 / スイート | `runnora.yaml` に書く実行の単位。環境 (unit / mock) は接続先と共通の前後処理を、スイートは実行する runbook の選び方を決める |
 | 契約テスト | 同じケースをモックと実装の両方に流し、どちらも OpenAPI どおりに振る舞うことを確かめるテスト |
 | シナリオ試験 | 実装 (実 DB) に対して、状態の変化を複数手順で追う業務シナリオのテスト |
 | 不変条件 | どの操作の後でも成り立つべき DB の条件（例: 貸出可能冊数 = 所蔵冊数 − 貸出中件数） |

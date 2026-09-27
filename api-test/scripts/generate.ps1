@@ -3,8 +3,8 @@
 . (Join-Path $PSScriptRoot '_common.ps1')
 Push-Location $Root
 try {
-    & $Runnora generate --config config.mock.yaml --openapi openapi/library-api.yaml --out . `
-        --clean --force
+    # 出力先は runnora.yaml のあるフォルダ。template の接続先は ${RUNNORA_BASE_URL} で、実行時に環境 (unit / mock) の vars で決まる
+    & $Runnora generate --openapi openapi/library-api.yaml --clean --force
     if ($LASTEXITCODE -ne 0) { throw 'runnora generate に失敗しました' }
     & (Join-Path $PSScriptRoot 'add-response-evidence.ps1')
 } finally {

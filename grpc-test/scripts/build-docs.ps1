@@ -8,8 +8,8 @@ if (-not $docgen) { $docgen = Join-Path $projects 'runnora-docgen\runnora-docgen
 if (-not (Test-Path -LiteralPath $docgen)) { throw "runnora-docgen が見つかりません: $docgen" }
 Push-Location $root
 try {
-    & $docgen generate --base-dir . --config config.yaml --proto proto/library.proto `
-        --out docs/generated --force runbooks/unary.yml runbooks/server-streaming.yml runbooks/calculation-streaming.yml runbooks/series-analysis.yml
+    # 原稿にする runbook は runnora.yaml のスイート grpc で決まる
+    & $docgen generate --suite grpc --proto proto/library.proto --out docs/generated --force
     if ($LASTEXITCODE -ne 0) { throw '原稿生成に失敗しました' }
     if (-not $GenerateOnly) {
         ddq html docs

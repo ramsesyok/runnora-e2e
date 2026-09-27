@@ -1,4 +1,6 @@
 desc: "稼働状態を確認する suite"
+runnora:
+  id: "GEN-getHealth"
 labels:
   - generated
   - openapi
