@@ -1,5 +1,17 @@
 # runnora-e2e
 
+> [!IMPORTANT]
+> **このリポジトリのサンプルは旧形式（runnora `v0.3.0` まで）で書かれています。**
+> runnora の `main` は新形式（`runnora.yaml` と runbook の `runnora:` ブロック）に移行し、旧形式の `config.yaml`・`--config`・`--before-sql`・`--after-sql` を読まなくなりました（[新形式の詳細設計](https://github.com/ramsesyok/runnora/blob/main/docs/design/format-v2.md)）。
+> 移行ツール `runnora-migrate` を作成中で、完成後にこのリポジトリを新形式に書き換えます。旧形式のサンプルはタグ `format-v1` に残します。
+>
+> それまでの間、サンプルは runnora `v0.3.0` で実行してください。
+>
+> ```powershell
+> git -C ..\runnora checkout v0.3.0                      # 隣のフォルダの runnora を旧形式の最終版にする
+> go -C ..\runnora build -o runnora.exe .                # api-test が使う runnora.exe を作り直す（grpc-test はスクリプトがビルドする）
+> ```
+
 **runnora** と周辺ツール（oapi2wire / runnora-docgen / runnora-diff）を使ったテストの、フルセット検証用サンプル集です。
 対象のプロトコルごとにテストセットのフォルダを分けています。各フォルダは独立していて、それぞれのフォルダで実行します。
 HTTP と gRPC の各応答は runbook の判定前に JSON ファイルへ保存し、テストレポートとともに各テストセットの `reports/` に残します。
