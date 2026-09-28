@@ -21,7 +21,7 @@
 | 1 | API を起動する（ターミナル A） | `./scripts/api-start.ps1` | `library api listening` と表示 |
 | 2 | モックを起動する（ターミナル B） | `./scripts/mock-start.ps1` | 18080 で待ち受け |
 | 3 | モックに対してテストする | `./scripts/test-mock.ps1` | 「モック: 2/2 OK」 |
-| 4 | 実 API に対してテストする | `./scripts/test-api.ps1` | 「実 API: 3/3 OK」、カバレッジ 8/8 |
+| 4 | 実 API に対してテストする | `./scripts/test-api.ps1` | 「実 API: 3/3 OK」、カバレッジ 9/9 |
 | 5 | 手順書を生成する | `./scripts/build-docs.ps1` | `docs/_book/index.html` ができる |
 
 : 実行 {#tbl-run}
@@ -32,7 +32,7 @@
 |-----------|----------|------|------|
 | `test-mock.ps1` | `generated-mock`、`contract-mock` | mock | 生成テスト、契約テスト |
 | `test-api.ps1` | `generated-unit`、`contract-unit` | unit | 生成テスト、契約テスト（スイートの前処理 `contract_setup.sql` 付き） |
-| `test-api.ps1` | `scenarios` | unit | シナリオ試験 LIB-001〜007、検知確認（DEMO） |
+| `test-api.ps1` | `scenarios` | unit | シナリオ試験 LIB-001〜008、検知確認（DEMO） |
 
 : スクリプトとスイート {#tbl-suites}
 

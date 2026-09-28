@@ -26,6 +26,10 @@ tags:
     description: 会員
   - name: loans
     description: 貸出・返却
+  - name: covers
+    description: |
+      表紙画像のアップロード (multipart/form-data)。
+      runnora generate の生成対象外 (scripts/generate.ps1 の --tags) で、テストはシナリオ試験 LIB-008 に手書きする。
 paths:
   /health:
     get:
@@ -152,6 +156,42 @@ paths:
                 genre: NOVEL
                 totalCopies: 3
                 availableCopies: 3
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /books/{bookId}/cover:
+    post:
+      tags: [covers]
+      operationId: uploadBookCover
+      summary: 表紙画像をアップロードする
+      description: |
+        PNG または JPEG (1 MiB まで) を受け取り、受け取った内容の要約を返す。
+        画像の種類はファイルの中身で判定する (part の Content-Type やファイル名は見ない)。
+        サンプルのため画像は保存しない。
+      parameters:
+        - $ref: '#/components/parameters/BookId'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BookCoverUpload'
+      responses:
+        '201':
+          description: 受け取った表紙画像
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookCover'
+              example:
+                bookId: B0001
+                fileName: cover.png
+                contentType: image/png
+                size: 93
+                sha256: cd4e1d7819e60197b5fa92001c60352cd755f1c6d08a351e15362f9119aaa1ed
+                caption: 初版の表紙
+                primary: true
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
   /members/{memberId}:
@@ -385,6 +425,45 @@ components:
           type: integer
           minimum: 1
           maximum: 99
+    BookCoverUpload:
+      type: object
+      required: [image]
+      properties:
+        image:
+          type: string
+          format: binary
+          description: 表紙画像 (PNG または JPEG、1 MiB まで)
+        caption:
+          type: string
+          maxLength: 100
+          description: 説明
+        primary:
+          type: boolean
+          default: false
+          description: 代表の表紙にするか (true / false)
+    BookCover:
+      type: object
+      required: [bookId, fileName, contentType, size, sha256, caption, primary]
+      properties:
+        bookId:
+          type: string
+        fileName:
+          type: string
+          description: part の filename
+        contentType:
+          type: string
+          enum: [image/png, image/jpeg]
+          description: 中身から判定した画像の種類
+        size:
+          type: integer
+          description: バイト数
+        sha256:
+          type: string
+          description: 中身の SHA-256 (16 進)
+        caption:
+          type: string
+        primary:
+          type: boolean
     BookList:
       type: object
       required: [total, items]

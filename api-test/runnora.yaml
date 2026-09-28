@@ -56,7 +56,7 @@ suites:
       paths: [runbooks/contract/*.suite.yml]
     hooks:
       before: [sql/cases/contract_setup.sql]
-  # シナリオ試験 LIB-001〜007 と、事後検証が DB 不整合を検知することのデモ (expect: hookFail)
+  # シナリオ試験 LIB-001〜008 と、事後検証が DB 不整合を検知することのデモ (expect: hookFail)
   scenarios:
     env: unit
     select:

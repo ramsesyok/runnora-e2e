@@ -11,9 +11,12 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -90,6 +93,7 @@ func main() {
 	mux.HandleFunc("GET /books", s.listBooks)
 	mux.HandleFunc("POST /books", s.createBook)
 	mux.HandleFunc("GET /books/{bookId}", s.getBook)
+	mux.HandleFunc("POST /books/{bookId}/cover", s.uploadBookCover)
 	mux.HandleFunc("GET /members/{memberId}", s.getMember)
 	mux.HandleFunc("GET /members/{memberId}/loans", s.listMemberLoans)
 	mux.HandleFunc("POST /loans", s.createLoan)
@@ -233,6 +237,73 @@ func (s *server) createBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusCreated, b)
+}
+
+const maxCoverSize = 1 << 20
+
+// uploadBookCover は multipart/form-data の表紙画像を受け取り、受け取った内容の要約を返す (画像は保存しない)。
+func (s *server) uploadBookCover(w http.ResponseWriter, r *http.Request) {
+	r.Body = http.MaxBytesReader(w, r.Body, maxCoverSize+64*1024)
+	if err := r.ParseMultipartForm(maxCoverSize + 64*1024); err != nil {
+		writeError(w, http.StatusBadRequest, "VALIDATION_ERROR", "request body must be multipart/form-data")
+		return
+	}
+	file, header, err := r.FormFile("image")
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "VALIDATION_ERROR", "image is required")
+		return
+	}
+	defer file.Close()
+	data, err := io.ReadAll(io.LimitReader(file, maxCoverSize+1))
+	if err != nil {
+		internalError(w, err)
+		return
+	}
+	// 種類は part の Content-Type ではなく中身で判定する
+	contentType := http.DetectContentType(data)
+	var msg string
+	switch {
+	case len(data) == 0:
+		msg = "image is empty"
+	case len(data) > maxCoverSize:
+		msg = "image must be 1 MiB or less"
+	case contentType != "image/png" && contentType != "image/jpeg":
+		msg = "image must be PNG or JPEG"
+	}
+	caption := r.FormValue("caption")
+	if msg == "" && len([]rune(caption)) > 100 {
+		msg = "caption must be 100 characters or less"
+	}
+	primary := false
+	if v := r.FormValue("primary"); msg == "" && v != "" {
+		if primary, err = strconv.ParseBool(v); err != nil {
+			msg = "primary must be boolean"
+		}
+	}
+	if msg != "" {
+		writeError(w, http.StatusBadRequest, "VALIDATION_ERROR", msg)
+		return
+	}
+
+	b, err := s.findBook(r.Context(), r.PathValue("bookId"))
+	if errors.Is(err, sql.ErrNoRows) {
+		writeError(w, http.StatusNotFound, "NOT_FOUND", "book not found")
+		return
+	}
+	if err != nil {
+		internalError(w, err)
+		return
+	}
+	sum := sha256.Sum256(data)
+	writeJSON(w, http.StatusCreated, map[string]any{
+		"bookId":      b.BookID,
+		"fileName":    header.Filename,
+		"contentType": contentType,
+		"size":        len(data),
+		"sha256":      hex.EncodeToString(sum[:]),
+		"caption":     caption,
+		"primary":     primary,
+	})
 }
 
 func (s *server) getMember(w http.ResponseWriter, r *http.Request) {

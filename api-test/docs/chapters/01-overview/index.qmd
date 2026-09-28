@@ -10,7 +10,7 @@
 
 | 対象 | 内容 | 所在 |
 |------|------|------|
-| API 仕様 | 図書貸出 API 1.0.0（8 operation） | `openapi/library-api.yaml`（第 2 章） |
+| API 仕様 | 図書貸出 API 1.0.0（9 operation） | `openapi/library-api.yaml`（第 2 章） |
 | サンプル実装 | Go + go-ora。データは Oracle Database Free (23ai) の LIBAPP スキーマ | `api/`, `db/` |
 | モック | oapi2wire が生成した WireMock 資産 | `mock/` |
 

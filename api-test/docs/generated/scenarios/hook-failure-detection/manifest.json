@@ -30,7 +30,7 @@
     {
       "kind": "project",
       "path": "runnora.yaml",
-      "sha256": "5d7ceabf7e21ff480869433e05dfd7a43db2cf3658c917029f3dc927e2fb1f04"
+      "sha256": "858f953271879dd3585d8e955be7e3f0b69d0bcb247ea76e1d28829f88f32c05"
     },
     {
       "kind": "before-sql",

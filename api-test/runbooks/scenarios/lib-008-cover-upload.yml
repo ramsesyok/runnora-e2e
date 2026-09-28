@@ -1,0 +1,122 @@
+desc: LIB-008 表紙画像のアップロード（multipart/form-data）
+# multipart/form-data の書き方:
+#   - ファイルの項目は file:// を付ける。パスはこの runbook のあるディレクトリが基準。
+#     file:// を付けないと、ファイルが見つからないときにパスの文字列がテキストの項目として送られてしまう
+#     (付けると、ファイルが無ければ送信前にエラーになる)
+#   - ファイル以外の項目は文字列で書く (数値・真偽値は "3" / "true" のように引用符で囲む。真偽値のままだと送信できない)
+#   - file://... を vars に書かない (vars の file:// は読み込み時にファイルの中身に置き換わる)
+runnora:
+  id: LIB-008
+labels:
+  - scenario
+  - covers
+runners:
+  req:
+    endpoint: ${API_URL}
+    # 応答を OpenAPI 定義で自動検証する。異常系の入力を送るためリクエスト側の検証は行わない
+    openapi3: ../../openapi/library-api.yaml
+    skipValidateRequest: true
+steps:
+  upload_png:
+    desc: B0001にPNGの表紙画像を説明と代表フラグ付きでアップロードする
+    req:
+      /books/B0001/cover:
+        post:
+          headers:
+            X-Test-Scenario: LIB-008
+          body:
+            multipart/form-data:
+              image: file://../../fixtures/uploads/cover.png
+              caption: 初版の表紙
+              primary: "true"
+  check_upload_png:
+    desc: 画像がファイルとして届き、中身から PNG と判定され、内容のハッシュが送ったファイルと一致する
+    test: |
+      steps.upload_png.res.status == 201 &&
+      steps.upload_png.res.body.bookId == "B0001" &&
+      steps.upload_png.res.body.fileName == "cover.png" &&
+      steps.upload_png.res.body.contentType == "image/png" &&
+      steps.upload_png.res.body.size == 93 &&
+      steps.upload_png.res.body.sha256 == "cd4e1d7819e60197b5fa92001c60352cd755f1c6d08a351e15362f9119aaa1ed" &&
+      steps.upload_png.res.body.caption == "初版の表紙" &&
+      steps.upload_png.res.body.primary == true
+
+  upload_image_only:
+    desc: 任意項目を省略して画像だけを送る
+    req:
+      /books/B0002/cover:
+        post:
+          headers:
+            X-Test-Scenario: LIB-008
+          body:
+            multipart/form-data:
+              image: file://../../fixtures/uploads/cover.png
+  check_upload_image_only:
+    desc: 省略した説明は空、代表フラグは既定の false になる
+    test: |
+      steps.upload_image_only.res.status == 201 &&
+      steps.upload_image_only.res.body.bookId == "B0002" &&
+      steps.upload_image_only.res.body.caption == "" &&
+      steps.upload_image_only.res.body.primary == false
+
+  upload_not_image:
+    desc: 画像ではないファイルは400になる（拡張子や part の Content-Type ではなく中身で判定される）
+    req:
+      /books/B0001/cover:
+        post:
+          headers:
+            X-Test-Scenario: LIB-008
+          body:
+            multipart/form-data:
+              image: file://../../fixtures/uploads/not-image.txt
+  check_upload_not_image:
+    test: |
+      steps.upload_not_image.res.status == 400 &&
+      steps.upload_not_image.res.body.code == "VALIDATION_ERROR" &&
+      steps.upload_not_image.res.body.message == "image must be PNG or JPEG"
+
+  upload_without_image:
+    desc: 画像の項目が無いと400になる
+    req:
+      /books/B0001/cover:
+        post:
+          headers:
+            X-Test-Scenario: LIB-008
+          body:
+            multipart/form-data:
+              caption: 画像なし
+  check_upload_without_image:
+    test: |
+      steps.upload_without_image.res.status == 400 &&
+      steps.upload_without_image.res.body.message == "image is required"
+
+  upload_invalid_primary:
+    desc: 代表フラグが真偽値でないと400になる
+    req:
+      /books/B0001/cover:
+        post:
+          headers:
+            X-Test-Scenario: LIB-008
+          body:
+            multipart/form-data:
+              image: file://../../fixtures/uploads/cover.png
+              primary: "yes"
+  check_upload_invalid_primary:
+    test: |
+      steps.upload_invalid_primary.res.status == 400 &&
+      steps.upload_invalid_primary.res.body.message == "primary must be boolean"
+
+  upload_unknown_book:
+    desc: 存在しない本には404になる
+    req:
+      /books/B9999/cover:
+        post:
+          headers:
+            X-Test-Scenario: LIB-008
+          body:
+            multipart/form-data:
+              image: file://../../fixtures/uploads/cover.png
+  check_upload_unknown_book:
+    test: |
+      steps.upload_unknown_book.res.status == 404 &&
+      steps.upload_unknown_book.res.body.code == "NOT_FOUND"
