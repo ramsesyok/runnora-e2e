@@ -2,6 +2,7 @@
 
 runnora-e2e の WebAPI（HTTP）テストセットです。リポジトリ全体の構成は [../README.md](../README.md) を参照してください。
 コマンドはすべてこのフォルダ（`api-test/`）で実行します。
+テスト用語や「スイートは必要か」「契約テストとは何か」は [はじめて読む人のためのテスト用語](../docs/test-basics.md) を参照してください。
 
 **runnora / oapi2wire / runnora-docgen** を組み合わせた API テストのフルセット検証用サンプルです。
 OpenAPI を正本として、API のサンプル実装・モック・テスト・ドキュメントまでを一通りそろえています。

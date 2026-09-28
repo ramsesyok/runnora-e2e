@@ -1,6 +1,7 @@
 # grpc-test：gRPC E2E テストセット
 
 Go 製の図書照会・計算配信 gRPC サーバを、runnora の runbook から検証するサンプルです。`grpc-test/` を作業ディレクトリとして実行します。
+runbook・シナリオ・ケース・スイートの違いは [はじめて読む人のためのテスト用語](../docs/test-basics.md) を参照してください。
 API 契約は [proto/library.proto](proto/library.proto) に置き、サーバと runbook が同じ定義を使います。
 サーバは Go で proto を起動時に読み込むため、`protoc` は不要です。Oracle と oapi2wire は使用しません。
 
