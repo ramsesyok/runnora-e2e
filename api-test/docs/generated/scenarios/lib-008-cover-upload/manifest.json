@@ -1,73 +1,57 @@
 {
   "generator": "runnora-docgen",
-  "scenario": "LIB-002 在庫1冊の本の取り合い（在庫切れ409と返却後の再貸出）",
-  "scenarioId": "LIB-002",
-  "source": "runbooks/scenarios/lib-002-no-stock.yml",
-  "sha256": "262d3ef56f442eea9ed64ad63f4820ef549140aaa20bc267fc7e50776a624e56",
+  "scenario": "LIB-008 表紙画像のアップロード（multipart/form-data）",
+  "scenarioId": "LIB-008",
+  "source": "runbooks/scenarios/lib-008-cover-upload.yml",
+  "sha256": "2eff37a0f4abbe5570cf28afc6fb26f69e0e53fe505e13f03ab1e194d7dfa438",
   "steps": [
     {
       "number": 1,
-      "key": "first_loan"
+      "key": "upload_png"
     },
     {
       "number": 2,
-      "key": "check_first_loan"
+      "key": "check_upload_png"
     },
     {
       "number": 3,
-      "key": "save_first"
+      "key": "upload_image_only"
     },
     {
       "number": 4,
-      "key": "book_empty"
+      "key": "check_upload_image_only"
     },
     {
       "number": 5,
-      "key": "check_book_empty"
+      "key": "upload_not_image"
     },
     {
       "number": 6,
-      "key": "available_novels"
+      "key": "check_upload_not_image"
     },
     {
       "number": 7,
-      "key": "check_available_novels"
+      "key": "upload_without_image"
     },
     {
       "number": 8,
-      "key": "second_loan_rejected"
+      "key": "check_upload_without_image"
     },
     {
       "number": 9,
-      "key": "check_second_loan_rejected"
+      "key": "upload_invalid_primary"
     },
     {
       "number": 10,
-      "key": "db_no_extra_loan"
+      "key": "check_upload_invalid_primary"
     },
     {
       "number": 11,
-      "key": "return_first"
+      "key": "upload_unknown_book"
     },
     {
       "number": 12,
-      "key": "check_return_first"
-    },
-    {
-      "number": 13,
-      "key": "second_loan_ok"
-    },
-    {
-      "number": 14,
-      "key": "check_second_loan_ok"
-    },
-    {
-      "number": 15,
-      "key": "book_empty_again"
-    },
-    {
-      "number": 16,
-      "key": "check_book_empty_again"
+      "key": "check_upload_unknown_book"
     }
   ],
   "files": [
@@ -81,8 +65,8 @@
   "inputs": [
     {
       "kind": "runbook",
-      "path": "runbooks/scenarios/lib-002-no-stock.yml",
-      "sha256": "262d3ef56f442eea9ed64ad63f4820ef549140aaa20bc267fc7e50776a624e56"
+      "path": "runbooks/scenarios/lib-008-cover-upload.yml",
+      "sha256": "2eff37a0f4abbe5570cf28afc6fb26f69e0e53fe505e13f03ab1e194d7dfa438"
     },
     {
       "kind": "project",

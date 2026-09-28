@@ -76,7 +76,8 @@ flowchart TD
 
 **③ テスト雛形の生成（generate.ps1）**
 
-- `runnora generate --openapi openapi/library-api.yaml --clean --force`
+- `runnora generate --openapi openapi/library-api.yaml --tags system,books,members,loans --clean --force`
+- タグ `covers`（表紙画像のアップロード。multipart/form-data）は対象外です。アップロードのテストはシナリオ試験 LIB-008 に手書きしています。
 - OpenAPI の operation ごとに `runbooks/generated/<タグ>/<操作>.template.yml`・`.suite.yml` と `cases/generated/.../default.json` を作り直します。
 - 生成物には手を加えません。育てるテストは `runbooks/contract/` に複製して使います。
 
@@ -102,7 +103,7 @@ flowchart TD
 |---|---|---|
 | api-generated | `runnora run --suite generated-unit` | 生成テスト 8 本。前処理に `sql/cases/contract_setup.sql` を追加 |
 | api-contract | `runnora run --suite contract-unit` | 契約テスト 8 本。前処理は同上 |
-| api-scenarios | `runnora run --suite scenarios` | シナリオ試験 LIB-001〜007 と、検知デモ（`expect: hookFail`） |
+| api-scenarios | `runnora run --suite scenarios` | シナリオ試験 LIB-001〜008 と、検知デモ（`expect: hookFail`） |
 | （カバレッジ） | `runnora coverage --long 'runbooks/contract/*.template.yml' 'runbooks/scenarios/*.yml' 'runbooks/demo/*.yml'` | OpenAPI の operation のうち、契約テストとシナリオで呼んだものの一覧。`reports/coverage.txt` に保存 |
 
 実 API のスイートでは、runbook ごとに次の順で前後処理 SQL が流れます（すべて `runnora.yaml` と `runnora:` ブロックの指定）。

@@ -1,0 +1,10 @@
+## LIB-008 表紙画像のアップロード {#sec-lib-008}
+
+- 目的：multipart/form-data で送った画像がファイルとして届き、中身で種類が判定されること、入力不正と存在しない本が拒否されることを確認する。
+- 前提：共通前処理の蔵書（B0001、B0002）。アップロードするファイルは `fixtures/uploads/` に置く（PNG 画像 `cover.png` と、画像ではない `not-image.txt`）。
+- 合格条件：全手順の検証式が真であり、共通後処理が正常終了すること。
+- 書き方：ファイルの項目は `file://` を付け、この runbook のあるディレクトリからの相対パスで書く（付けないと、ファイルが見つからないときにパスの文字列がテキストとして送られる）。ファイル以外の項目は文字列で書く（`primary: "true"`）。
+- この API（タグ covers）は `runnora generate` の生成対象外とし、テストをこのシナリオに手書きしている。
+- 実行：`runnora run runbooks/scenarios/lib-008-cover-upload.yml`
+
+{{< include ../../generated/scenarios/lib-008-cover-upload/_body.qmd >}}

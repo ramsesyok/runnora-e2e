@@ -122,9 +122,10 @@ java -jar C:\tools\wiremock-standalone-3.13.2.jar --port 18080 --bind-address 12
 ## 4. OpenAPI からテスト雛形を作る
 
 ```powershell
-runnora generate --openapi openapi/library-api.yaml --clean --force
+runnora generate --openapi openapi/library-api.yaml --tags system,books,members,loans --clean --force
 ```
 
+- タグ `covers`（表紙画像のアップロード。multipart/form-data）は対象外にしています。生成物はファイルのパスが `TODO: path/to/file` のままで、真偽値の項目も送れないためです。アップロードのテストはシナリオ試験 LIB-008 に手書きしています（書き方は 7 章）。
 - operation ごとに `runbooks/generated/<タグ>/<メソッド>_<operationId>.template.yml`（1 回の呼び出し）と `.suite.yml`（ケースを順に流す）、`cases/generated/.../default.json`（入力と期待するステータス）を作ります。
 - 接続先は `${RUNNORA_BASE_URL}` で、実行時に環境（`unit` / `mock`）の `vars` から決まります。
 - `runbooks/generated/` は作り直すたびに上書きされます。手を加えて育てるテストは `runbooks/contract/` などに複製します。
@@ -174,7 +175,7 @@ go build -C api -o ../bin/library-api.exe .
 ```powershell
 runnora run --suite generated-unit     # 生成テスト (前処理に contract_setup.sql を追加)
 runnora run --suite contract-unit      # 契約テスト (同上)
-runnora run --suite scenarios          # シナリオ試験 LIB-001〜007 と検知デモ
+runnora run --suite scenarios          # シナリオ試験 LIB-001〜008 と検知デモ
 ```
 
 runbook ごとに、次の順で前後処理 SQL が流れます（すべて `runnora.yaml` と `runnora:` ブロックの指定どおり）。
@@ -197,6 +198,27 @@ runnora run --suite scenarios --trace                       # runn のトレー�
 
 変数の値は、`runnora.yaml` の `vars` → OS の環境変数 → `--var` の順に後のものが優先されます。
 Oracle のパスワードは `runnora.yaml` の `${LIBAPP_PASSWORD:-libapp_pw}` なので、`$env:LIBAPP_PASSWORD = '...'` で変えられます。
+
+### ファイルのアップロード（multipart/form-data）を書く
+
+表紙画像のアップロード（`POST /books/{bookId}/cover`）は、シナリオ試験 LIB-008（`runbooks/scenarios/lib-008-cover-upload.yml`）に手書きしています。
+
+```yaml
+req:
+  /books/B0001/cover:
+    post:
+      body:
+        multipart/form-data:
+          image: file://../../fixtures/uploads/cover.png   # この runbook からの相対パス
+          caption: 初版の表紙
+          primary: "true"                                 # 数値・真偽値は文字列で書く
+```
+
+- ファイルの項目には `file://` を付けます。付けないと、パスを誤ってファイルが見つからないときにエラーにならず、パスの文字列がテキストの項目として送られます。
+- パスは runbook のあるディレクトリが基準です（プロジェクト直下ではありません）。
+- 数値・真偽値は `"3"`・`"true"` のように文字列で書きます。真偽値のままだと `invalid body` で送信できません。
+- `file://...` を `vars` に書かないでください。vars の `file://` は読み込み時にファイルの中身に置き換わります。
+- ファイルとして届いたかは、API の応答（ファイル名・サイズ・ハッシュなど）で確かめます。
 
 ## 8. 結果を確認する
 
@@ -304,7 +326,7 @@ Remove-Item -Recurse reports   # 実行結果を消す場合
 | モックの整合性を検査する | `oapi2wire validate --openapi <OpenAPI> --cases <case YAML> --responses-root <応答>` |
 | モックを作る | `oapi2wire build --openapi <OpenAPI> --cases <case YAML> --responses-root <応答> --out <出力> --clean` |
 | case YAML の雛形を作る | `oapi2wire init --openapi <OpenAPI> --out-cases <case YAML> --responses-root <応答>` |
-| テスト雛形を作る | `runnora generate --openapi <OpenAPI> --clean --force` |
+| テスト雛形を作る | `runnora generate --openapi <OpenAPI> --clean --force`（このサンプルでは `--tags system,books,members,loans` を付ける） |
 | スイートを実行する | `runnora run --suite <スイート>` |
 | runbook を 1 本実行する | `runnora run [--env <環境>] <runbook>` |
 | 変数を上書きして実行する | `runnora run --suite <スイート> --var NAME=VALUE` |
@@ -320,7 +342,7 @@ Remove-Item -Recurse reports   # 実行結果を消す場合
 | api-test | `contract-mock` | mock | 契約テスト 8 本 |
 | api-test | `generated-unit` | unit | 生成テスト 8 本（実 API） |
 | api-test | `contract-unit` | unit | 契約テスト 8 本（実 API） |
-| api-test | `scenarios` | unit | シナリオ試験 LIB-001〜007 と検知デモ |
+| api-test | `scenarios` | unit | シナリオ試験 LIB-001〜008 と検知デモ |
 | grpc-test | `grpc` | unit | gRPC 4 本 |
 
 ## 14. runnora.yaml の主な設定

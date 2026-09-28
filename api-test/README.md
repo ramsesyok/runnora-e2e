@@ -20,13 +20,14 @@ BULK COLLECT/FORALL、例外処理、自律型トランザクションなど）�
 
 ## 題材：図書貸出 API
 
-蔵書・会員・貸出を Oracle で管理する 8 operation の API です（詳細は OpenAPI／手順書 第 2 章）。
+蔵書・会員・貸出を Oracle で管理する 9 operation の API です（詳細は OpenAPI／手順書 第 2 章）。
 
 | メソッド | パス | 概要 |
 |---|---|---|
 | GET | `/health` | 稼働確認（DB 疎通含む） |
 | GET / POST | `/books` | 蔵書検索 / 登録 |
 | GET | `/books/{bookId}` | 蔵書取得 |
+| POST | `/books/{bookId}/cover` | 表紙画像のアップロード（multipart/form-data。画像は保存せず、受け取った内容の要約を返す） |
 | GET | `/members/{memberId}` | 会員と貸出状況（貸出中件数・延滞有無） |
 | GET | `/members/{memberId}/loans` | 貸出履歴 |
 | POST | `/loans` | 貸出（在庫切れ・上限・延滞・利用停止は 409） |
@@ -42,12 +43,13 @@ api-test/
 ├─ docker-compose.yml            Oracle Database Free 23ai → 127.0.0.1:1522/FREEPDB1
 ├─ mock/                         oapi2wire の case YAML → WireMock 127.0.0.1:18080
 ├─ fixtures/responses/           応答本文（モックの戻り値 = 契約テストの期待値。両方から参照）
+├─ fixtures/uploads/             アップロードするファイル（LIB-008）
 ├─ runnora.yaml                  runnora のプロジェクトファイル（環境 unit / mock、スイート）
 ├─ sql/common/                   共通 前処理（リセット・シード）/ 後処理（不変条件検証）
 ├─ sql/cases/                    スイート・ケース固有の前処理・後処理
 ├─ runbooks/generated/           runnora generate の出力（再生成後に応答保存を追加）
 ├─ runbooks/contract/            契約テスト suite + template（モック・実 API 両方で実行）
-├─ runbooks/scenarios/           シナリオ試験 LIB-001〜007（実 API のみ）
+├─ runbooks/scenarios/           シナリオ試験 LIB-001〜008（実 API のみ）
 ├─ runbooks/demo/                事後検証が不整合を検知することの確認（expect: hookFail）
 ├─ cases/                        ケース JSON（generated / contract）
 ├─ tools/openapi-doc/            OpenAPI → 手順書 API 仕様章（.qmd）の変換
@@ -87,7 +89,7 @@ Oracle イメージ `container-registry.oracle.com/database/free:latest` を使�
 ```powershell
 ./scripts/db-up.ps1         # Oracle 起動 + LIBAPP スキーマ (再) 作成
 ./scripts/mock-build.ps1    # oapi2wire validate + build
-./scripts/generate.ps1      # runnora generate + 応答保存ステップの追加
+./scripts/generate.ps1      # runnora generate (タグ covers のアップロードは対象外)
 ./scripts/api-start.ps1     # ターミナル A: API
 ./scripts/mock-start.ps1    # ターミナル B: WireMock
 ./scripts/test-mock.ps1     # モックに対して スイート generated-mock + contract-mock
@@ -161,6 +163,7 @@ reports/20260927-153012-scenarios/
 | 条件成立まで再試行する | [LIB-001](runbooks/scenarios/lib-001-loan-lifecycle.yml) | `member_loans` の `loop.until`。最大回数内に条件を満たさなければ失敗する |
 | 複数件を個別に照会する | [LIB-007](runbooks/scenarios/lib-007-bulk-history.yml) | `inspect_history_book_0`〜`_2` が各応答を保存してから判定する |
 | API と DB の状態を両方確かめる | [LIB-004](runbooks/scenarios/lib-004-loan-limit.yml) | HTTP の `req`、SQL の `db.query`、`current.rows` の検証 |
+| ファイルをアップロードする（multipart/form-data） | [LIB-008](runbooks/scenarios/lib-008-cover-upload.yml) | `multipart/form-data:` の `image: file://...`。数値・真偽値は文字列で書く |
 
 `compare` は JSON の値を比較するため、オブジェクトのキー順や空白・改行は問いません。配列の要素順は比較対象です。
 `ignorePaths: []` は除外なしの全体比較です。現状の「除外あり」の例は ID と日時をまとめて除外しており、ID **だけ**を除外するケースはありません。
@@ -170,7 +173,7 @@ reports/20260927-153012-scenarios/
 |---|---|---|---|
 | 生成テスト | モック / 実 API | 8 suite | OpenAPI example で呼び出しステータスを確認 |
 | 契約テスト | モック / 実 API | 8 suite・21 ケース | ステータス + **本文の全体一致（モックと共有する期待ファイル）** + **OpenAPI 応答スキーマ検証**（`openapi3` ランナー） |
-| シナリオ試験 | 実 API | 7 runbook | 状態変化・ID 引き継ぎ・**DB 直接照会（runn DB ランナー）**・前後処理での DB 検証 |
+| シナリオ試験 | 実 API | 8 runbook | 状態変化・ID 引き継ぎ・**DB 直接照会（runn DB ランナー）**・前後処理での DB 検証 |
 | 検知確認 | 実 API | 1 | 事後検証が DB 不整合を検知して後処理が失敗する（`expect: hookFail` なので合格） |
 
 | ID | シナリオ | 前処理 (PL/SQL) | 後処理 (PL/SQL) |
@@ -182,8 +185,27 @@ reports/20260927-153012-scenarios/
 | LIB-005 | SAVEPOINT による部分確定 | SAVEPOINT / ROLLBACK TO / EXCEPTION_INIT | 取消結果と自律型ログを検証 |
 | LIB-006 | 異常系 400/404/409 | - | DB 不変（件数・採番）を検証 |
 | LIB-007 | 大量履歴・3 件の個別照会 | BULK COLLECT LIMIT + FORALL | - |
+| LIB-008 | 表紙画像のアップロード（multipart/form-data）・400/404 | - | - |
 
 LIB-007 は履歴の先頭 3 冊を個別の include ステップで照会し、それぞれの応答を保存・検証します。16 件の履歴全体は `returned_history` で一括検証します。
+
+### ファイルのアップロード（LIB-008）
+
+表紙画像のアップロード（`POST /books/{bookId}/cover`）は `runnora generate` の対象外（`generate.ps1` の `--tags`）とし、シナリオ試験 LIB-008 に手書きしています。
+生成物ではファイルのパスが `TODO: path/to/file` のままになり、真偽値の項目も送れないためです。
+
+```yaml
+body:
+  multipart/form-data:
+    image: file://../../fixtures/uploads/cover.png   # この runbook からの相対パス
+    caption: 初版の表紙
+    primary: "true"                                 # 数値・真偽値は文字列で書く
+```
+
+- ファイルの項目には `file://` を付けます。付けないと、ファイルが見つからないときにエラーにならず、パスの文字列がテキストの項目として送られます。
+- `file://...` を `vars` に書かないでください（vars の `file://` は読み込み時にファイルの中身に置き換わります）。
+- API は受け取った画像のファイル名・種類（中身で判定）・サイズ・SHA-256 を返すので、ファイルとして届いたことを応答で確かめています。
+- oapi2wire は multipart/form-data を扱わないため、この API のモックケースはありません（モックでは自動生成の fallback が 501 を返します）。
 
 すべての runbook の前後で、共通フック（`00_reset` → `10_seed_master` / `90_verify_integrity`）が走ります。
 `90_verify_integrity` は「貸出可能冊数 = 所蔵 − 貸出中」などの不変条件をカーソル FOR LOOP で検証し、

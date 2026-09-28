@@ -16,8 +16,9 @@
 | シナリオ | LIB-005 | pass（期待どおり） | | | | `<日時>-scenarios/` |
 | シナリオ | LIB-006 | pass（期待どおり） | | | | `<日時>-scenarios/` |
 | シナリオ | LIB-007 | pass（期待どおり） | | | | `<日時>-scenarios/` |
+| シナリオ | LIB-008 | pass（期待どおり） | | | | `<日時>-scenarios/` |
 | 検知確認 | DEMO-HOOK-FAILURE | hookFail（期待どおり） | | | | `<日時>-scenarios/` |
-| カバレッジ | 契約 + シナリオ | 8 / 8 operation | | | | `coverage.txt` |
+| カバレッジ | 契約 + シナリオ | 9 / 9 operation | | | | `coverage.txt` |
 
 : 実施記録 {#tbl-records}
 

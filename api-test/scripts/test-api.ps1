@@ -1,7 +1,7 @@
 ﻿# 実 API (Go + Oracle) に対してテストを流す。runbook ごとに PL/SQL の前後処理が走る。
 #   1. generated-unit : 生成 suite            (+ スイートの前処理 sql/cases/contract_setup.sql)
 #   2. contract-unit  : 契約テスト             (+ スイートの前処理 sql/cases/contract_setup.sql)
-#   3. scenarios      : シナリオ試験 LIB-001〜007 と検知デモ
+#   3. scenarios      : シナリオ試験 LIB-001〜008 と検知デモ
 #                       (ケース固有の SQL と期待する結果は各 runbook の runnora: ブロック。
 #                        検知デモは expect: hookFail なので、事後検証が不整合を検知すれば合格)
 # 最後に OpenAPI カバレッジを表示する。

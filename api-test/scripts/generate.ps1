@@ -4,7 +4,9 @@
 Push-Location $Root
 try {
     # 出力先は runnora.yaml のあるフォルダ。template の接続先は ${RUNNORA_BASE_URL} で、実行時に環境 (unit / mock) の vars で決まる
-    & $Runnora generate --openapi openapi/library-api.yaml --clean --force
+    # タグ covers (表紙画像のアップロード。multipart/form-data) は対象外。生成物がファイルのパスを
+    # "TODO: path/to/file" のままにし、真偽値の項目も送れないため、テストはシナリオ試験 LIB-008 に手書きしている
+    & $Runnora generate --openapi openapi/library-api.yaml --tags system,books,members,loans --clean --force
     if ($LASTEXITCODE -ne 0) { throw 'runnora generate に失敗しました' }
 } finally {
     Pop-Location

@@ -31,6 +31,7 @@ runnora / oapi2wire / runnora-docgen のフルセット検証用サンプル API
 | members | GET | `/members/{memberId}/loans` | listMemberLoans | 会員の貸出履歴を取得する | 200, 400, 404 |
 | loans | POST | `/loans` | createLoan | 本を貸し出す | 201, 400, 404, 409 |
 | loans | POST | `/loans/{loanId}/return` | returnLoan | 本を返却する | 200, 404, 409 |
+| covers | POST | `/books/{bookId}/cover` | uploadBookCover | 表紙画像をアップロードする | 201, 400, 404 |
 
 : API 一覧 {#tbl-api-list}
 
@@ -166,6 +167,28 @@ runnora / oapi2wire / runnora-docgen のフルセット検証用サンプル API
 
 : returnLoan の応答 {#tbl-api-returnloan-responses}
 
+### POST /books/{bookId}/cover（表紙画像をアップロードする） {#sec-api-uploadbookcover}
+
+PNG または JPEG (1 MiB まで) を受け取り、受け取った内容の要約を返す。
+画像の種類はファイルの中身で判定する (part の Content-Type やファイル名は見ない)。
+サンプルのため画像は保存しない。
+
+| 名前 | 位置 | 必須 | 型 | 制約 | 説明 | 例 |
+|---|---|---|---|---|---|---|
+| bookId | path | ○ | string | 形式: `^B[0-9]{4}$` |  | `B0001` |
+
+: uploadBookCover のパラメータ {#tbl-api-uploadbookcover-params}
+
+リクエストボディ（application/json、必須）：-
+
+| ステータス | 説明 | 応答スキーマ | 例 |
+|---|---|---|---|
+| 201 | 受け取った表紙画像 | BookCover（@sec-api-schema-bookcover） | `{"bookId":"B0001","caption":"初版の表紙","contentType":"image/png","fileName":"cover.png","primary":true,"sha256":"cd4e1d7819e60197b5fa92001c60352cd755f1c6d08a351e15362f9119aaa1ed","size":93}` |
+| 400 | 入力不正 | Error（@sec-api-schema-error） | `{"code":"VALIDATION_ERROR","message":"memberId is required"}` |
+| 404 | 対象が存在しない | Error（@sec-api-schema-error） | `{"code":"NOT_FOUND","message":"resource not found"}` |
+
+: uploadBookCover の応答 {#tbl-api-uploadbookcover-responses}
+
 ## データ定義 {#sec-api-schemas}
 
 ### Health {#sec-api-schema-health}
@@ -203,6 +226,30 @@ runnora / oapi2wire / runnora-docgen のフルセット検証用サンプル API
 | totalCopies | integer | ○ | 最小 1、最大 99 |  |
 
 : BookCreate {#tbl-api-schema-bookcreate}
+
+### BookCoverUpload {#sec-api-schema-bookcoverupload}
+
+| 項目 | 型 | 必須 | 制約 | 説明 |
+|---|---|---|---|---|
+| image | string(binary) | ○ |  | 表紙画像 (PNG または JPEG、1 MiB まで) |
+| caption | string |  | 最大長 100 | 説明 |
+| primary | boolean |  |  | 代表の表紙にするか (true / false) |
+
+: BookCoverUpload {#tbl-api-schema-bookcoverupload}
+
+### BookCover {#sec-api-schema-bookcover}
+
+| 項目 | 型 | 必須 | 制約 | 説明 |
+|---|---|---|---|---|
+| bookId | string | ○ |  |  |
+| fileName | string | ○ |  | part の filename |
+| contentType | string | ○ | 値: image/png / image/jpeg | 中身から判定した画像の種類 |
+| size | integer | ○ |  | バイト数 |
+| sha256 | string | ○ |  | 中身の SHA-256 (16 進) |
+| caption | string | ○ |  |  |
+| primary | boolean | ○ |  |  |
+
+: BookCover {#tbl-api-schema-bookcover}
 
 ### BookList {#sec-api-schema-booklist}
 
