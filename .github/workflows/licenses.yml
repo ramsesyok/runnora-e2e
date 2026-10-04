@@ -1,0 +1,23 @@
+name: License notices
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  notices:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.26.4'
+      - name: Check sample dependency notices
+        run: |
+          go run scripts/licenses.go -module-dir api-test/api -output api-test/api/THIRD_PARTY_NOTICES.md -check
+          go run scripts/licenses.go -module-dir api-test/tools -output api-test/tools/THIRD_PARTY_NOTICES.md -check
+          go run scripts/licenses.go -module-dir grpc-test -output grpc-test/THIRD_PARTY_NOTICES.md -check

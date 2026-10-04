@@ -54,3 +54,10 @@ Projects/
    ├─ api-test/
    └─ grpc-test/
 ```
+
+
+## ライセンス
+
+自作部分は [MIT License](LICENSE)（Copyright (c) 2026 ramsesyok）です。
+文書テンプレートの元の表示は [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)、
+サンプルの依存と外部テスト環境の条件は [ライセンス方針](docs/license-policy.md) を参照してください。
