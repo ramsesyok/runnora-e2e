@@ -4,6 +4,10 @@
 
 Source project: https://github.com/ramsesyok/ddq-template
 
+License text source: https://github.com/ramsesyok/ddq-template/blob/dca4f1208e21e79ea0aaa402a9aedd81cb73e343/LICENSE
+
+The copied mechanism files originate from v2.4.0. That tag does not contain a LICENSE file; the text below is the provider's later published MIT declaration, not a file recovered from the v2.4.0 tag.
+
 Applies to template-derived documentation mechanism files in api-test/docs/ and grpc-test/docs/.
 Original copyright and MIT permission notice are retained below.
 

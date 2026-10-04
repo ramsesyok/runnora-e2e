@@ -37,3 +37,5 @@ Oracle を利用するこのテスト環境に独自条件があることと、r
 ## 文書用テンプレート
 
 `api-test/docs/` と `grpc-test/docs/` には design-doc-quarto-template v2.4.0 由来の機構ファイルがあります。元の MIT 著作権名義 `RamsesYok` を含む本文を [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) に保持します。新しい自作部分の名義を ramsesyok に統一しても、元の表示は削除しません。
+
+v2.4.0 タグには LICENSE 本文がありません。収録した本文は、提供元が後に公開した [MIT 宣言](https://github.com/ramsesyok/ddq-template/blob/dca4f1208e21e79ea0aaa402a9aedd81cb73e343/LICENSE) に由来します。取得元と元ファイルの版を区別して記録しています。
