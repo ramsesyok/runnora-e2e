@@ -220,6 +220,35 @@ req:
 - `file://...` を `vars` に書かないでください。vars の `file://` は読み込み時にファイルの中身に置き換わります。
 - ファイルとして届いたかは、API の応答（ファイル名・サイズ・ハッシュなど）で確かめます。
 
+### JSON と CSV を multipart で送る
+
+パートごとの型指定が必要な API では、`multipart()` で本文を生成して送信します。
+JSON パートに `application/json`、CSV パートに `text/csv` を指定します。
+応答が JSON なら `Accept: application/json` を使い、全体の `Content-Type` には
+生成した boundary を含む値を渡します。
+
+```yaml
+prepare:
+  bind:
+    upload: 'multipart({"metadata": {"contentType": "application/json", "value": vars.metadata}, "file": {"contentType": "text/csv", "file": "fixtures/data.csv"}})'
+send:
+  req:
+    /upload:
+      post:
+        headers:
+          Accept: application/json
+          Content-Type: "{{ upload.contentType }}"
+        body:
+          application/octet-stream: "{{ upload.body }}"
+  test: current.res.status == 200
+```
+
+これは runbook の `steps` に置く例です。`vars.metadata` に送る JSON オブジェクトを定義します。
+ファイルパスは `runnora.yaml` のあるプロジェクトルート基準です。
+`application/octet-stream` は生本文送信の指定で、実際のリクエストは multipart になります。
+JSON ファイル・画像の例、415 を返す型指定の確認、Spring Boot の試験手順は
+[multipart テストの記載方法](../multipart-test/README.md#runbook-の書き方)を参照してください。
+
 ## 8. 結果を確認する
 
 実行ごとに次のフォルダができます（同じ秒に同じスイートを流すと `-2`、`-3` … が付きます）。

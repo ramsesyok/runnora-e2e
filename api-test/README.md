@@ -208,6 +208,8 @@ body:
 - API は受け取った画像のファイル名・種類（中身で判定）・サイズ・SHA-256 を返すので、ファイルとして届いたことを応答で確かめています。
 - oapi2wire は multipart/form-data を扱わないため、この API のモックケースはありません（モックでは自動生成の fallback が 501 を返します）。
 
+2026-10-05 の初期確認では、当時のソース `64bf851` からビルドした runnora と既存の `runnora.exe` の両方で、実 API に対する LIB-008 の全12ステップおよび共通前後処理が成功しました。[実行確認の詳細](../docs/multipart-verification-20261005.md)を参照してください。
+
 すべての runbook の前後で、共通フック（`00_reset` → `10_seed_master` / `90_verify_integrity`）が走ります。
 `90_verify_integrity` は「貸出可能冊数 = 所蔵 − 貸出中」などの不変条件をカーソル FOR LOOP で検証し、
 違反があれば `RAISE_APPLICATION_ERROR` で後処理を失敗させます（期待していない runbook なら runnora は exit 4 で終了します）。

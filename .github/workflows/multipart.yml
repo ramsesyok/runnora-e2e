@@ -1,0 +1,32 @@
+name: Multipart
+
+on:
+  push:
+    paths:
+      - '.github/workflows/multipart*.yml'
+      - 'multipart-test/**'
+      - 'api-test/fixtures/uploads/cover.png'
+  pull_request:
+    paths:
+      - '.github/workflows/multipart*.yml'
+      - 'multipart-test/**'
+      - 'api-test/fixtures/uploads/cover.png'
+  workflow_dispatch:
+    inputs:
+      runnora-ref:
+        description: runnora commit or ref with multipart() support
+        required: true
+        default: codex/multipart-part-content-type
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  multipart:
+    uses: ./.github/workflows/multipart-reusable.yml
+    with:
+      e2e-ref: ${{ github.sha }}
+      runnora-repository: ramsesyok/runnora
+      # Fixed implementation commit; manual runs can also test a newer ref.
+      runnora-ref: ${{ inputs.runnora-ref || '473b91eadb64da814fb595465733b1ebc54f6313' }}

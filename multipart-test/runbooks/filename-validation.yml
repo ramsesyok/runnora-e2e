@@ -1,0 +1,30 @@
+desc: 日本語ファイル名とOpenAPIリクエスト検証
+runnora:
+  id: MULTIPART-002
+runners:
+  req:
+    endpoint: ${API_URL}
+    openapi3: ../openapi.yaml
+vars:
+  metadata:
+    name: ファイル名の検証
+    kind: csv
+    enabled: true
+steps:
+  prepare:
+    bind:
+      upload: 'multipart({"metadata": {"contentType": "application/json", "value": vars.metadata}, "file": {"contentType": "text/csv", "file": "fixtures/data.csv", "filename": "取込.csv"}})'
+  upload:
+    req:
+      /upload:
+        post:
+          headers:
+            Accept: application/json
+            Content-Type: "{{ upload.contentType }}"
+          body:
+            application/octet-stream: "{{ upload.body }}"
+    test: |
+      current.res.status == 200 && current.res.body.fileName == "取込.csv" &&
+      current.res.body.metadata.name == vars.metadata.name &&
+      current.res.body.metadata.enabled == true && current.res.body.rows == 2 &&
+      current.res.body.metadataContentType == "application/json" && current.res.body.contentType == "text/csv"

@@ -3,6 +3,7 @@
 /*/bin/
 /*/reports/
 /*/logs/
+/multipart-test/server/target/
 # oapi2wire build の出力 (mapping の id が毎回変わるため管理しない。scripts/mock-build.ps1 で再生成)
 /*/mock/wiremock-out/
 
