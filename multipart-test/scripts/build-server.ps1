@@ -8,7 +8,7 @@ $serverRoot = Join-Path $trialRoot 'server'
 $targetDir = Join-Path $serverRoot 'target'
 New-Item -ItemType Directory -Force $targetDir | Out-Null
 if (-not $UseCachedJars) {
-    & mvn -f (Join-Path $serverRoot 'pom.xml') package -DskipTests
+    & mvn --batch-mode --no-transfer-progress -f (Join-Path $serverRoot 'pom.xml') package -DskipTests
     if ($LASTEXITCODE -ne 0) { throw 'Spring Boot server build failed' }
     return
 }

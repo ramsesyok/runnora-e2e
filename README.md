@@ -15,6 +15,7 @@ HTTP と gRPC の各応答は runnora が証跡として自動で JSON ファイ
 |---|---|---|---|
 | [api-test/](api-test/README.md) | WebAPI（HTTP） | 図書貸出 API（Go + Oracle）、oapi2wire による WireMock モック、生成・契約・シナリオテスト、PL/SQL 前後処理、runnora-docgen による手順書 | 作成済み |
 | [grpc-test/](grpc-test/README.md) | gRPC | Unary / Server streaming と、階層・配列を含む系列分析を許容誤差付きで比較する E2E runbook、runnora-docgen 手順書 | 作成済み |
+| [multipart-test/](multipart-test/README.md) | WebAPI（HTTP multipart） | Spring Boot への JSON + CSV / PNG アップロード、curl 比較、415 の再現・解消、CI | 作成済み |
 
 ツール群の連携方針は [runnora の連携設計](https://github.com/ramsesyok/runnora/blob/main/docs/integration-design.md) を参照してください。
 
@@ -53,7 +54,8 @@ Projects/
 ├─ runnora-docgen/     runnora-docgen.exe（手順書の表生成）
 └─ runnora-e2e/        このリポジトリ
    ├─ api-test/
-   └─ grpc-test/
+   ├─ grpc-test/
+   └─ multipart-test/
 ```
 
 

@@ -1,0 +1,92 @@
+name: Multipart Spring Boot E2E
+
+on:
+  workflow_call:
+    inputs:
+      e2e-ref:
+        description: Commit containing this workflow and its fixtures
+        required: true
+        type: string
+      runnora-repository:
+        description: Repository containing the runnora source under test
+        required: true
+        type: string
+      runnora-ref:
+        description: Commit or ref of runnora to build and test
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  multipart:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      GOWORK: 'off'
+    steps:
+      - name: Checkout E2E fixtures
+        uses: actions/checkout@v6
+        with:
+          repository: ramsesyok/runnora-e2e
+          ref: ${{ inputs.e2e-ref }}
+          path: e2e
+          persist-credentials: false
+
+      - name: Checkout runnora under test
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ inputs.runnora-repository }}
+          ref: ${{ inputs.runnora-ref }}
+          path: runnora
+          persist-credentials: false
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: runnora/go.mod
+          cache-dependency-path: runnora/go.sum
+
+      - name: Setup Java and Maven cache
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          cache-dependency-path: e2e/multipart-test/server/pom.xml
+
+      - name: Test multipart builder and runn integration
+        working-directory: runnora
+        run: |
+          go test ./internal/multipartbody
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          go test ./internal/app -run '^TestRunTypedMultipartThroughInclude$'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Build runnora
+        working-directory: runnora
+        run: |
+          $exePath = Join-Path $env:RUNNER_TEMP 'runnora-multipart.exe'
+          go build -o $exePath .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "RUNNORA_EXE=$exePath" >> $env:GITHUB_ENV
+          git rev-parse HEAD
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify Spring multipart against curl
+        run: ./e2e/multipart-test/scripts/run.ps1 -RunnoraExe $env:RUNNORA_EXE
+
+      - name: Upload reports and Spring logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: multipart-spring-evidence
+          path: |
+            e2e/multipart-test/reports/
+            e2e/multipart-test/logs/
+          if-no-files-found: warn
+          retention-days: 14

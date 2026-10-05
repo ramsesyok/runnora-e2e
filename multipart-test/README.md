@@ -63,6 +63,52 @@ steps:
 ファイルパスは `runnora.yaml` のある `multipart-test/` 基準。
 パートごとの指定を通常の `body: multipart/form-data:` に直接書く方式ではない。
 
+JSON と CSV を混ぜても、応答が JSON の API なら `Accept: application/json` を使う。
+全体の `Content-Type` は boundary を含む `upload.contentType` を使い、各パートの型は関数に渡す。
+
+| パートの設定 | 内容 |
+|---|---|
+| `value` | 値。`contentType: application/json` なら JSON にシリアライズする。オブジェクトには YAML のマップを渡す |
+| `file` | ファイルの中身をそのまま送る。`value` とどちらか一方だけ指定する |
+| `contentType` | JSON は `application/json`、CSV は `text/csv`、PNG は `image/png` など、API が要求する型 |
+| `filename` | ファイルの送信名。省略時はファイル名を使う |
+
+JSON ファイルと名前を変えた CSV を送る場合：
+
+```yaml
+prepare:
+  bind:
+    upload: 'multipart({"metadata": {"contentType": "application/json", "file": "fixtures/metadata.json"}, "file": {"contentType": "text/csv", "file": "fixtures/data.csv", "filename": "import.csv"}})'
+```
+
+送信ステップは上の例と同じ。PNG の場合はファイルパートを
+`{"contentType": "image/png", "file": "fixtures/cover.png"}` に置き換える。
+文字列として書いた JSON を `value` に渡すと、JSON オブジェクトではなく JSON 文字列になる。
+既存の JSON 本文は `file` を使う。`run` で利用でき、`loadt` への登録は対象外。
+ファイル全体をメモリに読み込むため、大容量ファイルのストリーミング送信には対応していない。
+
+## CI
+
+[Multipart ワークフロー](../.github/workflows/multipart.yml) は、このテストセットや PNG fixture の
+push / pull request で実行する。手動実行では `runnora-ref` に検証したい runnora のコミット・ブランチを指定できる。
+自動実行では型付き multipart 実装のコミット `bd818164d616a479dcafa7d8065ceb26b1a5c36f` を固定してビルドする。
+
+[共通ワークフロー](../.github/workflows/multipart-reusable.yml) を runnora 側の CI からも呼び出し、
+その push / pull request のコミットをビルドして同じテストを実行する。
+E2E のワークフローと fixture は同一の固定コミットを使うため、E2E の main の変更だけで検証内容は変わらない。
+テスト内容を更新する際は、runnora 側 CI の呼び出し SHA と `e2e-ref` も更新する。
+
+Windows runner で Go・Java 17 を用意し、通常の Maven ビルドを使う。`-UseCachedJars` は指定しない。
+builder の単体テスト、include / loop を通る runn の結合テスト、実 Spring Boot API の順に検証する。
+全12ステップ・HTTP 6 件の結果、curl と CSV の SHA-256 / サイズ一致、PNG の保持、
+HTTP ヘッダーとテキスト本文の boundary 一致、各証跡と HTML サマリーの保存を検査する。
+PNG を含むリクエスト本文は既存の証跡機能でサイズの要約になるため、受信した PNG のハッシュで内容を確認する。
+失敗時も `multipart-spring-evidence` artifact にレポート・curl 応答・Spring ログを14日間保存する。
+
+両リポジトリの追加コミットをリモートに push すると参照可能になる。
+初回は E2E 側の共通ワークフローを公開してから runnora 側の CI を実行する。
+GitHub の Actions 設定で、リポジトリ間の再利用ワークフローが許可されている必要がある。
+
 ## 実行結果（2026-10-05）
 
 Spring Boot の実 API に対して全12ステップが成功した。
@@ -86,6 +132,11 @@ OpenAPI **応答**検証も成功。異常なパート型を送るためリク�
 - `reports/20261005-181947-multipart/`：report.json、summary.html、HTTP 6 件のリクエスト・レスポンス
 - `reports/curl-response.json`：成功した curl の応答
 - `logs/spring.out.log`：Spring が application/octet-stream / text/plain を拒否したログ
+
+CI 追加時には通常の Maven `package` でビルドした JAR でも全12ステップが成功した
+（`reports/20261005-220952-multipart/`）。CI に組み込む Go テストと actionlint の構文検査も成功。
+HTTP ステータス、CSV の SHA-256、boundary を壊した証跡を検証処理が拒否することを確認した。
+GitHub Actions 上での実行は、両ブランチの push 後に行う。
 
 既存の Oracle + Go API のシナリオも新しい runnora で再実行し、9/9 成功した
 （`../api-test/reports/20261005-182045-scenarios/`、LIB-008 を含む）。

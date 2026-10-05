@@ -39,14 +39,19 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'curl baseline failed' }
     $curlResponse = Get-Content 'reports/curl-response.json' -Raw | ConvertFrom-Json
     $expectedHash = (Get-FileHash 'fixtures/data.csv' -Algorithm SHA256).Hash.ToLowerInvariant()
-    if ($curlResponse.sha256 -ne $expectedHash) { throw 'curl file hash differs from fixture' }
+    $expectedSize = (Get-Item 'fixtures/data.csv').Length
+    if ($curlResponse.sha256 -ne $expectedHash -or $curlResponse.size -ne $expectedSize) {
+        throw 'curl file hash/size differs from fixture'
+    }
+    $previousRuns = @(Get-ChildItem 'reports' -Directory | Select-Object -ExpandProperty FullName)
     & $RunnoraExe run --suite multipart
     if ($LASTEXITCODE -ne 0) { throw "multipart trial failed (exit $LASTEXITCODE)" }
-    $latestRun = Get-ChildItem 'reports' -Directory | Where-Object {$_.Name -match '^\d{8}-\d{6}-multipart'} | Sort-Object CreationTime | Select-Object -Last 1
-    $typedEvidence = Get-Content (Join-Path $latestRun.FullName 'evidence/MULTIPART-001/03-typed.json') -Raw | ConvertFrom-Json
-    if ($typedEvidence.response.body.sha256 -ne $expectedHash -or $typedEvidence.response.body.size -ne $curlResponse.size) {
-        throw 'runnora received bytes differ from curl/fixture'
-    }
+    $newRuns = @(Get-ChildItem 'reports' -Directory | Where-Object {
+        $_.Name -match '^\d{8}-\d{6}-multipart' -and $_.FullName -notin $previousRuns
+    })
+    if ($newRuns.Count -ne 1) { throw 'Expected exactly one new multipart report directory' }
+    & (Join-Path $PSScriptRoot 'verify-results.ps1') -RunDirectory $newRuns[0].FullName
+    Write-Host "Multipart E2E passed: $($newRuns[0].FullName)"
 } finally {
     if (-not $server.HasExited) { Stop-Process -Id $server.Id -Force }
     Pop-Location
