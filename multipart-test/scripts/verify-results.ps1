@@ -5,7 +5,7 @@ $ErrorActionPreference = 'Stop'
 $trialRoot = Split-Path $PSScriptRoot -Parent
 $RunDirectory = (Resolve-Path -LiteralPath $RunDirectory).Path
 $report = Get-Content (Join-Path $RunDirectory 'report.json') -Raw | ConvertFrom-Json
-if ($report.total -ne 1 -or $report.passed -ne 1 -or $report.failed -ne 0 -or $report.suite -ne 'multipart') {
+if ($report.total -ne 2 -or $report.passed -ne 2 -or $report.failed -ne 0 -or $report.suite -ne 'multipart') {
     throw 'Unexpected multipart suite result'
 }
 $scenario = @($report.results | Where-Object { $_.id -eq 'MULTIPART-001' })
@@ -26,17 +26,32 @@ foreach ($step in $httpSteps) {
     if ($item.response.status -ne $expectedStatuses[$step.key]) { throw "Unexpected status: $($step.key)" }
     $captured[$step.key] = $item
 }
+$filenameScenario = @($report.results | Where-Object { $_.id -eq 'MULTIPART-002' })
+if ($filenameScenario.Count -ne 1 -or $filenameScenario[0].actual -ne 'pass' -or
+    @($filenameScenario[0].steps).Count -ne 2 -or
+    @($filenameScenario[0].steps | Where-Object { $_.result -ne 'success' }).Count -ne 0) {
+    throw 'Expected two successful MULTIPART-002 steps'
+}
+$filenameStep = @($filenameScenario[0].steps | Where-Object { $_.key -eq 'upload' -and $_.runner -eq 'http' })
+if ($filenameStep.Count -ne 1 -or @($filenameStep[0].evidence).Count -ne 1) { throw 'Missing filename upload evidence' }
+$filenameEvidencePath = Join-Path (Join-Path $RunDirectory $report.evidenceDir) $filenameStep[0].evidence[0]
+$captured.filename = Get-Content -LiteralPath $filenameEvidencePath -Raw | ConvertFrom-Json
+if ($captured.filename.response.status -ne 200 -or $captured.filename.response.body.fileName -ne '取込.csv' -or
+    -not $captured.filename.request.body.Contains('filename="取込.csv"') -or
+    $captured.filename.request.body.Contains('filename*=') -or $captured.filename.request.body.Contains('name*=')) {
+    throw 'Incorrect RFC 7578 filename encoding or received filename'
+}
 $csvPath = Join-Path $trialRoot 'fixtures/data.csv'
 $expectedHash = (Get-FileHash $csvPath -Algorithm SHA256).Hash.ToLowerInvariant()
 $expectedSize = (Get-Item $csvPath).Length
 $curlResponse = Get-Content (Join-Path $trialRoot 'reports/curl-response.json') -Raw | ConvertFrom-Json
-foreach ($response in @($curlResponse, $captured.typed.response.body, $captured.json_file.response.body)) {
+foreach ($response in @($curlResponse, $captured.typed.response.body, $captured.json_file.response.body, $captured.filename.response.body)) {
     if ($response.sha256 -ne $expectedHash -or $response.size -ne $expectedSize -or $response.rows -ne 2 -or
         $response.contentType -ne 'text/csv' -or $response.metadataContentType -ne 'application/json') {
         throw 'CSV bytes or part types differ from curl/fixture'
     }
 }
-foreach ($key in @('typed', 'json_file', 'image')) {
+foreach ($key in @('typed', 'json_file', 'image', 'filename')) {
     $request = $captured[$key].request
     $contentType = @($request.headers.'Content-Type')
     if (@($request.headers.Accept) -notcontains 'application/json' -or $contentType.Count -ne 1 -or

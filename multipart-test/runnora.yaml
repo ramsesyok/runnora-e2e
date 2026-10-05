@@ -11,7 +11,7 @@ suites:
   multipart:
     env: spring
     select:
-      paths: [runbooks/json-csv.yml]
+      paths: [runbooks/json-csv.yml, runbooks/filename-validation.yml]
 evidence:
   mode: full
 report:

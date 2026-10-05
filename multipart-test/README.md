@@ -86,12 +86,15 @@ prepare:
 文字列として書いた JSON を `value` に渡すと、JSON オブジェクトではなく JSON 文字列になる。
 既存の JSON 本文は `file` を使う。`run` で利用でき、`loadt` への登録は対象外。
 ファイル全体をメモリに読み込むため、大容量ファイルのストリーミング送信には対応していない。
+本文全体の上限は **4 MiB（4,194,304 bytes）**。ファイル・JSON・ヘッダー・boundary の合計に適用する。
+超過時は bind ステップでエラーになり、HTTP 送信は行わない。上限の解除設定はない。
+ファイル名は日本語も使用でき、UTF-8 の `filename="取込.csv"` で送る（`filename*` は使わない）。
 
 ## CI
 
 [Multipart ワークフロー](../.github/workflows/multipart.yml) は、このテストセットや PNG fixture の
 push / pull request で実行する。手動実行では `runnora-ref` に検証したい runnora のコミット・ブランチを指定できる。
-自動実行では型付き multipart 実装のコミット `bd818164d616a479dcafa7d8065ceb26b1a5c36f` を固定してビルドする。
+自動実行では型付き multipart 実装のコミット `e38e0c9075cb55f3dc3193132ea3f34a567fb75b` を固定してビルドする。
 
 [共通ワークフロー](../.github/workflows/multipart-reusable.yml) を runnora 側の CI からも呼び出し、
 その push / pull request のコミットをビルドして同じテストを実行する。
@@ -100,9 +103,11 @@ E2E のワークフローと fixture は同一の固定コミットを使うた�
 
 Windows runner で Go・Java 17 を用意し、通常の Maven ビルドを使う。`-UseCachedJars` は指定しない。
 builder の単体テスト、include / loop を通る runn の結合テスト、実 Spring Boot API の順に検証する。
-全12ステップ・HTTP 6 件の結果、curl と CSV の SHA-256 / サイズ一致、PNG の保持、
+全14ステップ・HTTP 7 件の結果、curl と CSV の SHA-256 / サイズ一致、PNG の保持、
 HTTP ヘッダーとテキスト本文の boundary 一致、各証跡と HTML サマリーの保存を検査する。
 PNG を含むリクエスト本文は既存の証跡機能でサイズの要約になるため、受信した PNG のハッシュで内容を確認する。
+`MULTIPART-002` は日本語ファイル名と OpenAPI リクエスト検証を確認する。
+本文サイズの境界、複数パートの合計、超過時の未送信は Go テストで確認する。
 失敗時も `multipart-spring-evidence` artifact にレポート・curl 応答・Spring ログを14日間保存する。
 
 両リポジトリの追加コミットをリモートに push すると参照可能になる。
@@ -136,7 +141,10 @@ OpenAPI **応答**検証も成功。異常なパート型を送るためリク�
 CI 追加時には通常の Maven `package` でビルドした JAR でも全12ステップが成功した
 （`reports/20261005-220952-multipart/`）。CI に組み込む Go テストと actionlint の構文検査も成功。
 HTTP ステータス、CSV の SHA-256、boundary を壊した証跡を検証処理が拒否することを確認した。
-GitHub Actions 上での実行は、両ブランチの push 後に行う。
+マージ前の修正後は、通常 Maven ビルドで全14ステップ（2シナリオ・HTTP 7件）が成功した
+（`reports/20261005-222808-multipart/`）。日本語ファイル名 `取込.csv` の送受信、
+`filename*` / `name*` を使わないヘッダー、OpenAPI リクエスト検証の成功も確認した。
+GitHub Actions の実行結果は Actions 画面と `multipart-spring-evidence` artifact で確認する。
 
 既存の Oracle + Go API のシナリオも新しい runnora で再実行し、9/9 成功した
 （`../api-test/reports/20261005-182045-scenarios/`、LIB-008 を含む）。

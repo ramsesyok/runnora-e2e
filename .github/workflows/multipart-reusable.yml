@@ -64,7 +64,7 @@ jobs:
         run: |
           go test ./internal/multipartbody
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          go test ./internal/app -run '^TestRunTypedMultipartThroughInclude$'
+          go test ./internal/app -run '^TestRunTypedMultipart'
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Build runnora

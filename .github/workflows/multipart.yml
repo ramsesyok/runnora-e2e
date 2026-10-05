@@ -29,4 +29,4 @@ jobs:
       e2e-ref: ${{ github.sha }}
       runnora-repository: ramsesyok/runnora
       # Fixed implementation commit; manual runs can also test a newer ref.
-      runnora-ref: ${{ inputs.runnora-ref || 'bd818164d616a479dcafa7d8065ceb26b1a5c36f' }}
+      runnora-ref: ${{ inputs.runnora-ref || 'e38e0c9075cb55f3dc3193132ea3f34a567fb75b' }}
