@@ -21,6 +21,7 @@ HTTP と gRPC の各応答は runnora が証跡として自動で JSON ファイ
 | 資料 | 内容 |
 |---|---|
 | [はじめて読む人のためのテスト用語](docs/test-basics.md) | runbook・シナリオ・ケース・スイートの違い、スイートの要否、契約テストの意味を実例で説明 |
+| [JSON + CSV の multipart トライアル](multipart-test/README.md) | Spring Boot の実 API で 415 を再現し、runnora のパートごとの Content-Type 指定で解消する独立したテストセット |
 | [コマンドマニュアル](docs/command-manual.md) | スクリプトを使わず、runnora・oapi2wire・runnora-docgen のコマンドだけでテストの一連の流れ（モック生成 → テスト雛形 → モック / 実環境で実行 → 結果確認 → 手順書）を行う手順と早見表 |
 | [スクリプトの処理解説](docs/scripts-explained.md) | `api-test/scripts/run-all.ps1` と `grpc-test/scripts/run.ps1` が内部で何を・どの順で・何のために実行しているか |
 

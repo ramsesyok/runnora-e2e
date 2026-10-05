@@ -1,0 +1,18 @@
+version: 2
+project:
+  name: multipart-trial
+defaults:
+  env: spring
+environments:
+  spring:
+    vars:
+      API_URL: http://127.0.0.1:18082
+suites:
+  multipart:
+    env: spring
+    select:
+      paths: [runbooks/json-csv.yml]
+evidence:
+  mode: full
+report:
+  format: text

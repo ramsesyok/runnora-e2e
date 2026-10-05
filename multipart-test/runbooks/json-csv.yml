@@ -1,0 +1,116 @@
+desc: JSON と CSV/PNG の型指定、Spring Boot の415再現と解消
+runnora:
+  id: MULTIPART-001
+runners:
+  req:
+    endpoint: ${API_URL}
+    openapi3: ../openapi.yaml
+    # 異常な型も送ってサーバの415を確認する。応答スキーマは検証する。
+    skipValidateRequest: true
+vars:
+  metadata:
+    name: 日本語の取込
+    kind: csv
+    enabled: true
+steps:
+  legacy:
+    desc: 型指定なしのJSON文字列はSpringのDTO変換で415になる
+    req:
+      /upload:
+        post:
+          headers:
+            Accept: application/json
+          body:
+            multipart/form-data:
+              metadata: '{"name":"従来方式","kind":"csv","enabled":true}'
+              file: file://../fixtures/data.csv
+    test: current.res.status == 415
+  prepare:
+    desc: JSONをシリアライズし、CSVと各パートの型を明示する
+    bind:
+      upload: 'multipart({"metadata": {"contentType": "application/json", "value": vars.metadata}, "file": {"contentType": "text/csv", "file": "fixtures/data.csv"}})'
+  typed:
+    req:
+      /upload:
+        post:
+          headers:
+            Accept: application/json
+            Content-Type: "{{ upload.contentType }}"
+          body:
+            application/octet-stream: "{{ upload.body }}"
+    test: |
+      current.res.status == 200 &&
+      current.res.body.metadata.name == vars.metadata.name &&
+      current.res.body.metadata.enabled == true &&
+      current.res.body.metadataContentType == "application/json" &&
+      current.res.body.contentType == "text/csv" &&
+      current.res.body.fileName == "data.csv" &&
+      current.res.body.rows == 2
+  remember:
+    bind:
+      csv_hash: steps.typed.res.body.sha256
+      csv_size: steps.typed.res.body.size
+  prepare_json_file:
+    bind:
+      upload_json_file: 'multipart({"metadata": {"contentType": "application/json", "file": "fixtures/metadata.json"}, "file": {"contentType": "text/csv", "file": "fixtures/data.csv", "filename": "import.csv"}})'
+  json_file:
+    desc: JSONもファイルから送り、CSVの内容が前の送信と一致する
+    req:
+      /upload:
+        post:
+          headers:
+            Accept: application/json
+            Content-Type: "{{ upload_json_file.contentType }}"
+          body:
+            application/octet-stream: "{{ upload_json_file.body }}"
+    test: |
+      current.res.status == 200 &&
+      current.res.body.metadata.name == "JSONファイル" &&
+      current.res.body.fileName == "import.csv" &&
+      current.res.body.sha256 == csv_hash && current.res.body.size == csv_size
+  prepare_bad_json_type:
+    bind:
+      bad_json: 'multipart({"metadata": {"contentType": "text/plain", "value": "{}"}, "file": {"contentType": "text/csv", "file": "fixtures/data.csv"}})'
+  bad_json_type:
+    desc: JSONパートの型を誤ると415になる
+    req:
+      /upload:
+        post:
+          headers:
+            Accept: application/json
+            Content-Type: "{{ bad_json.contentType }}"
+          body:
+            application/octet-stream: "{{ bad_json.body }}"
+    test: current.res.status == 415
+  prepare_bad_csv_type:
+    bind:
+      bad_csv: 'multipart({"metadata": {"contentType": "application/json", "value": vars.metadata}, "file": {"contentType": "application/octet-stream", "file": "fixtures/data.csv"}})'
+  bad_csv_type:
+    desc: サーバが要求するCSVの型と不一致なら415になる
+    req:
+      /upload:
+        post:
+          headers:
+            Accept: application/json
+            Content-Type: "{{ bad_csv.contentType }}"
+          body:
+            application/octet-stream: "{{ bad_csv.body }}"
+    test: current.res.status == 415
+  prepare_image:
+    bind:
+      upload_image: 'multipart({"metadata": {"contentType": "application/json", "value": {"name": "表紙", "kind": "image", "enabled": false}}, "file": {"contentType": "image/png", "file": "../api-test/fixtures/uploads/cover.png"}})'
+  image:
+    desc: 同じ方式でPNGを送ってもバイナリが変化しない
+    req:
+      /upload:
+        post:
+          headers:
+            Accept: application/json
+            Content-Type: "{{ upload_image.contentType }}"
+          body:
+            application/octet-stream: "{{ upload_image.body }}"
+    test: |
+      current.res.status == 200 && current.res.body.size == 93 &&
+      current.res.body.contentType == "image/png" &&
+      current.res.body.metadata.enabled == false &&
+      current.res.body.sha256 == "cd4e1d7819e60197b5fa92001c60352cd755f1c6d08a351e15362f9119aaa1ed"

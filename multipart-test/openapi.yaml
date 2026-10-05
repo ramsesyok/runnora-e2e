@@ -1,0 +1,51 @@
+openapi: 3.0.3
+info:
+  title: Typed multipart trial
+  version: 1.0.0
+paths:
+  /upload:
+    post:
+      operationId: upload
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [metadata, file]
+              properties:
+                metadata:
+                  type: object
+                  properties:
+                    name: {type: string}
+                    kind: {type: string}
+                    enabled: {type: boolean}
+                file:
+                  type: string
+                  format: binary
+            encoding:
+              metadata:
+                contentType: application/json
+              file:
+                contentType: text/csv, image/png
+      responses:
+        '200':
+          description: Received multipart content
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [metadata, fileName, contentType, metadataContentType, size, sha256, rows]
+                properties:
+                  metadata: {type: object}
+                  fileName: {type: string}
+                  contentType: {type: string}
+                  metadataContentType: {type: string}
+                  size: {type: integer}
+                  sha256: {type: string}
+                  rows: {type: integer}
+        '415':
+          description: Unsupported part media type
+          content:
+            application/json:
+              schema: {type: object}
