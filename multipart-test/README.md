@@ -94,7 +94,7 @@ prepare:
 
 [Multipart ワークフロー](../.github/workflows/multipart.yml) は、このテストセットや PNG fixture の
 push / pull request で実行する。手動実行では `runnora-ref` に検証したい runnora のコミット・ブランチを指定できる。
-自動実行では型付き multipart 実装のコミット `e38e0c9075cb55f3dc3193132ea3f34a567fb75b` を固定してビルドする。
+自動実行では型付き multipart 実装のコミット `473b91eadb64da814fb595465733b1ebc54f6313` を固定してビルドする。
 
 [共通ワークフロー](../.github/workflows/multipart-reusable.yml) を runnora 側の CI からも呼び出し、
 その push / pull request のコミットをビルドして同じテストを実行する。
