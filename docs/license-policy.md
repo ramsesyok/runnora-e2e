@@ -27,6 +27,7 @@ go run scripts/licenses.go -module-dir grpc-test -output grpc-test/THIRD_PARTY_N
 | runnora / oapi2wire / runnora-docgen / runnora-diff | 各ツールの LICENSE と THIRD_PARTY_NOTICES に従う。実行ファイルをコピーして配布する場合も表示を同梱する |
 | Oracle Database Free | OSS ではなく Oracle Free Use Terms and Conditions の外部製品。未改変での開発・テスト・社内業務利用等と、条件付きの再配布が認められる。MIT として再許諾しない |
 | WireMock / Java | 別途取得して実行する。WireMock のライセンスと依存表示、選択した Java 配布物の条件に従う |
+| OpenAPI Generator / Spring Boot / Maven | multipart テスト用に別途取得する外部ツール・依存。生成コードは `server/target/` に置き、自動生成の表示を保持する。取得物と生成物の再配布時は各ライセンス・依存表示に従う |
 | Docker Desktop | 実行環境の利用条件は契約・組織条件による。サンプルの MIT は Desktop の利用許諾を含まない |
 | Quarto / Pandoc / Typst / ddq / PlantUML | 文書生成用の外部ツール。それぞれのライセンス・同梱物・出力素材の条件を確認する |
 

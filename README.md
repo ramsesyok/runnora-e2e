@@ -16,6 +16,7 @@ HTTP と gRPC の各応答は runnora が証跡として自動で JSON ファイ
 | [api-test/](api-test/README.md) | WebAPI（HTTP） | 図書貸出 API（Go + Oracle）、oapi2wire による WireMock モック、生成・契約・シナリオテスト、PL/SQL 前後処理、runnora-docgen による手順書 | 作成済み |
 | [grpc-test/](grpc-test/README.md) | gRPC | Unary / Server streaming と、階層・配列を含む系列分析を許容誤差付きで比較する E2E runbook、runnora-docgen 手順書 | 作成済み |
 | [multipart-test/](multipart-test/README.md) | WebAPI（HTTP multipart） | Spring Boot への JSON + CSV / PNG アップロード、curl 比較、415 の再現・解消、CI | 作成済み |
+| [multipart-openapi-test/](multipart-openapi-test/README.md) | OpenAPI 生成 Spring API（HTTP multipart） | OpenAPI Generator による API / DTO 生成、複雑な JSON 2 パート + CSV、415 / 400・送信前エラーの再現、CI | 作成済み |
 
 ツール群の連携方針は [runnora の連携設計](https://github.com/ramsesyok/runnora/blob/main/docs/integration-design.md) を参照してください。
 
@@ -23,6 +24,7 @@ HTTP と gRPC の各応答は runnora が証跡として自動で JSON ファイ
 |---|---|
 | [はじめて読む人のためのテスト用語](docs/test-basics.md) | runbook・シナリオ・ケース・スイートの違い、スイートの要否、契約テストの意味を実例で説明 |
 | [JSON + CSV の multipart トライアル](multipart-test/README.md) | Spring Boot の実 API で 415 を再現し、runnora のパートごとの Content-Type 指定で解消する独立したテストセット |
+| [OpenAPI 生成 Spring の multipart トライアル](multipart-openapi-test/README.md) | OpenAPI 定義から生成した API に curl / runnora で送信し、DTO と CSV の受信内容・異常系を照合する |
 | [コマンドマニュアル](docs/command-manual.md) | スクリプトを使わず、runnora・oapi2wire・runnora-docgen のコマンドだけでテストの一連の流れ（モック生成 → テスト雛形 → モック / 実環境で実行 → 結果確認 → 手順書）を行う手順と早見表 |
 | [スクリプトの処理解説](docs/scripts-explained.md) | `api-test/scripts/run-all.ps1` と `grpc-test/scripts/run.ps1` が内部で何を・どの順で・何のために実行しているか |
 
@@ -55,7 +57,8 @@ Projects/
 └─ runnora-e2e/        このリポジトリ
    ├─ api-test/
    ├─ grpc-test/
-   └─ multipart-test/
+   ├─ multipart-test/
+   └─ multipart-openapi-test/
 ```
 
 

@@ -57,7 +57,9 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: maven
-          cache-dependency-path: e2e/multipart-test/server/pom.xml
+          cache-dependency-path: |
+            e2e/multipart-test/server/pom.xml
+            e2e/multipart-openapi-test/server/pom.xml
 
       - name: Test multipart builder and runn integration
         working-directory: runnora
@@ -80,6 +82,9 @@ jobs:
       - name: Verify Spring multipart against curl
         run: ./e2e/multipart-test/scripts/run.ps1 -RunnoraExe $env:RUNNORA_EXE
 
+      - name: Verify OpenAPI-generated Spring multipart against curl
+        run: ./e2e/multipart-openapi-test/scripts/run.ps1 -RunnoraExe $env:RUNNORA_EXE
+
       - name: Upload reports and Spring logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -88,5 +93,8 @@ jobs:
           path: |
             e2e/multipart-test/reports/
             e2e/multipart-test/logs/
+            e2e/multipart-openapi-test/reports/
+            e2e/multipart-openapi-test/logs/
+            e2e/multipart-openapi-test/server/target/generated-sources/openapi/src/main/java/
           if-no-files-found: warn
           retention-days: 14

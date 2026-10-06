@@ -1,0 +1,5 @@
+{
+  "customer": {"name": "山田太郎", "address": {"country": "JP", "city": "東京"}, "tags": ["a", "b"]},
+  "items": [{"id": 101, "quantity": 2, "price": 12.5}, {"id": 102, "quantity": 0, "price": 0}],
+  "optional": null
+}

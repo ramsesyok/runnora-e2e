@@ -8,7 +8,7 @@ Spring Boot の `@RequestPart("metadata") Metadata` と `MultipartFile` を受�
 
 - Java 17、Spring Boot 2.7.15 / Spring Framework 5.3.29。手元の既存キャッシュで再現するため固定したトライアル環境。
 - 通常のビルドには Maven、オフラインの `-UseCachedJars` には `~/.m2/repository` の指定バージョンの JAR が必要。
-- `multipart()` を実装した runnora のブランチ `codex/multipart-part-content-type` からビルドした実行ファイルが必要。
+- `multipart()` を実装した runnora v0.5.0 以降の実行ファイルが必要。
 - curl.exe を比較に使用する。待ち受けは `127.0.0.1:18082`。CSV・画像は保存せず、受信内容の要約を返す。
 
 リポジトリルートから実行する。
@@ -83,8 +83,13 @@ prepare:
 
 送信ステップは上の例と同じ。PNG の場合はファイルパートを
 `{"contentType": "image/png", "file": "fixtures/cover.png"}` に置き換える。
-文字列として書いた JSON を `value` に渡すと、JSON オブジェクトではなく JSON 文字列になる。
-既存の JSON 本文は `file` を使う。`run` で利用でき、`loadt` への登録は対象外。
+JSON オブジェクトを送る場合は、`value` に `vars.metadata` のような元の値を渡し、JSON 化は `multipart()` に任せる。
+`value` に `toJSON(vars.metadata)` を渡すと二重シリアライズになり、今回の Spring DTO では HTTP 400 になる。
+API が JSON 文字列を要求する場合は `value` に文字列を渡せる。既存の JSON 本文は `file` を使う。
+通常の `body: multipart/form-data:` の `"{{ toJSON(...) }}"` は、送信前に
+`http request failed ... invalid body: map[...]` になる場合もある。
+正しい例と失敗する段階の違いは [OpenAPI multipart テストの説明](../multipart-openapi-test/README.md#json-化は-multipart-に任せる) を参照。
+`run` で利用でき、`loadt` への登録は対象外。
 ファイル全体をメモリに読み込むため、大容量ファイルのストリーミング送信には対応していない。
 本文全体の上限は **4 MiB（4,194,304 bytes）**。ファイル・JSON・ヘッダー・boundary の合計に適用する。
 超過時は bind ステップでエラーになり、HTTP 送信は行わない。上限の解除設定はない。
@@ -94,7 +99,8 @@ prepare:
 
 [Multipart ワークフロー](../.github/workflows/multipart.yml) は、このテストセットや PNG fixture の
 push / pull request で実行する。手動実行では `runnora-ref` に検証したい runnora のコミット・ブランチを指定できる。
-自動実行では型付き multipart 実装のコミット `473b91eadb64da814fb595465733b1ebc54f6313` を固定してビルドする。
+自動実行では v0.5.0 のコミット `d0a4f256b4ed5f2748cdfa753915af240bc49be8` を固定してビルドする。
+同じジョブで [OpenAPI Generator から生成した Spring API のテスト](../multipart-openapi-test/README.md) も実行する。
 
 [共通ワークフロー](../.github/workflows/multipart-reusable.yml) を runnora 側の CI からも呼び出し、
 その push / pull request のコミットをビルドして同じテストを実行する。

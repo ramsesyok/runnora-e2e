@@ -1,0 +1,5 @@
+{
+  "settings": {"enabled": true, "tags": [], "limits": {"max": 100, "min": 0}},
+  "message": "引用符 \"abc\" と改行\n2行目",
+  "flags": [true, false]
+}

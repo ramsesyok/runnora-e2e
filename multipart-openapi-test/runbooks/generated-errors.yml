@@ -1,0 +1,77 @@
+desc: 生成コードのJSON変換と必須パートの異常系
+runnora:
+  id: GENERATED-MULTIPART-002
+runners:
+  req:
+    endpoint: ${API_URL}
+    openapi3: ../openapi.yaml
+    # 故意に不正なパートをサーバまで送る。正常系はリクエスト検証も有効。
+    skipValidateRequest: true
+vars:
+  metadata1: json://../fixtures/metadata1.json
+  metadata2: json://../fixtures/metadata2.json
+steps:
+  legacy:
+    req:
+      /generated/upload:
+        post:
+          headers:
+            Accept: application/json
+          body:
+            multipart/form-data:
+              metadata1: '{}'
+              metadata2: '{}'
+              csv: file://../fixtures/data.csv
+    test: current.res.status == 415
+  prepare_bad_metadata1:
+    bind:
+      bad_metadata1: 'multipart({"metadata1": {"contentType": "text/plain", "value": toJSON(vars.metadata1)}, "metadata2": {"contentType": "application/json", "value": vars.metadata2}, "csv": {"contentType": "text/csv", "file": "fixtures/data.csv"}})'
+  bad_metadata1_type:
+    req:
+      /generated/upload:
+        post:
+          headers:
+            Accept: application/json
+            Content-Type: "{{ bad_metadata1.contentType }}"
+          body:
+            application/octet-stream: "{{ bad_metadata1.body }}"
+    test: current.res.status == 415
+  prepare_bad_metadata2:
+    bind:
+      bad_metadata2: 'multipart({"metadata1": {"contentType": "application/json", "value": vars.metadata1}, "metadata2": {"contentType": "text/plain", "value": toJSON(vars.metadata2)}, "csv": {"contentType": "text/csv", "file": "fixtures/data.csv"}})'
+  bad_metadata2_type:
+    req:
+      /generated/upload:
+        post:
+          headers:
+            Accept: application/json
+            Content-Type: "{{ bad_metadata2.contentType }}"
+          body:
+            application/octet-stream: "{{ bad_metadata2.body }}"
+    test: current.res.status == 415
+  prepare_json_string:
+    bind:
+      json_string: 'multipart({"metadata1": {"contentType": "application/json", "value": toJSON(vars.metadata1)}, "metadata2": {"contentType": "application/json", "value": vars.metadata2}, "csv": {"contentType": "text/csv", "file": "fixtures/data.csv"}})'
+  json_string:
+    req:
+      /generated/upload:
+        post:
+          headers:
+            Accept: application/json
+            Content-Type: "{{ json_string.contentType }}"
+          body:
+            application/octet-stream: "{{ json_string.body }}"
+    test: current.res.status == 400
+  prepare_wrong_name:
+    bind:
+      wrong_name: 'multipart({"metadata1": {"contentType": "application/json", "value": vars.metadata1}, "metadata2": {"contentType": "application/json", "value": vars.metadata2}, "file": {"contentType": "text/csv", "file": "fixtures/data.csv"}})'
+  wrong_csv_name:
+    req:
+      /generated/upload:
+        post:
+          headers:
+            Accept: application/json
+            Content-Type: "{{ wrong_name.contentType }}"
+          body:
+            application/octet-stream: "{{ wrong_name.body }}"
+    test: current.res.status == 400

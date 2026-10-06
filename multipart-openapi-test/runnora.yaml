@@ -1,0 +1,18 @@
+version: 2
+project:
+  name: multipart-openapi-trial
+defaults:
+  env: spring
+environments:
+  spring:
+    vars:
+      API_URL: http://127.0.0.1:18083
+suites:
+  generated-multipart:
+    env: spring
+    select:
+      paths: [runbooks/generated-success.yml, runbooks/generated-errors.yml, runbooks/native-expanded-json.yml]
+evidence:
+  mode: full
+report:
+  format: text

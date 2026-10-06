@@ -1,0 +1,37 @@
+desc: OpenAPI生成Springで複雑なJSON 2パートとCSVを受信
+runnora:
+  id: GENERATED-MULTIPART-001
+runners:
+  req:
+    endpoint: ${API_URL}
+    openapi3: ../openapi.yaml
+vars:
+  metadata1: json://../fixtures/metadata1.json
+  metadata2: json://../fixtures/metadata2.json
+steps:
+  prepare:
+    bind:
+      upload: 'multipart({"metadata1": {"contentType": "application/json", "value": vars.metadata1}, "metadata2": {"contentType": "application/json", "value": vars.metadata2}, "csv": {"contentType": "text/csv", "file": "fixtures/data.csv", "filename": "取込.csv"}})'
+  typed:
+    req:
+      /generated/upload:
+        post:
+          headers:
+            Accept: application/json
+            Content-Type: "{{ upload.contentType }}"
+          body:
+            application/octet-stream: "{{ upload.body }}"
+    test: current.res.status == 200 && current.res.body.fileName == "取込.csv" && current.res.body.csvContentType == "text/csv" && current.res.body.metadata1ContentType == "application/json" && current.res.body.metadata2ContentType == "application/json"
+  prepare_files:
+    bind:
+      upload_files: 'multipart({"metadata1": {"contentType": "application/json", "file": "fixtures/metadata1.json"}, "metadata2": {"contentType": "application/json", "file": "fixtures/metadata2.json"}, "csv": {"contentType": "text/csv", "file": "fixtures/data.csv"}})'
+  json_files:
+    req:
+      /generated/upload:
+        post:
+          headers:
+            Accept: application/json
+            Content-Type: "{{ upload_files.contentType }}"
+          body:
+            application/octet-stream: "{{ upload_files.body }}"
+    test: current.res.status == 200 && current.res.body.fileName == "data.csv"

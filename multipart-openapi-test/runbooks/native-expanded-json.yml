@@ -1,0 +1,21 @@
+desc: 通常multipartのJSON文字列展開がマップになり送信前に失敗する再現
+runnora:
+  id: GENERATED-MULTIPART-003
+  expect: fail
+runners:
+  req: ${API_URL}
+vars:
+  metadata1: json://../fixtures/metadata1.json
+  metadata2: json://../fixtures/metadata2.json
+steps:
+  native_expanded_json:
+    req:
+      /generated/upload:
+        post:
+          headers:
+            Accept: application/json
+          body:
+            multipart/form-data:
+              metadata1: "{{ toJSON(vars.metadata1) }}"
+              metadata2: "{{ toJSON(vars.metadata2) }}"
+              csv: file://../fixtures/data.csv

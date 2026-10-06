@@ -1,0 +1,119 @@
+openapi: 3.0.3
+info:
+  title: Generated Spring multipart E2E
+  version: 1.0.0
+paths:
+  /generated/upload:
+    post:
+      tags: [MultipartUpload]
+      operationId: uploadMultipart
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [metadata1, metadata2, csv]
+              properties:
+                metadata1:
+                  $ref: '#/components/schemas/Metadata1'
+                metadata2:
+                  $ref: '#/components/schemas/Metadata2'
+                csv:
+                  type: string
+                  format: binary
+            encoding:
+              metadata1: {contentType: application/json}
+              metadata2: {contentType: application/json}
+              csv: {contentType: text/csv}
+      responses:
+        '200':
+          description: Received generated DTOs and CSV
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadSummary'
+        '400':
+          description: JSON conversion or required part failed
+          content:
+            application/json:
+              schema: {type: object}
+        '415':
+          description: Unsupported JSON part media type
+          content:
+            application/json:
+              schema: {type: object}
+components:
+  schemas:
+    Metadata1:
+      type: object
+      required: [customer, items]
+      properties:
+        customer:
+          $ref: '#/components/schemas/Customer'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+        optional:
+          type: string
+          nullable: true
+    Customer:
+      type: object
+      required: [name, address, tags]
+      properties:
+        name: {type: string}
+        address:
+          $ref: '#/components/schemas/Address'
+        tags:
+          type: array
+          items: {type: string}
+    Address:
+      type: object
+      required: [country, city]
+      properties:
+        country: {type: string}
+        city: {type: string}
+    Item:
+      type: object
+      required: [id, quantity, price]
+      properties:
+        id: {type: integer}
+        quantity: {type: integer}
+        price: {type: number}
+    Metadata2:
+      type: object
+      required: [settings, message, flags]
+      properties:
+        settings:
+          $ref: '#/components/schemas/Settings'
+        message: {type: string}
+        flags:
+          type: array
+          items: {type: boolean}
+    Settings:
+      type: object
+      required: [enabled, tags, limits]
+      properties:
+        enabled: {type: boolean}
+        tags:
+          type: array
+          items: {type: string}
+        limits:
+          type: object
+          additionalProperties: {type: integer}
+    UploadSummary:
+      type: object
+      required: [metadata1, metadata2, fileName, csvContentType, metadata1ContentType, metadata2ContentType, size, sha256, rows]
+      properties:
+        metadata1:
+          $ref: '#/components/schemas/Metadata1'
+        metadata2:
+          $ref: '#/components/schemas/Metadata2'
+        fileName: {type: string}
+        csvContentType: {type: string}
+        metadata1ContentType: {type: string}
+        metadata2ContentType: {type: string}
+        size: {type: integer, format: int64}
+        sha256: {type: string}
+        rows: {type: integer, format: int64}
