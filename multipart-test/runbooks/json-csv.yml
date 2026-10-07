@@ -19,7 +19,7 @@ steps:
       /upload:
         post:
           headers:
-            Accept: application/json
+            Accept: "application/json"
           body:
             multipart/form-data:
               metadata: '{"name":"従来方式","kind":"csv","enabled":true}'
@@ -34,7 +34,7 @@ steps:
       /upload:
         post:
           headers:
-            Accept: application/json
+            Accept: "application/json"
             Content-Type: "{{ upload.contentType }}"
           body:
             application/octet-stream: "{{ upload.body }}"
@@ -59,7 +59,7 @@ steps:
       /upload:
         post:
           headers:
-            Accept: application/json
+            Accept: "application/json"
             Content-Type: "{{ upload_json_file.contentType }}"
           body:
             application/octet-stream: "{{ upload_json_file.body }}"
@@ -77,7 +77,7 @@ steps:
       /upload:
         post:
           headers:
-            Accept: application/json
+            Accept: "application/json"
             Content-Type: "{{ bad_json.contentType }}"
           body:
             application/octet-stream: "{{ bad_json.body }}"
@@ -91,7 +91,7 @@ steps:
       /upload:
         post:
           headers:
-            Accept: application/json
+            Accept: "application/json"
             Content-Type: "{{ bad_csv.contentType }}"
           body:
             application/octet-stream: "{{ bad_csv.body }}"
@@ -105,7 +105,7 @@ steps:
       /upload:
         post:
           headers:
-            Accept: application/json
+            Accept: "application/json"
             Content-Type: "{{ upload_image.contentType }}"
           body:
             application/octet-stream: "{{ upload_image.body }}"

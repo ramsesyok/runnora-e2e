@@ -52,7 +52,7 @@ steps:
       /upload:
         post:
           headers:
-            Accept: application/json
+            Accept: "application/json"
             Content-Type: "{{ upload.contentType }}"
           body:
             application/octet-stream: "{{ upload.body }}"
@@ -63,8 +63,24 @@ steps:
 ファイルパスは `runnora.yaml` のある `multipart-test/` 基準。
 パートごとの指定を通常の `body: multipart/form-data:` に直接書く方式ではない。
 
-JSON と CSV を混ぜても、応答が JSON の API なら `Accept: application/json` を使う。
+JSON と CSV を混ぜても、応答が JSON の API なら `Accept: "application/json"` を使う。
 全体の `Content-Type` は boundary を含む `upload.contentType` を使い、各パートの型は関数に渡す。
+
+**リクエストヘッダーの固定値は、すべてダブルクォーテーションで囲む。**
+数字だけの値や英字も、次のように書き方を統一する。
+
+```yaml
+headers:
+  Accept: "application/json"
+  X-Request-ID: "1"
+  X-Exerceis-ID: "R"
+  Content-Type: "{{ upload.contentType }}"
+```
+
+カスタムヘッダー名と値は API の仕様に合わせる。
+`X-Request-ID: 1` は YAML の数値型になり、runn のヘッダー解析で `invalid request` になる。
+`R` は引用符なしでも文字列だが、`"R"` と書いて表記を揃える。
+引用符は YAML 用で、HTTP の値には付かない。変数を使う場合も、展開後の値が文字列であることを確認する。
 
 | パートの設定 | 内容 |
 |---|---|

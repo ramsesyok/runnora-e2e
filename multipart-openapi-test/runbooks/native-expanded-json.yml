@@ -13,7 +13,7 @@ steps:
       /generated/upload:
         post:
           headers:
-            Accept: application/json
+            Accept: "application/json"
           body:
             multipart/form-data:
               metadata1: "{{ toJSON(vars.metadata1) }}"

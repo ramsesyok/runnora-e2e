@@ -17,7 +17,7 @@ steps:
       /generated/upload:
         post:
           headers:
-            Accept: application/json
+            Accept: "application/json"
             Content-Type: "{{ upload.contentType }}"
           body:
             application/octet-stream: "{{ upload.body }}"
@@ -30,7 +30,7 @@ steps:
       /generated/upload:
         post:
           headers:
-            Accept: application/json
+            Accept: "application/json"
             Content-Type: "{{ upload_files.contentType }}"
           body:
             application/octet-stream: "{{ upload_files.body }}"

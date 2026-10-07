@@ -16,7 +16,7 @@ steps:
       /generated/upload:
         post:
           headers:
-            Accept: application/json
+            Accept: "application/json"
           body:
             multipart/form-data:
               metadata1: '{}'
@@ -31,7 +31,7 @@ steps:
       /generated/upload:
         post:
           headers:
-            Accept: application/json
+            Accept: "application/json"
             Content-Type: "{{ bad_metadata1.contentType }}"
           body:
             application/octet-stream: "{{ bad_metadata1.body }}"
@@ -44,7 +44,7 @@ steps:
       /generated/upload:
         post:
           headers:
-            Accept: application/json
+            Accept: "application/json"
             Content-Type: "{{ bad_metadata2.contentType }}"
           body:
             application/octet-stream: "{{ bad_metadata2.body }}"
@@ -57,7 +57,7 @@ steps:
       /generated/upload:
         post:
           headers:
-            Accept: application/json
+            Accept: "application/json"
             Content-Type: "{{ json_string.contentType }}"
           body:
             application/octet-stream: "{{ json_string.body }}"
@@ -70,7 +70,7 @@ steps:
       /generated/upload:
         post:
           headers:
-            Accept: application/json
+            Accept: "application/json"
             Content-Type: "{{ wrong_name.contentType }}"
           body:
             application/octet-stream: "{{ wrong_name.body }}"

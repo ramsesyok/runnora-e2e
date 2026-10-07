@@ -68,7 +68,7 @@ steps:
       /generated/upload:
         post:
           headers:
-            Accept: application/json
+            Accept: "application/json"
             Content-Type: "{{ upload.contentType }}"
           body:
             application/octet-stream: "{{ upload.body }}"
@@ -78,9 +78,27 @@ steps:
 外側の `metadata1` / `metadata2` / `csv` は OpenAPI のパート名に合わせる。
 内側の `contentType` / `value` / `file` / `filename` は runnora の固定キー。
 `value` と `file` はどちらか一方を指定する。
-応答が JSON なので `Accept: application/json` を使う。
+応答が JSON なので `Accept: "application/json"` を使う。
 本文の `application/octet-stream` は runn の生バイト送信用キーで、
 実際の HTTP Content-Type は boundary を含む `upload.contentType` になる。
+
+### ヘッダー値はダブルクォーテーションで囲む
+
+**`headers` の固定値はすべてダブルクォーテーションで囲む。**
+数字の `"1"`、英字の `"R"` も同じ書き方に揃える。
+
+```yaml
+headers:
+  Accept: "application/json"
+  X-Request-ID: "1"
+  X-Exerceis-ID: "R"
+  Content-Type: "{{ upload.contentType }}"
+```
+
+カスタムヘッダー名と値は API の仕様に合わせる。
+`X-Request-ID: 1` は YAML で数値になり、runn のヘッダー解析で `invalid request` になる。
+`R` は引用符なしでも文字列になるが、表記を統一して `"R"` と書く。
+引用符は YAML 用で、HTTP の値には付かない。変数を使う場合も、展開後の値が文字列であることを確認する。
 
 ### JSON 化は multipart() に任せる
 
