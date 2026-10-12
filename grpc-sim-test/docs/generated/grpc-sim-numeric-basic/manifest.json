@@ -3,7 +3,7 @@
   "scenario": "単一球の定速計算を最後まで待ち、各レスポンスの数値ログと最終結果を許容誤差付きで比較する",
   "scenarioId": "GRPC-SIM-numeric-basic",
   "source": "runbooks/numeric-basic.yml",
-  "sha256": "e68f6d257b61966dd24e5b1af61c7bd663afc6abf3f2ffe70c9001a68852660c",
+  "sha256": "c823b319b45f7e21ea5a4786342d58f8fc19782805650ef8d10bd95bac2a6006",
   "steps": [
     {
       "number": 1,
@@ -11,10 +11,14 @@
     },
     {
       "number": 2,
-      "key": "compare_logs"
+      "key": "collect_logs"
     },
     {
       "number": 3,
+      "key": "compare_logs"
+    },
+    {
+      "number": 4,
       "key": "compare_result"
     }
   ],
@@ -28,7 +32,7 @@
     {
       "kind": "runbook",
       "path": "runbooks/numeric-basic.yml",
-      "sha256": "e68f6d257b61966dd24e5b1af61c7bd663afc6abf3f2ffe70c9001a68852660c"
+      "sha256": "c823b319b45f7e21ea5a4786342d58f8fc19782805650ef8d10bd95bac2a6006"
     },
     {
       "kind": "proto",

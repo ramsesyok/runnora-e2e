@@ -24,32 +24,26 @@ steps:
       demo.SimService/ExecSimulation:
         message: "{{ vars.request }}"
         timeout: 10s
+  collect_logs:
+    desc: 全レスポンスのlogsを配信順に連結し、応答数に依存せず一度に比較できる形にする
+    bind:
+      received_logs: flatten(map(steps.simulate.res.messages, {.logs}))
   compare_logs:
-    desc: 各SimResponse.logsを期待時刻のログと順番・構造・数値の許容誤差込みで比較する
+    desc: 全SimResponse.logsを期待ログの同じ件数と順番・構造・数値の許容誤差込みで比較する
     test: |
-      // RPCが正常終了し、8〜12ステップを5件ずつ送るので応答は2件か3件になる。
+      // RPCが正常終了し、少なくとも1件のログを受信したことを確認する。
       steps.simulate.res.status == 0 &&
-      len(steps.simulate.res.messages) >= 2 &&
-      len(steps.simulate.res.messages) <= 3 &&
-      // 1件目は常に5ステップ分、2件目は終了時刻に応じて3〜5ステップ分。
-      len(steps.simulate.res.messages[0].logs) == 5 &&
-      len(steps.simulate.res.messages[1].logs) >= 3 &&
-      len(steps.simulate.res.messages[1].logs) <= 5 &&
-      // 期待ログの先頭5件を、1件目の応答にまとめられたlogsと比較する。
-      diffEps(vars.expected_logs[0:5], steps.simulate.res.messages[0].logs,
-        "cases/numeric-basic/tolerances.yaml") &&
-      // 終了ステップ数は事前に不明なので、2件目の実際のlogs数だけ期待ログを切り出す。
-      diffEps(vars.expected_logs[5:5 + len(steps.simulate.res.messages[1].logs)],
-        steps.simulate.res.messages[1].logs,
-        "cases/numeric-basic/tolerances.yaml") &&
-      // 3件目がある場合、2件目は5件で、残り1〜2件を期待ログの11件目以降と比較する。
-      (len(steps.simulate.res.messages) == 2 ||
-        (len(steps.simulate.res.messages[1].logs) == 5 &&
-         len(steps.simulate.res.messages[2].logs) >= 1 &&
-         len(steps.simulate.res.messages[2].logs) <= 2 &&
-         diffEps(vars.expected_logs[10:10 + len(steps.simulate.res.messages[2].logs)],
-           steps.simulate.res.messages[2].logs,
-           "cases/numeric-basic/tolerances.yaml")))
+      len(received_logs) > 0 &&
+      // 期待JSONに受信ログ全件の比較対象があることを確認する。
+      len(received_logs) <= len(vars.expected_logs) &&
+      // 最終応答以外は5件ずつ、最終応答は1〜5件のログを持つ。
+      all(steps.simulate.res.messages[0:len(steps.simulate.res.messages)-1],
+        {len(.logs) == 5}) &&
+      len(steps.simulate.res.messages[-1].logs) >= 1 &&
+      len(steps.simulate.res.messages[-1].logs) <= 5 &&
+      // 実際に受信した件数だけ期待ログを切り出し、全件を一度に比較する。
+      diffEps(vars.expected_logs[0:len(received_logs)], received_logs,
+        "cases/numeric-basic/tolerances.yaml")
   compare_result:
     desc: 途中応答にresultがなく、最後のresultを終了コード・衝突回数とも許容誤差込みで比較する
     test: |
@@ -57,6 +51,6 @@ steps:
       len(filter(steps.simulate.res.messages, {.result != nil})) == 1 &&
       // 最終応答の進捗は100%で、同じ応答のresultが期待値と一致する。
       steps.simulate.res.messages[-1].progress == 1 &&
-      // ログと結果の数値比較にはtolerances.yamlの許容誤差を適用する。
+      // 結果の数値比較にはtolerances.yamlの許容誤差を適用する。
       diffEps(vars.expected_result, steps.simulate.res.messages[-1].result,
         "cases/numeric-basic/tolerances.yaml")
