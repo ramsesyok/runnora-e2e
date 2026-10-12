@@ -1,0 +1,92 @@
+desc: ２球の衝突と壁反射を含む可変長ストリームを５ステップ単位で検証する
+
+runnora:
+  id: GRPC-SIM-collision
+
+labels: [grpc, server-streaming, collision]
+
+vars:
+  request: json://../cases/collision-request.json
+  expected_status: 0 # gRPC OK
+
+runners:
+  greq:
+    addr: ${GRPC_ADDR}
+    tls: false
+    importPaths: [../proto]
+    protos: [../proto/simulation.proto]
+
+steps:
+  simulate:
+    desc: 向かい合う２球を投入し、ランダムな終了まで５ステップ単位の応答を受信する
+    greq:
+      demo.SimService/ExecSimulation:
+        message: "{{ vars.request }}"
+        timeout: 10s
+  collect_logs:
+    desc: 各レスポンス内のログを配信順に連結し、全ステップを検証できるようにする
+    bind:
+      received_logs: flatten(map(steps.simulate.res.messages, {.logs}))
+  check_batches:
+    desc: gRPC成功と２〜３応答・８〜１２ログを確認し、最終応答以外が５ログ入りであることを確かめる
+    test: |
+      steps.simulate.res.status == vars.expected_status &&
+      len(steps.simulate.res.messages) >= 2 &&
+      len(steps.simulate.res.messages) <= 3 &&
+      len(received_logs) >= 8 && len(received_logs) <= 12 &&
+      reduce(steps.simulate.res.messages,
+        #acc && len(#.logs) >= 1 && len(#.logs) <= 5 &&
+        (#index == len(steps.simulate.res.messages) - 1 || len(#.logs) == 5), true)
+  check_progress:
+    desc: 全応答のジョブIDと進捗の単調増加、最終応答だけのresultを確認する
+    test: |
+      reduce(steps.simulate.res.messages,
+        #acc && #.job_id == vars.request.job_id &&
+        #.progress > (#index == 0 ? 0 : steps.simulate.res.messages[#index - 1].progress) &&
+        (#index == len(steps.simulate.res.messages) - 1 ?
+          (#.progress == 1 && #.result != nil) :
+          (#.progress < 1 && #.result == nil)), true)
+  check_logs:
+    desc: 全ログのシミュレーション時刻が1000ずつ増え、欠落や重複がないことを確認する
+    test: |
+      reduce(received_logs,
+        #acc && int(#.timestamp) == (#index + 1) * 1000, true)
+  check_positions:
+    desc: 各ログに２球がID順で載り、位置が空間内、速度と方向が妥当なことを確認する
+    test: |
+      all(received_logs,
+        {len(.object_log) == 2 &&
+         .object_log[0].object_id == "101" &&
+         .object_log[1].object_id == "102" &&
+         all(.object_log,
+          {.position.x >= vars.request.area.x_min + 0.5 &&
+           .position.x <= vars.request.area.x_max - 0.5 &&
+           .position.y >= vars.request.area.y_min + 0.5 &&
+           .position.y <= vars.request.area.y_max - 0.5 &&
+           .position.z == 1 && abs(.speed - 1) < 0.000001 &&
+           .direction >= 0 && .direction < 360})})
+  check_events:
+    desc: 衝突・反射イベントのoneofと位置を確認し、両イベントの発生を確かめる
+    test: |
+      all(received_logs,
+        {all(.events,
+          {.event_type == "1" ?
+            (.hit != nil && .reflect == nil && len(.hit.objects) == 2 &&
+             abs(.hit.position.x - 4) < 0.000001 &&
+             abs(.hit.position.y - 4) < 0.000001) :
+            (.event_type == "2" && .reflect != nil && .hit == nil &&
+             (.reflect.position.x == 0.5 || .reflect.position.x == 7.5))})}) &&
+      any(received_logs,
+        {any(.events,
+          {.event_type == "1" && .hit != nil && .reflect == nil &&
+           compare(.hit.objects, ["101", "102"])})}) &&
+      any(received_logs,
+        {any(.events,
+          {.event_type == "2" && .reflect != nil && .hit == nil})})
+  check_result:
+    desc: 最終結果の終了コードが0で、衝突回数が全ログの衝突イベント数と一致することを確認する
+    test: |
+      int(steps.simulate.res.messages[-1].result.hit_count) ==
+        sum(map(received_logs,
+          {len(filter(.events, {.event_type == "1"}))})) &&
+      steps.simulate.res.messages[-1].result.exit_code == "0"

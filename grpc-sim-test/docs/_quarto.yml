@@ -1,0 +1,17 @@
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: gRPC 衝突シミュレーション E2E 手順書
+  chapters:
+    - index.qmd
+    - collision.qmd
+    - reflection.qmd
+    - numeric-basic.qmd
+    - invalid-area.qmd
+
+lang: ja
+format:
+  html:
+    toc: true

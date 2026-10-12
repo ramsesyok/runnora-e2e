@@ -1,0 +1,9 @@
+# 単一物体の反射
+
+物体を１つだけ与える。５ログ単位の配信と最終端数を確認する。壁での反射が配信され、衝突イベントは発生せず、最終結果の `hit_count` はゼロであることを確認する。終了ステップ数は固定しない。
+
+{{< include generated/grpc-sim-reflection/grpc.qmd >}}
+
+{{< include generated/grpc-sim-reflection/grpc-request.qmd >}}
+
+{{< include generated/grpc-sim-reflection/expectations.qmd >}}

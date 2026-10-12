@@ -1,0 +1,21 @@
+version: 2
+
+project:
+  name: runnora-e2e-grpc-sim
+
+defaults:
+  env: unit
+
+environments:
+  unit:
+    description: Go 製衝突シミュレーション gRPC サーバ
+    vars:
+      GRPC_ADDR: "127.0.0.1:19091"
+
+suites:
+  grpc-sim:
+    select:
+      paths: [runbooks/*.yml]
+
+report:
+  format: text

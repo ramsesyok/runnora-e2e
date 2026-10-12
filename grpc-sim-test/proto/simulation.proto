@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package demo;
+option java_multiple_files = true;
+option java_package = "demo.proto";
+option go_package = "demo/proto;demopb";
+
+service SimService {
+  rpc ExecSimulation(SimRequest) returns (stream SimResponse);
+}
+
+message SimRequest {
+  int64 job_id = 1;
+  repeated Object objects = 2;
+  Area area = 3;
+}
+
+message SimResponse {
+  int64 job_id = 1;
+  double progress = 2; // Progress at the last log in this response.
+  repeated SimLog logs = 3; // Five steps, except the final response may have 1-5.
+  optional SimResult result = 4;
+}
+
+message SimLog {
+  int64 timestamp = 1;
+  repeated ObjectLog object_log = 2;
+  repeated Event events = 3;
+}
+
+message ObjectLog {
+  int64 object_id = 1;
+  Position position = 2;
+  double speed = 3;
+  double direction = 4;
+}
+
+message SimResult {
+  int64 exit_code = 1;
+  int64 hit_count = 2;
+}
+
+message Position {
+  double x = 1;
+  double y = 2;
+  double z = 3;
+}
+
+message Event {
+  int64 event_id = 1;
+  int64 event_type = 2; // 1: object collision, 2: boundary reflection
+  oneof payload {
+    HitEvent hit = 3;
+    ReflectedEvent reflect = 4;
+  }
+}
+
+message HitEvent {
+  repeated int64 objects = 1;
+  Position position = 2;
+}
+
+message ReflectedEvent {
+  int64 id = 1;
+  Position position = 2;
+}
+
+message Object {
+  int64 object_id = 1;
+  Position position = 2;
+  double speed = 3;
+  double direction = 4; // Degrees from +X toward +Y; movement stays in XY.
+}
+
+message Area {
+  double x_min = 1;
+  double x_max = 2;
+  double y_min = 3;
+  double y_max = 4;
+  double z_min = 5;
+  double z_max = 6;
+}

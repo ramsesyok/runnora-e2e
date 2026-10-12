@@ -1,0 +1,9 @@
+# 概要
+
+Go 製の `demo.SimService/ExecSimulation` に対し、runnora から server streaming RPC を実行する。サーバはリクエストの受付後、8〜12 ステップから終了時刻をランダムに決定する。クライアントには選択した終了ステップ数を知らせない。
+
+５ステップ分の `SimLog` を１つの `SimResponse` にまとめて配信し、終了時の端数は１〜５ログで送る。各ログにはシミュレーション時刻、全物体の位置と速度、当該ステップの衝突・反射イベントを含む。レスポンスの `progress` はその最後のログ時点の推定値で、最終レスポンスだけ `result` を含める。
+
+`grpc-sim-test/` で `./scripts/run.ps1` を実行すると４本の runbook と RPC カバレッジを確認し、`./scripts/build-docs.ps1` でこの手順書を再生成する。実装条件と手動起動の手順は `README.md` に記載する。
+
+各章の表は runnora-docgen が runbook と proto から生成した原稿である。基本的な数値比較ケースでは最大12ステップの期待 JSON を用意し、実際に受信した各レスポンスのログ数だけ切り出して許容誤差付きで照合する。

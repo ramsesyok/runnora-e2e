@@ -1,0 +1,9 @@
+# 不正な空間指定
+
+X 座標の上下限が逆転した入力を与える。サーバは gRPC `InvalidArgument`（コード 3）を返し、ストリームにメッセージを送らない。
+
+{{< include generated/grpc-sim-invalid-area/grpc.qmd >}}
+
+{{< include generated/grpc-sim-invalid-area/grpc-request.qmd >}}
+
+{{< include generated/grpc-sim-invalid-area/expectations.qmd >}}

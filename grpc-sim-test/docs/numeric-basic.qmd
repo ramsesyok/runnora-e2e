@@ -1,0 +1,11 @@
+# 定速移動の数値結果比較
+
+単一球を X 軸方向へ１ステップ当たり 0.25 進める。サーバが決めた終了まで待ってから、各 `SimResponse.logs` を期待ログの対応部分と `diffEps()` で比較する。最後のレスポンスにある `result` も同じ関数で比較する。
+
+期待ログの X 座標は実値から 0.0004 ずらしてある。絶対許容誤差 0.001 の設定で、数値誤差を許しながらタイムスタンプ、物体 ID、ログ構造と順序も照合する。終了は８〜12ステップで変わるため、各レスポンスの実ログ数に合わせて期待ログから該当範囲を選ぶ。
+
+{{< include generated/grpc-sim-numeric-basic/grpc.qmd >}}
+
+{{< include generated/grpc-sim-numeric-basic/grpc-request.qmd >}}
+
+{{< include generated/grpc-sim-numeric-basic/expectations.qmd >}}

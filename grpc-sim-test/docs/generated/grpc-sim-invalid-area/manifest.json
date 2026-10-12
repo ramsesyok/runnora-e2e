@@ -1,0 +1,45 @@
+{
+  "generator": "runnora-docgen",
+  "scenario": "不正な空間指定はメッセージを配信せずInvalidArgumentで終了する",
+  "scenarioId": "GRPC-SIM-invalid-area",
+  "source": "runbooks/invalid-area.yml",
+  "sha256": "5148bc2d0c05a11bf809b8d3af4d9e6af653d488f19959295aee6050c3802b69",
+  "steps": [
+    {
+      "number": 1,
+      "key": "simulate"
+    },
+    {
+      "number": 2,
+      "key": "check_invalid"
+    }
+  ],
+  "files": [
+    "expectations.qmd",
+    "grpc-request.qmd",
+    "grpc.qmd",
+    "scenario.qmd"
+  ],
+  "inputs": [
+    {
+      "kind": "runbook",
+      "path": "runbooks/invalid-area.yml",
+      "sha256": "5148bc2d0c05a11bf809b8d3af4d9e6af653d488f19959295aee6050c3802b69"
+    },
+    {
+      "kind": "proto",
+      "path": "proto/simulation.proto",
+      "sha256": "3ef3d1fd87ff74e20e95b56228731f3f7946cb3d21ffc8c1af9c8fac8821824d"
+    },
+    {
+      "kind": "json",
+      "path": "cases/invalid-request.json",
+      "sha256": "13c6005cad6dbb146f378f7270437cf4ba74115890b4467b611119e0962bc938"
+    },
+    {
+      "kind": "project",
+      "path": "runnora.yaml",
+      "sha256": "74bf90882f79b23309da58962a102ab96bdcaf864f40626d27818c3235ee4a51"
+    }
+  ]
+}

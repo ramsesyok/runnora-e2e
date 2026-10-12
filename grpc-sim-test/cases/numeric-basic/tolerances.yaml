@@ -1,0 +1,3 @@
+default:
+  abs: 0.001
+  rel: 0

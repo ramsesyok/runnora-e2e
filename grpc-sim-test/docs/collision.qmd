@@ -1,0 +1,9 @@
+# 衝突と反射を含む可変長ストリーム
+
+２球を向かい合わせて開始する。途中で球同士が衝突し、その後は壁でも反射する。５ログずつ１レスポンスに入れ、最後は端数を許す。全件受信後にログ時刻の連続性、レスポンス間の進捗の単調増加、各ログの物体情報、最終レスポンスだけの `result`、oneof の種類、衝突イベント数と `hit_count` の一致を確認する。
+
+{{< include generated/grpc-sim-collision/grpc.qmd >}}
+
+{{< include generated/grpc-sim-collision/grpc-request.qmd >}}
+
+{{< include generated/grpc-sim-collision/expectations.qmd >}}

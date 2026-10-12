@@ -1,0 +1,69 @@
+{
+  "generator": "runnora-docgen",
+  "scenario": "２球の衝突と壁反射を含む可変長ストリームを５ステップ単位で検証する",
+  "scenarioId": "GRPC-SIM-collision",
+  "source": "runbooks/collision.yml",
+  "sha256": "c2906ee5018213152cb9a9d518de2e25e4db8f9c23f4da3bcb41c8217cf944a7",
+  "steps": [
+    {
+      "number": 1,
+      "key": "simulate"
+    },
+    {
+      "number": 2,
+      "key": "collect_logs"
+    },
+    {
+      "number": 3,
+      "key": "check_batches"
+    },
+    {
+      "number": 4,
+      "key": "check_progress"
+    },
+    {
+      "number": 5,
+      "key": "check_logs"
+    },
+    {
+      "number": 6,
+      "key": "check_positions"
+    },
+    {
+      "number": 7,
+      "key": "check_events"
+    },
+    {
+      "number": 8,
+      "key": "check_result"
+    }
+  ],
+  "files": [
+    "expectations.qmd",
+    "grpc-request.qmd",
+    "grpc.qmd",
+    "scenario.qmd"
+  ],
+  "inputs": [
+    {
+      "kind": "runbook",
+      "path": "runbooks/collision.yml",
+      "sha256": "c2906ee5018213152cb9a9d518de2e25e4db8f9c23f4da3bcb41c8217cf944a7"
+    },
+    {
+      "kind": "proto",
+      "path": "proto/simulation.proto",
+      "sha256": "3ef3d1fd87ff74e20e95b56228731f3f7946cb3d21ffc8c1af9c8fac8821824d"
+    },
+    {
+      "kind": "json",
+      "path": "cases/collision-request.json",
+      "sha256": "3415882d22861dee7c034ec18f52a008f7674ff74808d7bf53a94094da53d060"
+    },
+    {
+      "kind": "project",
+      "path": "runnora.yaml",
+      "sha256": "74bf90882f79b23309da58962a102ab96bdcaf864f40626d27818c3235ee4a51"
+    }
+  ]
+}

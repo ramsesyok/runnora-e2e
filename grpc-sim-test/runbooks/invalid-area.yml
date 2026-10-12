@@ -1,0 +1,30 @@
+desc: 不正な空間指定はメッセージを配信せずInvalidArgumentで終了する
+
+runnora:
+  id: GRPC-SIM-invalid-area
+
+labels: [grpc, server-streaming, validation]
+
+vars:
+  request: json://../cases/invalid-request.json
+  expected_status: 3 # gRPC InvalidArgument
+
+runners:
+  greq:
+    addr: ${GRPC_ADDR}
+    tls: false
+    importPaths: [../proto]
+    protos: [../proto/simulation.proto]
+
+steps:
+  simulate:
+    desc: x_minがx_maxより大きい空間を渡してシミュレーションを要求する
+    greq:
+      demo.SimService/ExecSimulation:
+        message: "{{ vars.request }}"
+        timeout: 10s
+  check_invalid:
+    desc: gRPC InvalidArgumentを返し、シミュレーションログを１件も配信しないことを確認する
+    test: |
+      steps.simulate.res.status == vars.expected_status &&
+      len(steps.simulate.res.messages) == 0

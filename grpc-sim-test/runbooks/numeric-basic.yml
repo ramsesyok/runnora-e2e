@@ -1,0 +1,62 @@
+desc: 単一球の定速計算を最後まで待ち、各レスポンスの数値ログと最終結果を許容誤差付きで比較する
+
+runnora:
+  id: GRPC-SIM-numeric-basic
+
+labels: [grpc, server-streaming, epsilon]
+
+vars:
+  request: json://../cases/numeric-basic/request.json
+  expected_logs: json://../cases/numeric-basic/expected-logs.json
+  expected_result: json://../cases/numeric-basic/expected-result.json
+
+runners:
+  greq:
+    addr: ${GRPC_ADDR}
+    tls: false
+    importPaths: [../proto]
+    protos: [../proto/simulation.proto]
+
+steps:
+  simulate:
+    desc: 単一球を一定速度で移動させ、サーバが決めた終了まで全レスポンスを受信する
+    greq:
+      demo.SimService/ExecSimulation:
+        message: "{{ vars.request }}"
+        timeout: 10s
+  compare_logs:
+    desc: 各SimResponse.logsを期待時刻のログと順番・構造・数値の許容誤差込みで比較する
+    test: |
+      // RPCが正常終了し、8〜12ステップを5件ずつ送るので応答は2件か3件になる。
+      steps.simulate.res.status == 0 &&
+      len(steps.simulate.res.messages) >= 2 &&
+      len(steps.simulate.res.messages) <= 3 &&
+      // 1件目は常に5ステップ分、2件目は終了時刻に応じて3〜5ステップ分。
+      len(steps.simulate.res.messages[0].logs) == 5 &&
+      len(steps.simulate.res.messages[1].logs) >= 3 &&
+      len(steps.simulate.res.messages[1].logs) <= 5 &&
+      // 期待ログの先頭5件を、1件目の応答にまとめられたlogsと比較する。
+      diffEps(vars.expected_logs[0:5], steps.simulate.res.messages[0].logs,
+        "cases/numeric-basic/tolerances.yaml") &&
+      // 終了ステップ数は事前に不明なので、2件目の実際のlogs数だけ期待ログを切り出す。
+      diffEps(vars.expected_logs[5:5 + len(steps.simulate.res.messages[1].logs)],
+        steps.simulate.res.messages[1].logs,
+        "cases/numeric-basic/tolerances.yaml") &&
+      // 3件目がある場合、2件目は5件で、残り1〜2件を期待ログの11件目以降と比較する。
+      (len(steps.simulate.res.messages) == 2 ||
+        (len(steps.simulate.res.messages[1].logs) == 5 &&
+         len(steps.simulate.res.messages[2].logs) >= 1 &&
+         len(steps.simulate.res.messages[2].logs) <= 2 &&
+         diffEps(vars.expected_logs[10:10 + len(steps.simulate.res.messages[2].logs)],
+           steps.simulate.res.messages[2].logs,
+           "cases/numeric-basic/tolerances.yaml")))
+  compare_result:
+    desc: 途中応答にresultがなく、最後のresultを終了コード・衝突回数とも許容誤差込みで比較する
+    test: |
+      // resultを持つ応答は全体で1件だけとし、途中応答に結果が混ざることを防ぐ。
+      len(filter(steps.simulate.res.messages, {.result != nil})) == 1 &&
+      // 最終応答の進捗は100%で、同じ応答のresultが期待値と一致する。
+      steps.simulate.res.messages[-1].progress == 1 &&
+      // ログと結果の数値比較にはtolerances.yamlの許容誤差を適用する。
+      diffEps(vars.expected_result, steps.simulate.res.messages[-1].result,
+        "cases/numeric-basic/tolerances.yaml")

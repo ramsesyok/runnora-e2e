@@ -1,0 +1,59 @@
+{
+  "generator": "runnora-docgen",
+  "scenario": "単一球の定速計算を最後まで待ち、各レスポンスの数値ログと最終結果を許容誤差付きで比較する",
+  "scenarioId": "GRPC-SIM-numeric-basic",
+  "source": "runbooks/numeric-basic.yml",
+  "sha256": "e68f6d257b61966dd24e5b1af61c7bd663afc6abf3f2ffe70c9001a68852660c",
+  "steps": [
+    {
+      "number": 1,
+      "key": "simulate"
+    },
+    {
+      "number": 2,
+      "key": "compare_logs"
+    },
+    {
+      "number": 3,
+      "key": "compare_result"
+    }
+  ],
+  "files": [
+    "expectations.qmd",
+    "grpc-request.qmd",
+    "grpc.qmd",
+    "scenario.qmd"
+  ],
+  "inputs": [
+    {
+      "kind": "runbook",
+      "path": "runbooks/numeric-basic.yml",
+      "sha256": "e68f6d257b61966dd24e5b1af61c7bd663afc6abf3f2ffe70c9001a68852660c"
+    },
+    {
+      "kind": "proto",
+      "path": "proto/simulation.proto",
+      "sha256": "3ef3d1fd87ff74e20e95b56228731f3f7946cb3d21ffc8c1af9c8fac8821824d"
+    },
+    {
+      "kind": "json",
+      "path": "cases/numeric-basic/request.json",
+      "sha256": "e6faa7ee2e63251066f9eafa1a07e902ca6227dc01a45e2395184618708b99ce"
+    },
+    {
+      "kind": "json",
+      "path": "cases/numeric-basic/expected-logs.json",
+      "sha256": "248dbaf3f38f6fd35de40181f18675496a601488595ca2bd4da459b10fb242a3"
+    },
+    {
+      "kind": "json",
+      "path": "cases/numeric-basic/expected-result.json",
+      "sha256": "cc29449f5d93a9319479ef5e8990e7b78e661efdd0d27b14127fb10531125f9c"
+    },
+    {
+      "kind": "project",
+      "path": "runnora.yaml",
+      "sha256": "74bf90882f79b23309da58962a102ab96bdcaf864f40626d27818c3235ee4a51"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+desc: 単一球が壁で反射する可変長ストリームを５ステップ単位で検証する
+
+runnora:
+  id: GRPC-SIM-reflection
+
+labels: [grpc, server-streaming, reflection]
+
+vars:
+  request: json://../cases/reflection-request.json
+  expected_status: 0 # gRPC OK
+
+runners:
+  greq:
+    addr: ${GRPC_ADDR}
+    tls: false
+    importPaths: [../proto]
+    protos: [../proto/simulation.proto]
+
+steps:
+  simulate:
+    desc: 単一球を投入し、ランダムな終了まで５ステップ単位の応答を受信する
+    greq:
+      demo.SimService/ExecSimulation:
+        message: "{{ vars.request }}"
+        timeout: 10s
+  collect_logs:
+    desc: 各レスポンス内のログを配信順に連結して全ステップを取り出す
+    bind:
+      received_logs: flatten(map(steps.simulate.res.messages, {.logs}))
+  check_batches:
+    desc: gRPC成功と２〜３応答・８〜１２ログを確認し、最終応答以外が５ログ入りであることを確かめる
+    test: |
+      steps.simulate.res.status == vars.expected_status &&
+      len(steps.simulate.res.messages) >= 2 &&
+      len(steps.simulate.res.messages) <= 3 &&
+      len(received_logs) >= 8 && len(received_logs) <= 12 &&
+      reduce(steps.simulate.res.messages,
+        #acc && len(#.logs) >= 1 && len(#.logs) <= 5 &&
+        (#index == len(steps.simulate.res.messages) - 1 || len(#.logs) == 5), true)
+  check_progress:
+    desc: 全応答のジョブIDと進捗の単調増加、最終応答だけのresultを確認する
+    test: |
+      reduce(steps.simulate.res.messages,
+        #acc && #.job_id == vars.request.job_id &&
+        #.progress > (#index == 0 ? 0 : steps.simulate.res.messages[#index - 1].progress) &&
+        (#index == len(steps.simulate.res.messages) - 1 ?
+          (#.progress == 1 && #.result != nil) :
+          (#.progress < 1 && #.result == nil)), true)
+  check_timestamps:
+    desc: 全ログのシミュレーション時刻が1000ずつ増え、欠落や重複がないことを確認する
+    test: |
+      reduce(received_logs,
+        #acc && int(#.timestamp) == (#index + 1) * 1000, true)
+  check_object_log:
+    desc: 各ログに球201の状態が１件だけ含まれることを確認する
+    test: |
+      all(received_logs,
+        {len(.object_log) == 1 && .object_log[0].object_id == "201"})
+  check_events:
+    desc: 全ログに衝突がなく、球201の壁反射イベントがあることを確認する
+    test: |
+      all(received_logs, {none(.events, {.event_type == "1"})}) &&
+      any(received_logs,
+        {any(.events, {.event_type == "2" && .reflect.id == "201" && .hit == nil})})
+  check_result:
+    desc: 最後の応答だけに結果があり、正常終了かつ衝突回数ゼロであることを確認する
+    test: |
+      len(filter(steps.simulate.res.messages, {.result != nil})) == 1 &&
+      steps.simulate.res.messages[-1].progress == 1 &&
+      steps.simulate.res.messages[-1].result != nil &&
+      steps.simulate.res.messages[-1].result.exit_code == "0" &&
+      steps.simulate.res.messages[-1].result.hit_count == "0"

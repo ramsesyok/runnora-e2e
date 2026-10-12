@@ -1,0 +1,69 @@
+{
+  "generator": "runnora-docgen",
+  "scenario": "単一球が壁で反射する可変長ストリームを５ステップ単位で検証する",
+  "scenarioId": "GRPC-SIM-reflection",
+  "source": "runbooks/reflection.yml",
+  "sha256": "0f6661e8a6892eda389527fa716e3da3195fd2fbc48710f3ae87eadfa05c67f1",
+  "steps": [
+    {
+      "number": 1,
+      "key": "simulate"
+    },
+    {
+      "number": 2,
+      "key": "collect_logs"
+    },
+    {
+      "number": 3,
+      "key": "check_batches"
+    },
+    {
+      "number": 4,
+      "key": "check_progress"
+    },
+    {
+      "number": 5,
+      "key": "check_timestamps"
+    },
+    {
+      "number": 6,
+      "key": "check_object_log"
+    },
+    {
+      "number": 7,
+      "key": "check_events"
+    },
+    {
+      "number": 8,
+      "key": "check_result"
+    }
+  ],
+  "files": [
+    "expectations.qmd",
+    "grpc-request.qmd",
+    "grpc.qmd",
+    "scenario.qmd"
+  ],
+  "inputs": [
+    {
+      "kind": "runbook",
+      "path": "runbooks/reflection.yml",
+      "sha256": "0f6661e8a6892eda389527fa716e3da3195fd2fbc48710f3ae87eadfa05c67f1"
+    },
+    {
+      "kind": "proto",
+      "path": "proto/simulation.proto",
+      "sha256": "3ef3d1fd87ff74e20e95b56228731f3f7946cb3d21ffc8c1af9c8fac8821824d"
+    },
+    {
+      "kind": "json",
+      "path": "cases/reflection-request.json",
+      "sha256": "65307d77f244eca465721dfdaa5645cdbc4ee896c825b0189b290b7c88bc380e"
+    },
+    {
+      "kind": "project",
+      "path": "runnora.yaml",
+      "sha256": "74bf90882f79b23309da58962a102ab96bdcaf864f40626d27818c3235ee4a51"
+    }
+  ]
+}

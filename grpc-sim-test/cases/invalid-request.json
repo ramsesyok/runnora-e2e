@@ -1,0 +1,7 @@
+{
+  "job_id": "303",
+  "objects": [
+    {"object_id": "301", "position": {"x": 1, "y": 1, "z": 1}, "speed": 1, "direction": 0}
+  ],
+  "area": {"x_min": 8, "x_max": 0, "y_min": 0, "y_max": 8, "z_min": 0, "z_max": 2}
+}
