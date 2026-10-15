@@ -1,0 +1,38 @@
+desc: レスポンスの会員IDで外部JSONの1フィールドだけを上書きして貸し出す
+labels:
+  - demo
+  - loans
+runners:
+  req:
+    endpoint: ${API_URL}
+    openapi3: ../../openapi/library-api.yaml
+vars:
+  loan_base: json://../../cases/demo/create-loan-base.json
+steps:
+  get_member:
+    req:
+      /members/M0001:
+        get:
+          body: null
+    test: current.res.status == 200
+    bind:
+      member_id: current.res.body.memberId
+
+  prepare_loan:
+    bind:
+      loan_request: 'merge(vars.loan_base, {"memberId": member_id})'
+    test: |
+      vars.loan_base.memberId == "M0003" &&
+      loan_request.memberId == member_id &&
+      loan_request.bookId == vars.loan_base.bookId
+
+  create_loan:
+    req:
+      /loans:
+        post:
+          body:
+            application/json: "{{ loan_request }}"
+    test: |
+      current.res.status == 201 &&
+      current.res.body.memberId == member_id &&
+      current.res.body.bookId == vars.loan_base.bookId

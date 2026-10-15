@@ -160,6 +160,7 @@ reports/20260927-153012-scenarios/
 | 変動する項目だけ比較から除外する | [post_createLoan.template.yml](runbooks/contract/post_createLoan.template.yml)、[created ケース](cases/contract/loans/post_createLoan/01_created.json) | `ignorePaths` で貸出 ID と日時を除外し、残りの JSON 全体を比較する |
 | 複数ケースで同じ手順を使う | [post_createBook.suite.yml](runbooks/contract/post_createBook.suite.yml) | ケースごとの `include` と `vars.case` / `vars.expected` |
 | 応答の ID を次のリクエストに渡す | [LIB-001](runbooks/scenarios/lib-001-loan-lifecycle.yml) | `bind` で貸出 ID を保存し、返却 URL の `{{ loan_id }}` に使う |
+| 外部 JSON の一部を応答の ID で上書きする | [json-bind-merge.yml](runbooks/demo/json-bind-merge.yml)、[元の JSON](cases/demo/create-loan-base.json) | `json://` で読み込み、`merge()` で `memberId` だけ差し替えて POST する |
 | 一覧から必要なデータを選ぶ | [LIB-003](runbooks/scenarios/lib-003-overdue.yml) | `filter(...)` で延滞中の貸出を選び、`bind` で ID を保存する |
 | 条件成立まで再試行する | [LIB-001](runbooks/scenarios/lib-001-loan-lifecycle.yml) | `member_loans` の `loop.until`。最大回数内に条件を満たさなければ失敗する |
 | 複数件を個別に照会する | [LIB-007](runbooks/scenarios/lib-007-bulk-history.yml) | `inspect_history_book_0`〜`_2` が各応答を保存してから判定する |
@@ -169,6 +170,20 @@ reports/20260927-153012-scenarios/
 `compare` は JSON の値を比較するため、オブジェクトのキー順や空白・改行は問いません。配列の要素順は比較対象です。
 `ignorePaths: []` は除外なしの全体比較です。現状の「除外あり」の例は ID と日時をまとめて除外しており、ID **だけ**を除外するケースはありません。
 `loop.until` のステップには、条件成立前に失敗する `test` を重ねず、成立条件を `until` に記述しています。
+
+### 外部 JSON の1フィールドをレスポンスの値で上書きする
+
+`runbooks/demo/json-bind-merge.yml` は `GET /members/M0001` の応答から `memberId` を bind し、
+`cases/demo/create-loan-base.json` の `memberId: M0003` だけを `merge()` で `M0001` に差し替えます。
+`bookId: B0001` は外部 JSON の値を保持したまま `POST /loans` に送ります。
+`merge()` は直下のキーを上書きするので、入れ子の項目を変える場合はその階層でも `merge()` を使います。
+
+モックを起動してから、`api-test/` で単独実行します。この demo は `scenarios` スイートには含まれません。
+
+```powershell
+runnora validate --env mock runbooks/demo/json-bind-merge.yml
+runnora run --env mock runbooks/demo/json-bind-merge.yml
+```
 
 | 種類 | 実行先 | 本数 | 検証 |
 |---|---|---|---|
