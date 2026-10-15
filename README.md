@@ -16,6 +16,7 @@ HTTP と gRPC の各応答は runnora が証跡として自動で JSON ファイ
 | [api-test/](api-test/README.md) | WebAPI（HTTP） | 図書貸出 API（Go + Oracle）、oapi2wire による WireMock モック、生成・契約・シナリオテスト、PL/SQL 前後処理、runnora-docgen による手順書 | 作成済み |
 | [grpc-test/](grpc-test/README.md) | gRPC | Unary / Server streaming と、階層・配列を含む系列分析を許容誤差付きで比較する E2E runbook、runnora-docgen 手順書 | 作成済み |
 | [grpc-sim-test/](grpc-sim-test/README.md) | gRPC | ランダムな終了時刻の衝突シミュレーションを server streaming で配信し、可変長の応答、衝突・反射、数値ログと最終結果の許容誤差付き比較、入力エラーを検証する runbook | 作成済み |
+| [docgen-sample/](docgen-sample/README.md) | 手順書 | `test` のない行、`bind` 式、`exec.command` の検証式、長い変数参照を示す Quarto サンプル | 作成済み |
 | [multipart-test/](multipart-test/README.md) | WebAPI（HTTP multipart） | Spring Boot への JSON + CSV / PNG アップロード、curl 比較、415 の再現・解消、CI | 作成済み |
 | [multipart-openapi-test/](multipart-openapi-test/README.md) | OpenAPI 生成 Spring API（HTTP multipart） | OpenAPI Generator による API / DTO 生成、複雑な JSON 2 パート + CSV、415 / 400・送信前エラーの再現、CI | 作成済み |
 
@@ -58,6 +59,7 @@ Projects/
 └─ runnora-e2e/        このリポジトリ
    ├─ api-test/
    ├─ grpc-test/
+   ├─ docgen-sample/
    ├─ multipart-test/
    └─ multipart-openapi-test/
 ```

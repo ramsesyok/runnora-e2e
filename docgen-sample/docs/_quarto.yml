@@ -1,0 +1,16 @@
+project:
+  type: book
+  output-dir: _book
+  render:
+    - index.qmd
+book:
+  title: runnora-docgen テストシナリオ表示サンプル
+  chapters:
+    - index.qmd
+lang: ja
+format:
+  html:
+    toc: true
+    css: design-doc.css
+filters:
+  - design-doc.lua

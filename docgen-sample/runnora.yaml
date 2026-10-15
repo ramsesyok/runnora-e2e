@@ -1,0 +1,15 @@
+version: 2
+
+project:
+  name: runnora-e2e-docgen-sample
+
+suites:
+  docgen:
+    select:
+      paths: [runbooks/*.yml]
+
+runn:
+  scopes: [run:exec]
+
+report:
+  format: text

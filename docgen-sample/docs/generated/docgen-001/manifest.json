@@ -1,0 +1,41 @@
+{
+  "generator": "runnora-docgen",
+  "scenario": "テストシナリオ表の表示サンプル",
+  "scenarioId": "DOCGEN-001",
+  "source": "runbooks/scenario.yml",
+  "sha256": "78619980ff607ac927b54664a5754900f4400eefdd9a1a18582d658b874bd32d",
+  "steps": [
+    {
+      "number": 1,
+      "key": "set_expected_file"
+    },
+    {
+      "number": 2,
+      "key": "compare_json"
+    },
+    {
+      "number": 3,
+      "key": "save_result"
+    },
+    {
+      "number": 4,
+      "key": "check_saved_result"
+    }
+  ],
+  "files": [
+    "expectations.qmd",
+    "scenario.qmd"
+  ],
+  "inputs": [
+    {
+      "kind": "runbook",
+      "path": "runbooks/scenario.yml",
+      "sha256": "78619980ff607ac927b54664a5754900f4400eefdd9a1a18582d658b874bd32d"
+    },
+    {
+      "kind": "project",
+      "path": "runnora.yaml",
+      "sha256": "a4b8661d2776ce9937a63bb7104d1bc3f0795e0a711d46991e7cc0888a7db3b8"
+    }
+  ]
+}

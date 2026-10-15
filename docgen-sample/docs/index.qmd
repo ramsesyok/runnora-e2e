@@ -1,0 +1,9 @@
+# テストシナリオ表の表示サンプル
+
+この文書は `runbooks/scenario.yml` から `runnora-docgen` で生成した原稿を取り込みます。
+
+- `test` のない `bind` 行では期待値欄を「ー」と表示します。
+- `bind` 行には設定した変数名と式を表示します。長い変数参照は区切りで改行します。
+- `exec.command` 行には外部コマンドと、`test` に記述した終了コード・標準出力・標準エラーの検証式を表示します。期待値専用の追加キーは使いません。
+
+{{< include generated/docgen-001/scenario.qmd >}}

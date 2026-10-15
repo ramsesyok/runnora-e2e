@@ -1,0 +1,26 @@
+desc: テストシナリオ表の表示サンプル
+runnora:
+  id: DOCGEN-001
+steps:
+  set_expected_file:
+    desc: 比較に使う期待 JSON のパスを変数に保存する
+    bind:
+      expected_result_json_file: '"fixtures/expected.json"'
+
+  compare_json:
+    desc: 外部コマンドで実際の JSON と期待 JSON を比較する
+    exec:
+      command: runnora-diff --quiet {{ expected_result_json_file }} fixtures/actual.json
+    test: |
+      current.exit_code == 0 &&
+      current.stdout == "" &&
+      current.stderr == ""
+
+  save_result:
+    desc: 検査結果を後続の変数に保存する
+    bind:
+      comparison_exit_code_from_external_command: steps.compare_json.exit_code
+
+  check_saved_result:
+    desc: 保存した終了コードを検証する
+    test: comparison_exit_code_from_external_command == 0
