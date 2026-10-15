@@ -24,6 +24,7 @@ HTTP と gRPC の各応答は runnora が証跡として自動で JSON ファイ
 
 | 資料 | 内容 |
 |---|---|
+| [runn / runnora テストシナリオ記法リファレンス](docs/scenario-syntax-reference.md) | ローカル LLM への添付向け。プロジェクト設定、runbook、式、各ランナー、パス基準を一冊に整理 |
 | [はじめて読む人のためのテスト用語](docs/test-basics.md) | runbook・シナリオ・ケース・スイートの違い、スイートの要否、契約テストの意味を実例で説明 |
 | [JSON + CSV の multipart トライアル](multipart-test/README.md) | Spring Boot の実 API で 415 を再現し、runnora のパートごとの Content-Type 指定で解消する独立したテストセット |
 | [OpenAPI 生成 Spring の multipart トライアル](multipart-openapi-test/README.md) | OpenAPI 定義から生成した API に curl / runnora で送信し、DTO と CSV の受信内容・異常系を照合する |
