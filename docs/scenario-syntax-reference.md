@@ -313,7 +313,7 @@ steps:
 | `test: current.res.status == 200` | 一つの真偽式で判定する |
 | `test: len(current.res.body.items) == 2` | 配列長を確認する |
 | `test: compare(actual, expected)` | runn 標準の構造比較 |
-| `compare(actual, expected, ignorePaths)` | 変動項目を jq 形式のパスで除外して比較する |
+| `compare(actual, expected, ignorePaths)` | 変動項目を jq 形式のパスの配列で除外して比較する |
 | `diffEps(expected, actual[, rules])` | runnora 固有。数値に許容誤差を付けて構造比較する |
 | `loadJSON("cases/expected.json")` | runnora 固有。大きな整数を丸めずに JSON を読む |
 
@@ -339,6 +339,124 @@ tolerances:
 ```
 
 gRPC の 64 ビット整数は ProtoJSON で文字列になることがあります。`diffEps()` は取得した RPC レスポンスの descriptor に基づき対象フィールドを数値として比較します。期待 JSON に大きな整数がある場合は、`json://` で丸められた値を使わず `diffEps(loadJSON("cases/expected.json"), current.res.message)` とします。`loadJSON()` のパスはプロジェクトルート基準です。
+
+### runn の Additional built-in functions
+
+以下は **runn v1.9.2 の式で使える追加組み込み関数**です。`test:`、`bind:`、`{{ ... }}` に式として書きます。runnora 固有の `diffEps()`、`loadJSON()`、`multipart()` とは区別してください。`len()` や `fromJSON()` など expr 言語側の関数は、この表の対象外です。
+
+| 関数 | 用途とテストケースでの使い方 |
+|---|---|
+| `urlencode(text)` | クエリ値を URL エンコードする。例: `urlencode("A B")` は `A+B`。URL のパス全体ではなく、クエリの**値**に使う |
+| `url(text)` | URL を解析し、`.Host`、`.Path` などを参照する。v1.9.2 の実装には登録されているが、README の関数一覧には載っていない |
+| `bool(value)` | `"true"` などの値を真偽値へ変換する。文字列で返るフォーム値を真偽値と比較するときに使う |
+| `basename(path)` | パスの末尾のファイル名を得る。アップロード応答のファイル名を確認するときに使う |
+| `time(value)` | 日時の文字列や数値を時刻に変換する。DB の日時型と期待日時を比較するときに使う |
+| `compare(a, b[, ignorePaths])` | 構造が一致すれば `true`。動的な日時や ID を除外する場合は、jq 形式のパスを **配列**で渡す |
+| `diff(a, b[, ignorePaths])` | 差分を文字列で返し、一致なら空文字。失敗箇所を調べるときや `diff(...) == ""` の判定に使う |
+| `pick(map, keys...)` | マップから指定キーだけを残す。応答の一部だけを期待値と比較するときに使う |
+| `omit(map, keys...)` | マップから指定キーを除く。採番 ID や更新時刻を除いて比較するときに使う |
+| `merge(map1, map2, ...)` | 左から右へマップを重ねる。同名キーは右側が優先。共通ケースに今回だけの入力を追加する |
+| `intersect(array1, array2)` | 二つの配列の共通要素を得る。許可された値が応答に含まれるかを調べる |
+| `file(path)` | ファイルを文字列として読む。存在しなければ `nil`。JSON なら `fromJSON(file(path))` でオブジェクトにできる |
+| `hash.Sha256(value)` / `hash.Sha512(value)` | 入力のハッシュを小文字の16進文字列で返す。送受信データの内容一致を確かめる |
+| `faker.UUID()` など | ランダムな値を生成する。テスト入力を作り、`bind` で一度保存して応答との突き合わせに使う |
+| `jwt.Sign(options)` / `jwt.Parse(token, options)` | 署名付き JWT を作成・検証する。認証ヘッダーを作り、返った token の claim を確認する |
+| `input(message, default)` | 標準入力で値を尋ねる。手動 runbook 用 |
+| `secret(message)` | 画面に入力を表示せず値を尋ねる。手動 runbook 用 |
+| `select(message, choices, default)` | 候補から選択させる。手動 runbook 用 |
+
+`compare()` と `diff()` の第3引数は `vars.case.expect.ignorePaths` のような文字列配列が推奨です。個別のパス文字列を可変個引数で渡す旧形式は v1.9.2 で非推奨警告が出ます。`diff()` は差分文字列を返す関数で、数値の許容誤差や runnora の `.diff.json` 証跡が必要なら `diffEps()` を使います。
+
+#### 作成時に使う例
+
+クエリ値を埋め込み、レスポンスの変動項目を除いて比較します。
+
+```yaml
+vars:
+  keyword: A B
+  expected:
+    items: [{id: B0001}]
+steps:
+  search:
+    req:
+      /books?keyword={{ urlencode(vars.keyword) }}:
+        get:
+          body: null
+  check_search:
+    test: |
+      steps.search.res.status == 200 &&
+      compare(steps.search.res.body, vars.expected, [".requestId", ".checkedAt"])
+```
+
+共通の JSON ケースに差分を重ねます。`merge()` は新しい値を作るので、元の `vars.base` はそのまま利用できます。
+
+```yaml
+vars:
+  base: json://../cases/create-loan-base.json
+steps:
+  prepare:
+    bind:
+      request_body: 'merge(vars.base, {"bookId": "B0002"})'
+  create:
+    req:
+      /loans:
+        post:
+          body:
+            application/json: "{{ request_body }}"
+  check:
+    test: |
+      steps.create.res.status == 201 &&
+      compare(pick(steps.create.res.body, "bookId"), {"bookId": "B0002"})
+```
+
+ファイル内容と応答のハッシュを照合します。`file()` の相対パスは **runbook の位置**から解決します。`json://` のような読込時の値展開と違い、`file()` は式の評価時に呼び出します。
+
+```yaml
+steps:
+  upload:
+    req:
+      /upload:
+        post:
+          body:
+            multipart/form-data:
+              file: file://../fixtures/data.csv
+    test: |
+      current.res.status == 201 &&
+      current.res.body.sha256 == hash.Sha256(file("../fixtures/data.csv"))
+```
+
+ランダム値は一度だけ作ります。複数箇所で `faker.UUID()` を呼ぶと別の値になります。
+
+```yaml
+steps:
+  prepare:
+    bind:
+      request_id: faker.UUID()
+  send:
+    req:
+      /echo:
+        post:
+          body:
+            application/json:
+              requestId: "{{ request_id }}"
+    test: current.res.body.requestId == request_id
+```
+
+JWT の署名鍵は環境変数から渡し、runbook の `secrets` に登録します。`jwt.Sign()` は JWS を生成し、`jwt.Parse()` は署名を検証して claim のマップを返します。v1.9.2 の実装が扱うアルゴリズムは `HS256`（既定）、`HS384`、`HS512` です。JWE は対象外です。
+
+```yaml
+vars:
+  jwt_secret: ${JWT_SECRET}
+secrets: [vars.jwt_secret, token]
+steps:
+  issue:
+    bind:
+      token: 'jwt.Sign({"secret": vars.jwt_secret, "subject": "M0001", "expires_in": "5m"})'
+  verify:
+    test: 'jwt.Parse(token, {"secret": vars.jwt_secret}).sub == "M0001"'
+```
+
+`input()`、`secret()`、`select()` は人が端末で応答する処理です。CI や無人実行のシナリオでは、固定ケース JSON、環境変数、`--var` を使います。利用例は `input("会員ID", "M0001")`、`secret("パスワード")`、`select("環境", ["mock", "unit"], "mock")` です。
 
 ## 6. multipart の二つの書き方
 
@@ -414,6 +532,7 @@ runnora run --suite scenarios --var API_URL=http://127.0.0.1:18081
 この文書は、次の実装・サンプルと照合して作成しました。特定機能の細部を調べる際は、対応する資料も参照してください。
 
 - [runn v1.9.2 の公式 README](https://github.com/k1LoW/runn/tree/v1.9.2#readme)：runbook、ランナー、式、include、loop の仕様。
+- [runn v1.9.2 の組み込み関数登録](https://github.com/k1LoW/runn/blob/v1.9.2/book.go)：追加組み込み関数の実際の名前とシグネチャ。
 - [runnora の format v2 設計](https://github.com/ramsesyok/runnora/blob/main/docs/design/format-v2.md)：プロジェクト設定と `runnora:` の仕様。現行の細部は `internal/project`、`internal/scenario` の実装を優先。
 - [runnora の README](https://github.com/ramsesyok/runnora#readme)：CLI、レポート、`diffEps()`、`loadJSON()`。
 - このリポジトリの [コマンドマニュアル](command-manual.md)、[用語解説](test-basics.md)、[HTTP シナリオ](../api-test/runbooks/scenarios/lib-001-loan-lifecycle.yml)、[gRPC シナリオ](../grpc-test/runbooks/series-analysis.yml)、[multipart シナリオ](../multipart-test/runbooks/json-csv.yml)。
