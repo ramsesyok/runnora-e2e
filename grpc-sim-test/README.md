@@ -17,6 +17,31 @@ cd grpc-sim-test
 
 手動での実行は別ターミナルで `go run ./cmd/simd -proto proto/simulation.proto` を起動し、`runnora run --suite grpc-sim` を実行します。
 
+## GripMock による gRPC モック
+
+[GripMock v3.17.1](https://github.com/bavix/gripmock/releases/tag/v3.17.1) の実行ファイルを PATH に追加し、PowerShell から次を実行します。`GRIPMOCK_EXE` と `RUNNORA_EXE` で各実行ファイルを指定することもできます。GripMock は同じ proto と [stub](mock/stubs/) を読み、gRPC の `127.0.0.1:4770` と管理 API の `127.0.0.1:4771` で待ち受けます。
+
+```powershell
+cd grpc-sim-test
+./scripts/run-mock.ps1
+```
+
+手動実行する場合はターミナル A で GripMock を起動します。
+
+```powershell
+gripmock --stub=mock/stubs proto/simulation.proto
+```
+
+ターミナル B でスイートを実行します。
+
+```powershell
+runnora run --suite grpc-sim-mock
+```
+
+stub は `job_id` で４種類のテスト入力を返し分けます。正常系は実サーバと同じ計算から作った10ステップを `output.stream` によって５ログずつ２件の `SimResponse` として配信し、途中の応答では `result` を省きます。配信間隔は200 msです。異常系はメッセージを送らず `InvalidArgument`（コード3）で終了します。未定義の入力は GripMock の `NotFound` になります。
+
+`grpc-sim-mock` は実サーバと同じ４本の [runbook](runbooks/) をモック環境で実行します。モックの終了ステップ数は10に固定しています。8〜12ステップのランダムな終了を確認する場合は実サーバ用の `grpc-sim` スイートを実行してください。
+
 ## 契約と物理モデル
 
 [proto/simulation.proto](proto/simulation.proto) は依頼のインターフェースをもとに作成しました。未定義だった綴りを `Poition` → `Position`、`hist` → `hit` に修正しています。サーバはこの proto を起動時に読み込むため `protoc` は不要です。

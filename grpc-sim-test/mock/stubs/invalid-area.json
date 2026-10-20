@@ -1,0 +1,13 @@
+{
+  "service": "SimService",
+  "method": "ExecSimulation",
+  "input": {
+    "equals": {
+      "job_id": 303
+    }
+  },
+  "output": {
+    "error": "area bounds are reversed or too small",
+    "code": 3
+  }
+}

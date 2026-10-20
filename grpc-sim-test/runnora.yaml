@@ -11,9 +11,17 @@ environments:
     description: Go 製衝突シミュレーション gRPC サーバ
     vars:
       GRPC_ADDR: "127.0.0.1:19091"
+  mock:
+    description: GripMock の gRPC モック
+    vars:
+      GRPC_ADDR: "127.0.0.1:4770"
 
 suites:
   grpc-sim:
+    select:
+      paths: [runbooks/*.yml]
+  grpc-sim-mock:
+    env: mock
     select:
       paths: [runbooks/*.yml]
 
